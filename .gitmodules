@@ -2,53 +2,53 @@
 	path = src/tree-sitter
 	url = https://github.com/tonyfettes/tree-sitter.git
 [submodule "grammars/tree-sitter-json"]
-	path = grammars/tree-sitter-json
+	path = src/grammars/tree-sitter-json
 	url = https://github.com/tree-sitter/tree-sitter-json.git
 [submodule "grammars/tree-sitter-c"]
-	path = grammars/tree-sitter-c
+	path = src/grammars/tree-sitter-c
 	url = https://github.com/tree-sitter/tree-sitter-c.git
 [submodule "grammars/tree-sitter-markdown"]
-	path = grammars/tree-sitter-markdown
+	path = src/grammars/tree-sitter-markdown
 	url = https://github.com/tree-sitter-grammars/tree-sitter-markdown
 [submodule "grammars/tree-sitter-moonbit"]
-	path = grammars/tree-sitter-moonbit
+	path = src/grammars/tree-sitter-moonbit
 	url = https://github.com/moonbitlang/tree-sitter-moonbit
 [submodule "grammars/tree-sitter-yaml"]
-	path = grammars/tree-sitter-yaml
+	path = src/grammars/tree-sitter-yaml
 	url = https://github.com/tree-sitter-grammars/tree-sitter-yaml
 [submodule "grammars/tree-sitter-query"]
-	path = grammars/tree-sitter-query
+	path = src/grammars/tree-sitter-query
 	url = https://github.com/tree-sitter-grammars/tree-sitter-query
 [submodule "grammars/tree-sitter-javascript"]
-	path = grammars/tree-sitter-javascript
+	path = src/grammars/tree-sitter-javascript
 	url = https://github.com/tree-sitter/tree-sitter-javascript
 [submodule "grammars/tree-sitter-go"]
-	path = grammars/tree-sitter-go
+	path = src/grammars/tree-sitter-go
 	url = https://github.com/tree-sitter/tree-sitter-go
 [submodule "grammars/tree-sitter-python"]
-	path = grammars/tree-sitter-python
+	path = src/grammars/tree-sitter-python
 	url = https://github.com/tree-sitter/tree-sitter-python
 [submodule "grammars/tree-sitter-java"]
-	path = grammars/tree-sitter-java
+	path = src/grammars/tree-sitter-java
 	url = https://github.com/tree-sitter/tree-sitter-java
 [submodule "grammars/tree-sitter-html"]
-	path = grammars/tree-sitter-html
+	path = src/grammars/tree-sitter-html
 	url = https://github.com/tree-sitter/tree-sitter-html
 [submodule "grammars/tree-sitter-typescript"]
-	path = grammars/tree-sitter-typescript
+	path = src/grammars/tree-sitter-typescript
 	url = https://github.com/tree-sitter/tree-sitter-typescript
 [submodule "grammars/tree-sitter-rust"]
-	path = grammars/tree-sitter-rust
+	path = src/grammars/tree-sitter-rust
 	url = https://github.com/tree-sitter/tree-sitter-rust
 [submodule "grammars/tree-sitter-ocaml"]
-	path = grammars/tree-sitter-ocaml
+	path = src/grammars/tree-sitter-ocaml
 	url = https://github.com/tree-sitter/tree-sitter-ocaml
 [submodule "grammars/tree-sitter-swift"]
-	path = grammars/tree-sitter-swift
+	path = src/grammars/tree-sitter-swift
 	url = https://github.com/alex-pinkus/tree-sitter-swift
 [submodule "grammars/tree-sitter-css"]
-	path = grammars/tree-sitter-css
+	path = src/grammars/tree-sitter-css
 	url = https://github.com/tree-sitter/tree-sitter-css
 [submodule "grammars/tree-sitter-cpp"]
-	path = grammars/tree-sitter-cpp
+	path = src/grammars/tree-sitter-cpp
 	url = https://github.com/tree-sitter/tree-sitter-cpp
