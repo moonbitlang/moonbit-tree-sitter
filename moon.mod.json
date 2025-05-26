@@ -8,7 +8,8 @@
     "tonyfettes/tree_sitter_moonbit": "0.1.20",
     "tonyfettes/tree_sitter_json": "0.1.16",
     "tonyfettes/tree_sitter_markdown": "0.1.16",
-    "tonyfettes/tree_sitter_yaml": "0.1.16"
+    "tonyfettes/tree_sitter_yaml": "0.1.16",
+    "tonyfettes/uv": "0.5.0"
   },
   "readme": "README.md",
   "repository": "https://github.com/tonyfettes/moonbit-tree-sitter",
