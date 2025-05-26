@@ -64,17 +64,11 @@ class Project:
     def copy(
         self,
         source: Path,
-        prefix: Optional[Path] = None,
-        suffix: Optional[Path] = None,
         relocate: bool = True,
         condition: Optional[str] = None,
     ):
         target = self.mangle(source)
         content = (self.source / source).read_text(encoding="utf-8")
-        if prefix is not None:
-            content = prefix.read_text() + content
-        if suffix is not None:
-            content = content + suffix.read_text()
         if relocate:
             content = self.relocate(source, content)
         if condition is not None:
@@ -85,7 +79,7 @@ class Project:
 
 
 def configure(project: Project):
-    project.copy(Path("lib") / "src" / "lib.c", suffix=Path("src") / "tree-sitter.c")
+    project.copy(Path("lib") / "src" / "lib.c")
 
 
 def main():

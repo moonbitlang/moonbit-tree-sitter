@@ -51,7 +51,7 @@
     "tonyfettes/tree_sitter/sexp"
   ],
   "supported-targets": ["native"],
-  "native-stub": ["tree-sitter#lib#src#lib.c"],
+  "native-stub": ["tree-sitter.c"],
   "test-import": [
     "tonyfettes/tree_sitter_moonbit",
     "tonyfettes/tree_sitter_json",

@@ -34,10 +34,7 @@ def copy_source(src: Path, dst: Path):
                 continue
             if file.name == "moon.pkg.json":
                 continue
-            if native_stub and file.name in native_stub:
-                shutil.copy(file, dst_pkg / file.name)
-                continue
-            if ".h" in file.suffixes:
+            if ".c" in file.suffixes or ".h" in file.suffixes:
                 shutil.copy(file, dst_pkg / file.name)
                 continue
             if ".mbt" in file.suffixes:
