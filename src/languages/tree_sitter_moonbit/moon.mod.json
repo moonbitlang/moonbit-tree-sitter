@@ -1,6 +1,6 @@
 {
   "name": "tonyfettes/tree_sitter_moonbit",
-  "version": "0.1.19",
+  "version": "0.1.20",
   "deps": {
     "tonyfettes/tree_sitter_language": "0.1.1"
   },
