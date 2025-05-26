@@ -1,12 +1,12 @@
 [submodule "src/tree-sitter"]
 	path = src/tree-sitter
-	url = https://github.com/tree-sitter/tree-sitter.git
+	url = https://github.com/tree-sitter/tree-sitter
 [submodule "grammars/tree-sitter-json"]
 	path = src/grammars/tree-sitter-json
-	url = https://github.com/tree-sitter/tree-sitter-json.git
+	url = https://github.com/tree-sitter/tree-sitter-json
 [submodule "grammars/tree-sitter-c"]
 	path = src/grammars/tree-sitter-c
-	url = https://github.com/tree-sitter/tree-sitter-c.git
+	url = https://github.com/tree-sitter/tree-sitter-c
 [submodule "grammars/tree-sitter-markdown"]
 	path = src/grammars/tree-sitter-markdown
 	url = https://github.com/tree-sitter-grammars/tree-sitter-markdown
@@ -45,7 +45,7 @@
 	url = https://github.com/tree-sitter/tree-sitter-ocaml
 [submodule "grammars/tree-sitter-swift"]
 	path = src/grammars/tree-sitter-swift
-	url = https://github.com/alex-pinkus/tree-sitter-swift
+	url = https://github.com/tonyfettes/tree-sitter-swift
 [submodule "grammars/tree-sitter-css"]
 	path = src/grammars/tree-sitter-css
 	url = https://github.com/tree-sitter/tree-sitter-css
