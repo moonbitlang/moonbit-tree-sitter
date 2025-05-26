@@ -4,15 +4,22 @@ import json
 import subprocess
 
 
+def collect_package(path: Path) -> list[str]:
+    if path.name == ".mooncakes":
+        return []
+    if (path / "moon.mod.json").exists():
+        return []
+    if (path / "moon.pkg.json").exists():
+        pkgs = [path]
+        for entry in path.iterdir():
+            if entry.is_dir():
+                pkgs.extend(collect_package(entry))
+        return pkgs
+    return []
+
+
 def copy_source(src: Path, dst: Path):
-    pkgs: list[Path] = []
-    for moon_pkg_json in src.rglob("moon.pkg.json"):
-        pkg = moon_pkg_json.parent
-        if (pkg / "moon.mod.json").exists():
-            continue
-        if ".mooncakes" in pkg.parts:
-            continue
-        pkgs.append(pkg)
+    pkgs: list[Path] = collect_package(src)
     for pkg in pkgs:
         print(f"Copying package {pkg}")
         moon_pkg_json = json.loads((pkg / "moon.pkg.json").read_text())
@@ -57,11 +64,6 @@ def main():
             name.startswith("tonyfettes/tree_sitter_")
             and name != "tonyfettes/tree_sitter_language"
         ):
-            continue
-        if "path" in spec:
-            dep_path = Path(spec["path"])
-            dep_moon_mod_json = json.loads((dep_path / "moon.mod.json").read_text())
-            clean_deps[name] = dep_moon_mod_json["version"]
             continue
         clean_deps[name] = spec
     moon_mod_json["deps"] = clean_deps
