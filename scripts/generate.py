@@ -351,7 +351,7 @@ def main():
         else:
             # Multiple grammars case
             futures = []
-            for path in Path("grammars").iterdir():
+            for path in Path("src", "grammars").iterdir():
                 if not path.is_dir():
                     continue
 
