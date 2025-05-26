@@ -37,6 +37,9 @@ def copy_source(src: Path, dst: Path):
             if native_stub and file.name in native_stub:
                 shutil.copy(file, dst_pkg / file.name)
                 continue
+            if ".h" in file.suffixes:
+                shutil.copy(file, dst_pkg / file.name)
+                continue
             if ".mbt" in file.suffixes:
                 if file.stem.endswith("_test"):
                     continue
@@ -53,7 +56,10 @@ def main():
     moon_mod_json = json.loads(Path("moon.mod.json").read_text())
     clean_deps = {}
     for name, spec in moon_mod_json.get("deps", {}).items():
-        if name.startswith("tonyfettes/tree_sitter_") and name != "tonyfettes/tree_sitter_language":
+        if (
+            name.startswith("tonyfettes/tree_sitter_")
+            and name != "tonyfettes/tree_sitter_language"
+        ):
             continue
         if "path" in spec:
             dep_path = Path(spec["path"])
