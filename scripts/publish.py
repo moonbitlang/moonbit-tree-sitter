@@ -2,22 +2,46 @@ import shutil
 from pathlib import Path
 import json
 import subprocess
-import re
 
 
-def remove_pre_build(path: Path):
-    moon_pkg_json = json.loads(path.read_text())
-    if "pre-build" in moon_pkg_json:
-        moon_pkg_json.pop("pre-build")
-        path.write_text(json.dumps(moon_pkg_json, indent=2))
-
-
-def set_targets(path: Path, sources: list[Path]):
-    moon_pkg_json = json.loads(path.read_text())
-    moon_pkg_json["targets"] = {}
-    for source in sources:
-        moon_pkg_json["targets"][source.name] = ["native"]
-    path.write_text(json.dumps(moon_pkg_json, indent=2))
+def copy_source(src: Path, dst: Path):
+    pkgs: list[Path] = []
+    for moon_pkg_json in src.rglob("moon.pkg.json"):
+        pkg = moon_pkg_json.parent
+        if (pkg / "moon.mod.json").exists():
+            continue
+        if ".mooncakes" in pkg.parts:
+            continue
+        pkgs.append(pkg)
+    for pkg in pkgs:
+        print(f"Copying package {pkg}")
+        moon_pkg_json = json.loads((pkg / "moon.pkg.json").read_text())
+        if "pre-build" in moon_pkg_json:
+            moon_pkg_json.pop("pre-build")
+        if "test-import" in moon_pkg_json:
+            moon_pkg_json.pop("test-import")
+        dst_pkg = dst / pkg
+        dst_pkg.mkdir(parents=True, exist_ok=True)
+        (dst_pkg / "moon.pkg.json").write_text(
+            json.dumps(moon_pkg_json, indent=2, ensure_ascii=False) + "\n",
+            encoding="utf-8",
+        )
+        native_stub = (
+            moon_pkg_json["native-stub"] if "native-stub" in moon_pkg_json else None
+        )
+        for file in pkg.iterdir():
+            if not file.is_file():
+                continue
+            if file.name == "moon.pkg.json":
+                continue
+            if native_stub and file.name in native_stub:
+                shutil.copy(file, dst_pkg / file.name)
+                continue
+            if ".mbt" in file.suffixes:
+                if file.stem.endswith("_test"):
+                    continue
+                else:
+                    shutil.copy(file, dst / file)
 
 
 def main():
@@ -26,30 +50,36 @@ def main():
         shutil.rmtree("publish")
 
     publish_path.mkdir()
-    shutil.copy("moon.mod.json", publish_path / "moon.mod.json")
+    moon_mod_json = json.loads(Path("moon.mod.json").read_text())
+    clean_deps = {}
+    for name, spec in moon_mod_json.get("deps", {}).items():
+        if name.startswith("tonyfettes/tree_sitter_") and name != "tonyfettes/tree_sitter_language":
+            continue
+        if "path" in spec:
+            dep_path = Path(spec["path"])
+            dep_moon_mod_json = json.loads((dep_path / "moon.mod.json").read_text())
+            clean_deps[name] = dep_moon_mod_json["version"]
+            continue
+        clean_deps[name] = spec
+    moon_mod_json["deps"] = clean_deps
+    (publish_path / "moon.mod.json").write_text(
+        json.dumps(
+            moon_mod_json,
+            indent=2,
+            ensure_ascii=False,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
     shutil.copy("README.md", publish_path / "README.md")
     shutil.copy("LICENSE", publish_path / "LICENSE")
-    shutil.copytree("src", publish_path / "src")
-    for path in (publish_path / "src").rglob("moon.pkg.json"):
-        remove_pre_build(path)
-    shutil.rmtree(publish_path / "src" / "tree-sitter")
-    shutil.rmtree(publish_path / "src" / "grammar" / "moonbit")
-    for test_path in (publish_path / "src").rglob("*_test.mbt"):
-        test_path.unlink()
-    sources = []
-    for source in (publish_path / "src").glob("*.mbt"):
-        sources.append(source)
-    set_targets(publish_path / "src" / "moon.pkg.json", sources)
-    (publish_path / "src" / ".gitignore").unlink()
-    (publish_path / "src" / "tree-sitter.c").unlink()
+    copy_source(Path("src"), publish_path)
 
     subprocess.run(
         ["moon", "check", "--target", "native"], cwd=publish_path, check=True
     )
     shutil.rmtree(publish_path / ".mooncakes")
     shutil.rmtree(publish_path / "target")
-
-    subprocess.run(["moon", "publish"], cwd=publish_path)
 
 
 if __name__ == "__main__":
