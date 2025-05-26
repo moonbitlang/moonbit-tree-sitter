@@ -1,6 +1,6 @@
 {
   "name": "tonyfettes/tree_sitter",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "deps": {
     "tonyfettes/tree_sitter_language": {
       "path": "src/language"
