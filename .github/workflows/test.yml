@@ -44,6 +44,7 @@ jobs:
           moon add tonyfettes/tree_sitter_language
           moon add tonyfettes/tree_sitter_json
           moon add tonyfettes/tree_sitter_markdown
+          moon add tonyfettes/tree_sitter_moonbit
           moon add tonyfettes/tree_sitter_yaml
 
       - name: Setup MSVC
