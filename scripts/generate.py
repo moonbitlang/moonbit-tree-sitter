@@ -327,7 +327,7 @@ def main():
     parser.add_argument(
         "path",
         type=Path,
-        nargs="?",
+        nargs="*",  # accept multiple paths
         default=None,
         help="Path to the grammars directory",
     )
@@ -341,30 +341,30 @@ def main():
 
     # Create a thread pool executor
     with concurrent.futures.ThreadPoolExecutor(max_workers=args.workers) as executor:
+        futures = []
         if args.path:
-            # Single grammar case
-            future = executor.submit(generate_binding, args.path, Path("src", "languages"))
-            try:
-                future.result()  # Wait for completion and propagate any exceptions
-            except Exception as e:
-                logger.error(f"Error generating binding for {args.path}: {e}")
+            # Process each path provided
+            for p in args.path:
+                future = executor.submit(generate_binding, p, Path("src", "languages"))
+                futures.append((p, future))
         else:
-            # Multiple grammars case
-            futures = []
-            for path in Path("src", "grammars").iterdir():
-                if not path.is_dir():
+            # Multiple grammars case (default behavior when no path is specified)
+            for path_item in Path("src", "grammars").iterdir():
+                if not path_item.is_dir():
                     continue
 
                 # Submit each grammar to the thread pool
-                future = executor.submit(generate_binding, path, Path("src", "languages"))
-                futures.append((path, future))
+                future = executor.submit(
+                    generate_binding, path_item, Path("src", "languages")
+                )
+                futures.append((path_item, future))
 
-            # Wait for all futures to complete and handle any exceptions
-            for path, future in futures:
-                try:
-                    future.result()
-                except Exception as e:
-                    logger.error(f"Error generating binding for {path}: {e}")
+        # Wait for all futures to complete and handle any exceptions
+        for path_item, future in futures:
+            try:
+                future.result()
+            except Exception as e:
+                logger.error(f"Error generating binding for {path_item}: {e}")
 
 
 if __name__ == "__main__":

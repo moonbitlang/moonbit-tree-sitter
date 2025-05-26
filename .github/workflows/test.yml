@@ -39,6 +39,13 @@ jobs:
       - name: Update mooncakes.io index
         run: moon update
 
+      - name: Install mooncakes.io dependencies
+        run: |
+          moon add tonyfettes/tree_sitter_language
+          moon add tonyfettes/tree_sitter_json
+          moon add tonyfettes/tree_sitter_markdown
+          moon add tonyfettes/tree_sitter_yaml
+
       - name: Setup MSVC
         if: ${{ matrix.os == 'windows-latest' }}
         uses: ilammy/msvc-dev-cmd@v1
