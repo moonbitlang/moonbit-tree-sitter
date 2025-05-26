@@ -1,5 +1,5 @@
 ///|
-enum Prec {
+enum PrecType {
   NonAssoc
   Left
   Right
@@ -7,23 +7,52 @@ enum Prec {
 } derive(Eq, Hash)
 
 ///|
-impl Show for Prec with to_string(self) {
+impl Show for PrecType with to_string(self) {
   match self {
-    Prec::NonAssoc => "PREC"
-    Prec::Left => "PREC_LEFT"
-    Prec::Right => "PREC_RIGHT"
-    Prec::Dynamic => "PREC_DYNAMIC"
+    PrecType::NonAssoc => "PREC"
+    PrecType::Left => "PREC_LEFT"
+    PrecType::Right => "PREC_RIGHT"
+    PrecType::Dynamic => "PREC_DYNAMIC"
   }
 }
 
 ///|
-impl Show for Prec with output(self, logger) {
+impl Show for PrecType with output(self, logger) {
   logger.write_string(self.to_string())
 }
 
 ///|
-impl ToJson for Prec with to_json(self) {
+impl ToJson for PrecType with to_json(self) {
   self.to_string().to_json()
+}
+
+///|
+enum PrecValue {
+  Number(Int)
+  String(String)
+} derive(Show, Hash, Eq)
+
+///|
+impl ToJson for PrecValue with to_json(self : PrecValue) -> Json {
+  match self {
+    PrecValue::Number(value) => value.to_json()
+    PrecValue::String(value) => value.to_json()
+  }
+}
+
+///|
+impl @json.FromJson for PrecValue with from_json(
+  json : Json,
+  json_path : @json.JsonPath
+) -> PrecValue!@json.JsonDecodeError {
+  match json {
+    Number(value) => PrecValue::Number(value.to_int())
+    String(value) => PrecValue::String(value)
+    _ => {
+      let message = "PrecValue::from_json: expected number or string, got \{json}"
+      raise @json.JsonDecodeError((json_path, message))
+    }
+  }
 }
 
 ///|
@@ -38,109 +67,12 @@ pub enum Rule {
   Seq(Array[Rule])
   Field(name~ : String, Rule)
   Token(immediate~ : Bool, Rule)
-  Prec(prec~ : Prec, value~ : Int, Rule)
+  Prec(prec~ : PrecType, value~ : PrecValue, Rule)
   Pattern(String)
-} derive(Show)
+} derive(Show, Hash, Eq)
 
 ///|
-pub impl Eq for Rule with op_equal(self : Rule, other : Rule) -> Bool {
-  match (self, other) {
-    (Alias(named=named1, alias1, rule1), Alias(named=named2, alias2, rule2)) =>
-      named1 == named2 && alias1 == alias2 && rule1 == rule2
-    (Alias(_, ..), _) => false
-    (Blank, Blank) => true
-    (Blank, _) => false
-    (Symbol(name1), Symbol(name2)) => name1 == name2
-    (Symbol(_), _) => false
-    (String(value1), String(value2)) => value1 == value2
-    (String(_), _) => false
-    (Repeat(rule1), Repeat(rule2)) => rule1 == rule2
-    (Repeat(_), _) => false
-    (Repeat1(rule1), Repeat1(rule2)) => rule1 == rule2
-    (Repeat1(_), _) => false
-    (Choice(rules1), Choice(rules2)) => rules1 == rules2
-    (Choice(_, ..), _) => false
-    (Seq(rules1), Seq(rules2)) => rules1 == rules2
-    (Seq(_, ..), _) => false
-    (Field(name=name1, rule1), Field(name=name2, rule2)) =>
-      name1 == name2 && rule1 == rule2
-    (Field(_, ..), _) => false
-    (Token(immediate=imm1, rule1), Token(immediate=imm2, rule2)) =>
-      imm1 == imm2 && rule1 == rule2
-    (Token(_, ..), _) => false
-    (
-      Prec(prec=prec1, value=value1, rule1),
-      Prec(prec=prec2, value=value2, rule2),
-    ) => prec1 == prec2 && value1 == value2 && rule1 == rule2
-    (Prec(_, ..), _) => false
-    (Pattern(value1), Pattern(value2)) => value1 == value2
-    (Pattern(_, ..), _) => false
-  }
-}
-
-///|
-pub impl Hash for Rule with hash_combine(self, hasher) {
-  match self {
-    Alias(named~, value, rule) => {
-      hasher.combine_int(0)
-      hasher.combine_bool(named)
-      hasher.combine_string(value)
-      hasher.combine(rule)
-    }
-    Blank => hasher.combine_int(1)
-    Symbol(name) => {
-      hasher.combine_int(2)
-      hasher.combine_string(name)
-    }
-    String(value) => {
-      hasher.combine_int(3)
-      hasher.combine_string(value)
-    }
-    Repeat(rule) => {
-      hasher.combine_int(4)
-      hasher.combine(rule)
-    }
-    Repeat1(rule) => {
-      hasher.combine_int(5)
-      hasher.combine(rule)
-    }
-    Choice(rules) => {
-      hasher.combine_int(6)
-      for rule in rules {
-        hasher.combine(rule)
-      }
-    }
-    Seq(rules) => {
-      hasher.combine_int(7)
-      for rule in rules {
-        hasher.combine(rule)
-      }
-    }
-    Field(name~, rule) => {
-      hasher.combine_int(8)
-      hasher.combine_string(name)
-      hasher.combine(rule)
-    }
-    Token(immediate~, rule) => {
-      hasher.combine_int(9)
-      hasher.combine_bool(immediate)
-      hasher.combine(rule)
-    }
-    Prec(prec~, value~, rule) => {
-      hasher.combine_int(10)
-      hasher.combine(prec)
-      hasher.combine_int(value)
-      hasher.combine(rule)
-    }
-    Pattern(value) => {
-      hasher.combine_int(11)
-      hasher.combine(value)
-    }
-  }
-}
-
-///|
-fn Rule::visit_rule[E : Error](
+fn[E : Error] Rule::visit_rule(
   self : Rule,
   visitor : (Rule) -> Unit!E
 ) -> Unit!E {
@@ -222,15 +154,15 @@ impl @json.FromJson for Rule with from_json(
       Rule::Field(name~, Rule::from_json!(rule, json_path.add_key("content")))
     {
       "type": String([.. "PREC", .. suffix]),
-      "value": Number(value),
+      "value": value,
       "content": rule,
       ..
     } => {
       let prec = match suffix {
-        [.. ""] => Prec::NonAssoc
-        [.. "_LEFT"] => Prec::Left
-        [.. "_RIGHT"] => Prec::Right
-        [.. "_DYNAMIC"] => Prec::Dynamic
+        [.. ""] => PrecType::NonAssoc
+        [.. "_LEFT"] => PrecType::Left
+        [.. "_RIGHT"] => PrecType::Right
+        [.. "_DYNAMIC"] => PrecType::Dynamic
         suffix => {
           let message = "Rule::from_json: invalid precedence type \"PREC\{suffix}\""
           raise @json.JsonDecodeError((json_path, message))
@@ -238,11 +170,19 @@ impl @json.FromJson for Rule with from_json(
       }
       Rule::Prec(
         prec~,
-        value=value.to_int(),
+        value=value |> @json.from_json!(path=json_path.add_key("value")),
         Rule::from_json!(rule, json_path.add_key("content")),
       )
     }
     { "type": "PATTERN", "value": String(value), .. } => Rule::Pattern(value)
+    { "type": String(type_), .. } => {
+      let message = "Rule::from_json: unknown rule type \"\{type_}\""
+      raise @json.JsonDecodeError((json_path, message))
+    }
+    { "type": type_, .. } => {
+      let message = "Rule::from_json: expected object with \"type\" field, got \{type_}"
+      raise @json.JsonDecodeError((json_path, message))
+    }
     json => {
       let message = "Rule::from_json: expected object with \"type\" field, got \{json}"
       raise @json.JsonDecodeError((json_path, message))
@@ -308,16 +248,22 @@ impl ToJson for RuleName with to_json(self : RuleName) -> Json {
 
 ///|
 pub struct Grammar {
+  schema : String
   name : String
   rules : Map[String, Rule]
   extras : Array[Rule]
   supertypes : Array[RuleName]
   reserved : Map[String, Rule]
+  precedences : Array[Array[Rule]]
   externals : Array[Rule]
   inline : Array[RuleName]
   conflicts : Array[Array[RuleName]]
   word : RuleName?
-} derive(@json.FromJson(fields(reserved(default={}))), Show, ToJson)
+} derive (
+  @json.FromJson(fields(schema(rename="$schema"), reserved(default={}))),
+  Show,
+  ToJson(fields(schema(rename="$schema"))),
+)
 
 ///|
 type! GrammarParseError {
@@ -327,9 +273,7 @@ type! GrammarParseError {
 
 ///|
 pub fn Grammar::from_json(json : Json) -> Grammar!GrammarParseError {
-  let grammar : Grammar = try {
-    @json.from_json!(json)
-  } catch {
+  let grammar : Grammar = try @json.from_json!(json) catch {
     error => raise JsonDecodeError(error)
   }
   for _, rule in grammar.rules {
