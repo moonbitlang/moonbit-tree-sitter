@@ -16,7 +16,11 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-MOON_HOME = Path(os.getenv("MOON_HOME"))
+MOON_HOME = os.getenv("MOON_HOME", None)
+if MOON_HOME is None:
+    MOON_HOME = Path.home() / ".moon"
+else:
+    MOON_HOME = Path(MOON_HOME)
 VERSION = "0.1.16"
 
 
@@ -81,25 +85,18 @@ class Grammar:
         self.file_types = file_types
 
     def tree_sitter_generate(self):
-        subprocess.run(["tree-sitter", "generate"], cwd=self.path, check=True)
+        subprocess.run(
+            ["tree-sitter", "generate"], cwd=self.path, check=True, capture_output=True
+        )
 
     def tree_sitter_build_wasm(self):
-        subprocess.run(["tree-sitter", "build", "--wasm"], cwd=self.path, check=True)
+        subprocess.run(
+            ["tree-sitter", "build", "--wasm"],
+            cwd=self.path,
+            check=True,
+            capture_output=True,
+        )
         return list(self.path.glob("*.wasm"))[0]
-
-    def git_clean(self):
-        subprocess.run(
-            ["git", "clean", "-fdX"],
-            cwd=self.path,
-            check=True,
-            capture_output=True,
-        )
-        subprocess.run(
-            ["git", "reset", "--hard"],
-            cwd=self.path,
-            check=True,
-            capture_output=True,
-        )
 
     def generate_gitignore_to(self, destination: Path):
         content = "\n".join(self.files) + "\n"
@@ -233,7 +230,6 @@ pub extern "c" fn language() -> @tree_sitter_language.Language = "{function_name
             destination / "moon.mod.json", version, wasm=wasm_path.name
         )
         self.generate_moon_pkg_json_to(destination / "moon.pkg.json")
-        self.git_clean()
 
 
 def git_submodule_url(path: Path) -> str:
@@ -265,62 +261,102 @@ def git_submodule_commit(path: Path) -> str:
     return commit
 
 
+def git_clean(path: Path):
+    try:
+        subprocess.run(
+            ["git", "clean", "-fd"],
+            cwd=path,
+            check=True,
+            capture_output=True,
+        )
+        subprocess.run(
+            ["git", "clean", "-fdX"],
+            cwd=path,
+            check=True,
+            capture_output=True,
+        )
+        subprocess.run(
+            ["git", "reset", "--hard"],
+            cwd=path,
+            check=True,
+            capture_output=True,
+        )
+    except subprocess.CalledProcessError as e:
+        raise RuntimeError(f"Failed to clean git repository at {path}: {e}")
+
+
 def generate_binding(project: Path, bindings: Path):
     if not project.exists():
         raise FileNotFoundError(f"{project} does not exist")
 
-    tree_sitter_path = project / "tree-sitter.json"
-    if not tree_sitter_path.exists():
-        raise FileNotFoundError(f"{tree_sitter_path} does not exist")
-    if (project / "package.json").exists():
-        try:
-            subprocess.run(["npm", "install"], cwd=project, check=True, capture_output=True)
-        except subprocess.CalledProcessError as e:
-            pass
-    tree_sitter_dict = json.loads(tree_sitter_path.read_text())
-    metadata_dict = tree_sitter_dict["metadata"]
-    metadata_links_dict = metadata_dict["links"]
-    submodule_commit = git_submodule_commit(project)
-    metadata = Metadata(
-        version=metadata_dict["version"],
-        license=metadata_dict["license"],
-        description=metadata_dict["description"],
-        repository=metadata_links_dict["repository"],
-        commit=submodule_commit,
-    )
-    grammars = tree_sitter_dict["grammars"]
-    for grammar_dict in grammars:
-        grammar_name = grammar_dict["name"]
-        grammar_path = "."
-        if "path" in grammar_dict:
-            grammar_path = grammar_dict["path"]
-        grammar_path: Path = project / grammar_path
-        grammar_external_files = []
-        for external_file in (
-            grammar_dict["external-files"] if "external-files" in grammar_dict else []
-        ):
-            external_file_path: Path = project / external_file
-            if not external_file_path.exists():
-                raise FileNotFoundError(
-                    f"{external_file_path} does not exist, but is listed in tree-sitter.json"
+    try:
+        tree_sitter_path = project / "tree-sitter.json"
+        if not tree_sitter_path.exists():
+            raise FileNotFoundError(f"{tree_sitter_path} does not exist")
+        if (project / "package.json").exists():
+            logger.info(f"Installing npm dependencies for {project}")
+            try:
+                subprocess.run(
+                    ["npm", "install"], cwd=project, check=True, capture_output=True
                 )
-            grammar_external_files.append(external_file_path)
-        grammar_dict = Grammar(
-            name=grammar_name,
-            path=grammar_path,
-            external_files=grammar_external_files,
-            file_types=(
-                grammar_dict["file-types"] if "file-types" in grammar_dict else []
-            ),
-            metadata=metadata,
+            except subprocess.CalledProcessError as e:
+                pass
+        tree_sitter_dict = json.loads(tree_sitter_path.read_text())
+        metadata_dict = tree_sitter_dict["metadata"]
+        metadata_links_dict = metadata_dict["links"]
+        submodule_commit = git_submodule_commit(project)
+        metadata = Metadata(
+            version=metadata_dict["version"],
+            license=metadata_dict["license"],
+            description=metadata_dict["description"],
+            repository=metadata_links_dict["repository"],
+            commit=submodule_commit,
         )
-        binding_root: Path = (bindings / f"tree_sitter_{grammar_name}").resolve()
-        logger.info(f"Generating binding for {grammar_name}")
-        grammar_dict.generate_binding_to(binding_root)
+        grammars = tree_sitter_dict["grammars"]
+        for grammar_dict in grammars:
+            grammar_name = grammar_dict["name"]
+            grammar_path = "."
+            if "path" in grammar_dict:
+                grammar_path = grammar_dict["path"]
+            grammar_path: Path = project / grammar_path
+            grammar_external_files = []
+            for external_file in (
+                grammar_dict["external-files"]
+                if "external-files" in grammar_dict
+                else []
+            ):
+                external_file_path: Path = project / external_file
+                if not external_file_path.exists():
+                    raise FileNotFoundError(
+                        f"{external_file_path} does not exist, but is listed in tree-sitter.json"
+                    )
+                grammar_external_files.append(external_file_path)
+            grammar_dict = Grammar(
+                name=grammar_name,
+                path=grammar_path,
+                external_files=grammar_external_files,
+                file_types=(
+                    grammar_dict["file-types"] if "file-types" in grammar_dict else []
+                ),
+                metadata=metadata,
+            )
+            binding_root: Path = (bindings / f"tree_sitter_{grammar_name}").resolve()
+            logger.info(f"Generating binding for {grammar_name}")
+            grammar_dict.generate_binding_to(binding_root)
 
-        subprocess.run(
-            ["moon", "build", "--target", "native"], cwd=binding_root, check=True
-        )
+            logger.info(f"Building binding for {grammar_name}")
+            subprocess.run(
+                ["moon", "build", "--target", "native"],
+                cwd=binding_root,
+                check=True,
+                capture_output=True,
+            )
+    except Exception as e:
+        logger.error(f"Error generating binding for {project}: {e}")
+        raise e
+    finally:
+        logger.info(f"Finished generating binding for {grammar_name}, cleaning")
+        git_clean(project)
 
 
 def main():
