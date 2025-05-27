@@ -94,6 +94,12 @@ jobs:
     runs-on: ${{ matrix.os }}
     continue-on-error: false
     steps:
+      - name: Cache git
+        uses: actions/cache@v4
+        with:
+          path: .git
+          key: git-${{ github.sha }}
+
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
