@@ -16,7 +16,11 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-MOON_HOME = Path(os.getenv("MOON_HOME"))
+MOON_HOME = os.getenv("MOON_HOME", None)
+if MOON_HOME is None:
+    MOON_HOME = Path.home() / ".moon"
+else:
+    MOON_HOME = Path(MOON_HOME)
 VERSION = "0.1.16"
 
 
