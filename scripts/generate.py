@@ -273,7 +273,10 @@ def generate_binding(project: Path, bindings: Path):
     if not tree_sitter_path.exists():
         raise FileNotFoundError(f"{tree_sitter_path} does not exist")
     if (project / "package.json").exists():
-        subprocess.run(["npm", "install"], cwd=project, check=True, capture_output=True)
+        try:
+            subprocess.run(["npm", "install"], cwd=project, check=True, capture_output=True)
+        except subprocess.CalledProcessError as e:
+            pass
     tree_sitter_dict = json.loads(tree_sitter_path.read_text())
     metadata_dict = tree_sitter_dict["metadata"]
     metadata_links_dict = metadata_dict["links"]

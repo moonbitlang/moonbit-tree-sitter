@@ -1,5 +1,0 @@
-grammar.json
-node-types.json
-parser.c
-scanner.c
-tree_sitter
