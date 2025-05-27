@@ -355,6 +355,7 @@ def generate_binding(project: Path, bindings: Path):
         logger.error(f"Error generating binding for {project}: {e}")
         raise e
     finally:
+        logger.info(f"Finished generating binding for {grammar_name}, cleaning")
         git_clean(project)
 
 
