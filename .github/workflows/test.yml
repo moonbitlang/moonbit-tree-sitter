@@ -32,6 +32,12 @@ jobs:
     runs-on: ubuntu-latest
     continue-on-error: false
     steps:
+      - name: Cache git
+        uses: actions/cache@v4
+        with:
+          path: .git
+          key: git-${{ github.sha }}
+
       - uses: actions/checkout@v4
         with:
           submodules: true
@@ -54,12 +60,19 @@ jobs:
       - name: Update mooncakes.io index
         run: moon update
 
+      - name: Get submodule commit SHA
+        id: submodule-sha
+        run: |
+          grammar_path=src/grammars/tree-sitter-${{ matrix.grammar }}
+          sha=$(git submodule status "$grammar_path" | awk '{print $1}')
+          echo "sha=$sha" >> $GITHUB_OUTPUT
+
       - name: Cache bindings
         id: cache-bindings
         uses: actions/cache@v4
         with:
           path: src/languages
-          key: ${{ matrix.grammar }}
+          key: tree-sitter-${{ matrix.grammar }}-${{ steps.submodule-sha.outputs.sha }}
 
       - name: Generate bindings
         if: steps.cache-bindings.outputs.cache-hit != 'true'
