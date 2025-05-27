@@ -7,6 +7,65 @@ on:
     branches: ["main"]
 
 jobs:
+  bind:
+    strategy:
+      matrix:
+        grammar:
+          - "c"
+          - "cpp"
+          - "css"
+          - "go"
+          - "html"
+          - "java"
+          - "javascript"
+          - "json"
+          - "markdown"
+          - "moonbit"
+          - "ocaml"
+          - "python"
+          - "query"
+          - "rust"
+          - "swift"
+          - "typescript"
+          - "yaml"
+      fail-fast: false
+    runs-on: ubuntu-latest
+    continue-on-error: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Install MoonBit
+        run: |
+          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
+          echo "$HOME/.moon/bin" >> $GITHUB_PATH
+
+      - name: Inspect MoonBit version
+        run: |
+          moon version --all
+          moonrun --version
+
+      - name: Update mooncakes.io index
+        run: moon update
+
+      - name: Cache bindings
+        id: cache-bindings
+        uses: actions/cache@v4
+        with:
+          path: src/languages
+          key: ${{ matrix.grammar }}
+
+      - name: Generate bindings
+        if: steps.cache-bindings.outputs.cache-hit != 'true'
+        run: python3 scripts/generate.py src/grammars/tree-sitter-${{ matrix.grammar }}
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          path: src/languages
+          name: bindings-${{ matrix.grammar }}
+
   test:
     strategy:
       matrix:
@@ -15,7 +74,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     continue-on-error: false
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
           submodules: true
 
@@ -42,6 +102,12 @@ jobs:
       - name: Setup MSVC
         if: ${{ matrix.os == 'windows-latest' }}
         uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+          path: src/languages
 
       - name: Run tests
         run: |
