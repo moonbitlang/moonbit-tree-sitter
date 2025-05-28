@@ -67,7 +67,7 @@ class Grammar:
         path: Path,
         metadata: Metadata,
         external_files: list[Path] = [],
-        file_types: list[Path] = [],
+        file_types: list[str] = [],
     ):
         self.name = name
         self.path = path
@@ -131,6 +131,8 @@ class Grammar:
         )
         parser_source = parser.read_text()
         function_name_match = function_name_regex.search(parser_source)
+        if function_name_match is None:
+            raise ValueError(f"Could not find function name in {parser}, expected pattern: {function_name_regex.pattern}")
         function_name = function_name_match.group(1)
         content = f"""///|
 pub extern "c" fn language() -> @tree_sitter_language.Language = "{function_name}"
@@ -315,7 +317,7 @@ def generate_binding(project: Path, bindings: Path):
         grammars = tree_sitter_dict["grammars"]
         for grammar_dict in grammars:
             grammar_name = grammar_dict["name"]
-            grammar_path = "."
+            grammar_path = Path(".")
             if "path" in grammar_dict:
                 grammar_path = grammar_dict["path"]
             grammar_path: Path = project / grammar_path
@@ -355,7 +357,7 @@ def generate_binding(project: Path, bindings: Path):
         logger.error(f"Error generating binding for {project}: {e}")
         raise e
     finally:
-        logger.info(f"Finished generating binding for {grammar_name}, cleaning")
+        logger.info(f"Finished generating binding for {project}, cleaning")
         git_clean(project)
 
 
