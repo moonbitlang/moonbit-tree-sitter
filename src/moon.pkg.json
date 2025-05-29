@@ -48,7 +48,8 @@
     "tonyfettes/tree_sitter/grammar",
     "tonyfettes/tree_sitter/node_types",
     "tonyfettes/tree_sitter_language",
-    "tonyfettes/tree_sitter/sexp"
+    "tonyfettes/tree_sitter/sexp",
+    "illusory0x0/native"
   ],
   "supported-targets": ["native"],
   "native-stub": ["tree-sitter.c"],

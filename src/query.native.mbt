@@ -279,7 +279,7 @@ extern "c" fn ts_query_capture_name_for_id(
   self : Query,
   capture_id : UInt,
   length : FixedArray[UInt]
-) -> @c.Pointer[Byte] = "moonbit_ts_query_capture_name_for_id"
+) -> @native.ConstPtr[Byte] = "moonbit_ts_query_capture_name_for_id"
 
 ///|
 /// Get the name of one of the query's captures. Each capture is associated with a

@@ -80,29 +80,32 @@ pub fn Language::field_count(self : Language) -> Int {
 extern "c" fn ts_language_field_name_for_id(
   self : Language,
   id : FieldId
-) -> @c.Pointer[Byte] = "moonbit_ts_language_field_name_for_id"
+) -> @native.ConstPtr[Byte] = "moonbit_ts_language_field_name_for_id"
 
 ///|
 /// Get the field name string for the given numerical id.
 pub fn Language::field_name_for_id(self : Language, id : FieldId) -> String? {
   let name_bytes = ts_language_field_name_for_id(self, id)
-  return decode_c_string(name_bytes)
+  decode_c_string(name_bytes)
 }
 
 ///|
-fn decode_c_string(c_string : @c.Pointer[Byte], length? : Int) -> String? {
+fn decode_c_string(c_string : @native.ConstPtr[Byte], length? : Int) -> String? {
   if c_string.is_null() {
     return None
   }
   let buffer = @buffer.new()
   match length {
-    None =>
-      for i = 0; c_string[i] != 0; i = i + 1 {
-        buffer.write_byte(c_string[i])
+    None => {
+      let mut p = c_string
+      while p.get() != 0 {
+        buffer.write_byte(p.get())
+        p = p.add(1)
       }
+    }
     Some(length) =>
       for i = 0; i < length; i = i + 1 {
-        buffer.write_byte(c_string[i])
+        buffer.write_byte(c_string.add(i.to_int64()).get())
       }
   }
   let name = buffer.contents()
@@ -148,7 +151,7 @@ pub fn Language::subtypes(self : Language) -> Array[Symbol] {
 extern "c" fn ts_language_symbol_name(
   self : Language,
   symbol : Symbol
-) -> @c.Pointer[Byte] = "moonbit_ts_language_symbol_name"
+) -> @native.ConstPtr[Byte] = "moonbit_ts_language_symbol_name"
 
 ///|
 /// Get a node type string for the given numerical id.
@@ -287,7 +290,7 @@ pub fn Language::next_state(
 }
 
 ///|
-extern "c" fn ts_language_name(self : Language) -> @c.Pointer[Byte] = "moonbit_ts_language_name"
+extern "c" fn ts_language_name(self : Language) -> @native.ConstPtr[Byte] = "moonbit_ts_language_name"
 
 ///|
 /// Get the name of this language. This returns `None` in older parsers.

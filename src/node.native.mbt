@@ -10,7 +10,10 @@ struct Node {
 
 ///|
 #borrow(self, tree)
-extern "c" fn ts_node_type(self : TSNode, tree : TSTree) -> @c.Pointer[Byte] = "moonbit_ts_node_type"
+extern "c" fn ts_node_type(
+  self : TSNode,
+  tree : TSTree
+) -> @native.ConstPtr[Byte] = "moonbit_ts_node_type"
 
 ///|
 /// Get the node's type as a string.
@@ -43,7 +46,7 @@ pub fn Node::language(self : Node) -> Language {
 extern "c" fn ts_node_grammar_type(
   self : TSNode,
   tree : TSTree
-) -> @c.Pointer[Byte] = "moonbit_ts_node_grammar_type"
+) -> @native.ConstPtr[Byte] = "moonbit_ts_node_grammar_type"
 
 ///|
 /// Get the node's type as it appears in the grammar ignoring aliases as a string.
@@ -128,9 +131,7 @@ pub fn Node::string(self : Node) -> String {
 
 ///|
 pub impl Show for Node with output(self : Node, logger : &@builtin.Logger) -> Unit {
-  try {
-    @sexp.parse!(self.string()) |> @sexp.pretty() |> @sexp.print_to(logger)
-  } catch {
+  try @sexp.parse!(self.string()) |> @sexp.pretty() |> @sexp.print_to(logger) catch {
     _ => logger.write_string(self.string().to_string())
   }
 }
@@ -328,7 +329,7 @@ extern "c" fn ts_node_field_name_for_child(
   self : TSNode,
   tree : TSTree,
   child_index : UInt
-) -> @c.Pointer[Byte] = "moonbit_ts_node_field_name_for_child"
+) -> @native.ConstPtr[Byte] = "moonbit_ts_node_field_name_for_child"
 
 ///|
 /// Get the field name for node's child at the given index, where zero represents
@@ -349,7 +350,7 @@ extern "c" fn ts_node_field_name_for_named_child(
   self : TSNode,
   tree : TSTree,
   child_index : UInt
-) -> @c.Pointer[Byte] = "moonbit_ts_node_field_name_for_named_child"
+) -> @native.ConstPtr[Byte] = "moonbit_ts_node_field_name_for_named_child"
 
 ///|
 /// Get the field name for node's named child at the given index, where zero

@@ -250,7 +250,8 @@ test "pattern" {
   inspect!(
     pattern_query.source,
     content=
-      #|(binary_expression (compound_expression (simple_expression (_) @A)) ("==") (compound_expression (simple_expression (_) @A))) @pattern
+      #|(binary_expression (_) @A ("==") (_) @A) @pattern
+
     ,
   )
   let query_cursor = source_tree.query!(pattern_query.source)
