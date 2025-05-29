@@ -24,11 +24,6 @@ else:
 VERSION = "0.1.16"
 
 
-include_directories = [
-    (Path(".") / "bindings" / "tinycc" / "include").absolute(),
-]
-
-
 class Metadata:
     version: str
     license: str
@@ -144,20 +139,10 @@ pub extern "c" fn language() -> @tree_sitter_language.Language = "{function_name
     ):
         system_include_pattern = re.compile(r"#\s*include\s+<([^>]+)>")
         relative_include_pattern = re.compile(r"#\s*include\s+\"([^\"]+)\"")
-        already_included: set[Path] = set()
 
         def read_file(file: Path) -> list[str]:
             return file.read_text().splitlines()
 
-        def try_include(include_path: str) -> list[str]:
-            for include_dir in include_directories:
-                include_file = include_dir / include_path
-                if include_file.exists():
-                    if include_file in already_included:
-                        return []
-                    already_included.add(include_file)
-                    return include_file.read_text().splitlines()
-            raise FileNotFoundError(f"Could not find include file {include_path}")
 
         def process_file(lines: list[str]):
             expanded_lines: list[str] = []
@@ -181,19 +166,7 @@ pub extern "c" fn language() -> @tree_sitter_language.Language = "{function_name
                     else:
                         expanded_lines.append(line)
                     continue
-                match = system_include_pattern.match(line)
-                if match:
-                    try:
-                        included_lines = try_include(match.group(1))
-                        expanded_lines.extend(
-                            ["#ifdef __TINYC__"]
-                            + process_file(included_lines)
-                            + ["#else", line, "#endif"]
-                        )
-                    except FileNotFoundError:
-                        expanded_lines.append(line)
-                else:
-                    expanded_lines.append(line)
+                expanded_lines.append(line)
             return expanded_lines
 
         original_lines = read_file(destination / file)
