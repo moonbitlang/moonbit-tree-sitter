@@ -113,11 +113,10 @@ test "query cursor with predicates" {
   // Create a query to find if expressions with a specific condition
   let query_source =
     #|((if_expression
-    #|  (compound_expression
-    #|   (binary_expression
-    #|    (_) @left
-    #|    "<"
-    #|    (_) @right))) @if_block
+    #|  (binary_expression
+    #|   (_) @left
+    #|   "<"
+    #|   (_) @right)) @if_block
     #| (#eq? @left "x"))
   let query_cursor = tree.query!(query_source)
   let matches = []
