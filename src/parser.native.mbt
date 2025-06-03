@@ -170,7 +170,7 @@ extern "c" fn ts_parser_parse(
   input : (UInt, Point, FixedArray[UInt]) -> Bytes,
   encoding : InputEncoding,
   decode : @c.Nullable[
-    FuncRef[(@c.Pointer[Byte], UInt, @c.Pointer[Int]) -> Int],
+    FuncRef[(@native.ConstPtr[Byte], UInt, @native.Ptr[Int]) -> Int],
   ]
 ) -> TSTree = "moonbit_ts_parser_parse"
 
@@ -205,7 +205,7 @@ extern "c" fn ts_parser_parse_with_options(
   input : (UInt, Point, FixedArray[UInt]) -> Bytes,
   encoding : UInt,
   decode : @c.Nullable[
-    FuncRef[(@c.Pointer[Byte], UInt, @c.Pointer[Int]) -> Int],
+    FuncRef[(@native.ConstPtr[Byte], UInt, @native.Ptr[Int]) -> Int],
   ],
   progress_callback : (UInt, Bool) -> Bool
 ) -> TSTree = "moonbit_ts_parser_parse_with_options"
@@ -257,18 +257,18 @@ pub fn Parser::parse[Encoding : DecodeFunction](
 ) -> Tree!ParseError {
   let encoding = input.decode.encoding()
   let decode : @c.Nullable[
-    FuncRef[(@c.Pointer[Byte], UInt, @c.Pointer[Int]) -> Int],
+    FuncRef[(@native.ConstPtr[Byte], UInt, @native.Ptr[Int]) -> Int],
   ] = match encoding {
     Custom =>
       @c.Nullable::some(fn(bytes, length, code_point) {
         let buffer = @buffer.new()
         for i in 0..<length.reinterpret_as_int() {
-          buffer.write_byte(bytes[i])
+          buffer.write_byte(bytes.add(i.to_int64()).get())
         }
         let bytes = buffer.contents()
         match Encoding::decode(bytes[:]) {
           Some(result) => {
-            code_point.store(result.code_point.to_int())
+            code_point.set(result.code_point.to_int())
             result.bytes_read
           }
           None => -1
