@@ -45,10 +45,10 @@ type! LanguageError {
     library_version~ : Int,
     min_compatible_version~ : Int
   )
-}
+} derive(Show)
 
 ///|
-impl ToJson for LanguageError with to_json(self) -> Json {
+pub impl ToJson for LanguageError with to_json(self) -> Json {
   match self {
     VersionMismatch(
       language_abi_version~,
@@ -383,7 +383,7 @@ pub fn Parser::parse_bytes(
 pub type! ParseError {
   MissingLanguage
   Cancelled
-} derive(Show)
+} derive(Show, ToJson)
 
 ///|
 fn raise_parse_error(self : Parser, tree : TSTree?) -> TSTree!ParseError {
