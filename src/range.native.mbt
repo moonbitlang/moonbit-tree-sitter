@@ -48,8 +48,8 @@ pub fn Range::end_point(self : Range) -> Point {
 }
 
 ///|
-fn ts_range_start_byte(self : Range) -> UInt {
-  self._[4]
+fn ts_range_start_byte(point : Range) -> UInt {
+  point._[4]
 }
 
 ///|
@@ -58,8 +58,8 @@ pub fn Range::start_byte(self : Range) -> Int {
 }
 
 ///|
-fn ts_range_end_byte(self : Range) -> UInt {
-  self._[5]
+fn ts_range_end_byte(point : Range) -> UInt {
+  point._[5]
 }
 
 ///|

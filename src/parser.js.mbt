@@ -20,9 +20,9 @@ pub fn Parser::new() -> Parser {
 }
 
 ///|
-pub fn parser(language : Language) -> Parser!LanguageError {
+pub fn parser(language : Language) -> Parser raise LanguageError {
   let parser = Parser::new()
-  parser.set_language!(language)
+  parser.set_language(language)
   return parser
 }
 
@@ -54,7 +54,7 @@ extern "js" fn ts_parser_set_language(
   #|}
 
 ///|
-type! LanguageError {
+suberror LanguageError {
   VersionMismatch(
     language_abi_version~ : Int,
     library_version~ : Int,
@@ -74,7 +74,7 @@ type! LanguageError {
 pub fn Parser::set_language(
   self : Parser,
   language : Language
-) -> Unit!LanguageError {
+) -> Unit raise LanguageError {
   let succeed = ts_parser_set_language(self, language)
   if not(succeed) {
     raise VersionMismatch(
@@ -112,13 +112,13 @@ pub fn Parser::included_ranges(self : Parser) -> Array[Range] {
 }
 
 ///|
-pub type! ParseError {
+pub suberror ParseError {
   MissingLanguage
   Cancelled
 } derive(Show)
 
 ///|
-fn raise_parse_error(self : Parser, tree : Tree?) -> Tree!ParseError {
+fn raise_parse_error(self : Parser, tree : Tree?) -> Tree raise ParseError {
   match tree {
     None =>
       match self.language() {
@@ -147,13 +147,13 @@ pub fn Parser::parse_string(
   self : Parser,
   old_tree? : Tree,
   string : @string.View
-) -> Tree!ParseError {
+) -> Tree raise ParseError {
   let old_ts_tree = match old_tree {
     None => ts_tree_null()
     Some(tree) => tree
   }
   let tree = ts_parser_parse_string(self, string.to_string(), old_ts_tree).to_option()
-  raise_parse_error!(self, tree)
+  raise_parse_error(self, tree)
 }
 
 ///|

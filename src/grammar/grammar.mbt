@@ -44,7 +44,7 @@ impl ToJson for PrecValue with to_json(self : PrecValue) -> Json {
 impl @json.FromJson for PrecValue with from_json(
   json : Json,
   json_path : @json.JsonPath
-) -> PrecValue!@json.JsonDecodeError {
+) -> PrecValue raise @json.JsonDecodeError {
   match json {
     Number(value) => PrecValue::Number(value.to_int())
     String(value) => PrecValue::String(value)
@@ -74,19 +74,19 @@ pub enum Rule {
 ///|
 fn[E : Error] Rule::visit_rule(
   self : Rule,
-  visitor : (Rule) -> Unit!E
-) -> Unit!E {
-  visitor!(self)
+  visitor : (Rule) -> Unit raise E
+) -> Unit raise E {
+  visitor(self)
   match self {
-    Alias(_, rule, ..) => rule.visit_rule!(visitor)
-    Prec(rule, ..) => rule.visit_rule!(visitor)
-    Token(rule, ..) => rule.visit_rule!(visitor)
-    Field(rule, ..) => rule.visit_rule!(visitor)
+    Alias(_, rule, ..) => rule.visit_rule(visitor)
+    Prec(rule, ..) => rule.visit_rule(visitor)
+    Token(rule, ..) => rule.visit_rule(visitor)
+    Field(rule, ..) => rule.visit_rule(visitor)
     Seq(rules) | Choice(rules) =>
       for rule in rules {
-        rule.visit_rule!(visitor)
+        rule.visit_rule(visitor)
       }
-    Repeat1(rule) | Repeat(rule) => rule.visit_rule!(visitor)
+    Repeat1(rule) | Repeat(rule) => rule.visit_rule(visitor)
     String(_) => ()
     Symbol(_) => ()
     Blank => ()
@@ -98,7 +98,7 @@ fn[E : Error] Rule::visit_rule(
 impl @json.FromJson for Rule with from_json(
   json : Json,
   json_path : @json.JsonPath
-) -> Rule!@json.JsonDecodeError {
+) -> Rule raise @json.JsonDecodeError {
   match json {
     {
       "type": "ALIAS",
@@ -109,9 +109,9 @@ impl @json.FromJson for Rule with from_json(
       ..
     } =>
       Rule::Alias(
-        named=@json.from_json!(named),
+        named=@json.from_json(named),
         value,
-        Rule::from_json!(rule, json_path.add_key("content")),
+        Rule::from_json(rule, json_path.add_key("content")),
       )
     { "type": "BLANK", .. } => Rule::Blank
     { "type": "SYMBOL", "name": String(name), .. } => Rule::Symbol(name)
@@ -120,9 +120,7 @@ impl @json.FromJson for Rule with from_json(
       let members_json_path = json_path.add_key("members")
       let rules = []
       for i, member_json in members_json {
-        rules.push(
-          Rule::from_json!(member_json, members_json_path.add_index(i)),
-        )
+        rules.push(Rule::from_json(member_json, members_json_path.add_index(i)))
       }
       Rule::Choice(rules)
     }
@@ -130,28 +128,26 @@ impl @json.FromJson for Rule with from_json(
       let members_json_path = json_path.add_key("members")
       let rules = []
       for i, member_json in members_json {
-        rules.push(
-          Rule::from_json!(member_json, members_json_path.add_index(i)),
-        )
+        rules.push(Rule::from_json(member_json, members_json_path.add_index(i)))
       }
       Rule::Seq(rules)
     }
     { "type": "REPEAT", "content": rule, .. } =>
-      Rule::Repeat(Rule::from_json!(rule, json_path.add_key("content")))
+      Rule::Repeat(Rule::from_json(rule, json_path.add_key("content")))
     { "type": "REPEAT1", "content": rule, .. } =>
-      Rule::Repeat1(Rule::from_json!(rule, json_path.add_key("content")))
+      Rule::Repeat1(Rule::from_json(rule, json_path.add_key("content")))
     { "type": "TOKEN", "content": rule, .. } =>
       Rule::Token(
         immediate=false,
-        Rule::from_json!(rule, json_path.add_key("content")),
+        Rule::from_json(rule, json_path.add_key("content")),
       )
     { "type": "IMMEDIATE_TOKEN", "content": rule, .. } =>
       Rule::Token(
         immediate=true,
-        Rule::from_json!(rule, json_path.add_key("content")),
+        Rule::from_json(rule, json_path.add_key("content")),
       )
     { "type": "FIELD", "name": String(name), "content": rule, .. } =>
-      Rule::Field(name~, Rule::from_json!(rule, json_path.add_key("content")))
+      Rule::Field(name~, Rule::from_json(rule, json_path.add_key("content")))
     {
       "type": String([.. "PREC", .. suffix]),
       "value": value,
@@ -170,8 +166,8 @@ impl @json.FromJson for Rule with from_json(
       }
       Rule::Prec(
         prec~,
-        value=value |> @json.from_json!(path=json_path.add_key("value")),
-        Rule::from_json!(rule, json_path.add_key("content")),
+        value=value |> @json.from_json(path=json_path.add_key("value")),
+        Rule::from_json(rule, json_path.add_key("content")),
       )
     }
     { "type": "PATTERN", "value": String(value), .. } => Rule::Pattern(value)
@@ -233,7 +229,7 @@ struct RuleName {
 impl @json.FromJson for RuleName with from_json(
   json : Json,
   json_path : @json.JsonPath
-) -> RuleName!@json.JsonDecodeError {
+) -> RuleName raise @json.JsonDecodeError {
   guard json is String(name) else {
     let message = "RuleName::from_json: expected string, got \{json}"
     raise @json.JsonDecodeError((json_path, message))
@@ -266,18 +262,18 @@ pub struct Grammar {
 )
 
 ///|
-type! GrammarParseError {
+suberror GrammarParseError {
   JsonDecodeError(@json.JsonDecodeError)
   RuleNotFound(String)
 } derive(Show)
 
 ///|
-pub fn Grammar::from_json(json : Json) -> Grammar!GrammarParseError {
-  let grammar : Grammar = try @json.from_json!(json) catch {
+pub fn Grammar::from_json(json : Json) -> Grammar raise GrammarParseError {
+  let grammar : Grammar = @json.from_json(json) catch {
     error => raise JsonDecodeError(error)
   }
   for _, rule in grammar.rules {
-    let visitor = fn(rule : Rule) -> Unit!GrammarParseError {
+    let visitor = fn(rule : Rule) -> Unit raise GrammarParseError {
       match rule {
         Symbol(name) =>
           if grammar.rules.get(name) is None {
@@ -286,7 +282,7 @@ pub fn Grammar::from_json(json : Json) -> Grammar!GrammarParseError {
         _ => return
       }
     }
-    rule.visit_rule!(visitor)
+    rule.visit_rule(visitor)
   }
   for supertype in grammar.supertypes {
     guard grammar.rules.get(supertype.name) is Some(rule) else {

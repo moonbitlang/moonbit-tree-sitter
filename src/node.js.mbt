@@ -107,9 +107,9 @@ pub fn Node::string(self : Node) -> @string.View {
 
 ///|
 pub impl Show for Node with output(self : Node, logger : &@builtin.Logger) -> Unit {
-  try {
-    self.string() |> @sexp.parse!() |> @sexp.pretty() |> @sexp.print_to(logger)
-  } catch {
+  try
+    self.string() |> @sexp.parse() |> @sexp.pretty() |> @sexp.print_to(logger)
+  catch {
     _ => logger.write_string(self.string().to_string())
   }
 }
@@ -794,8 +794,8 @@ pub fn Node::next_symbol_names(self : Node) -> Iter[String] {
 pub fn Node::query(
   self : Node,
   source : @string.View
-) -> QueryCursor!QueryError {
-  let query = Query::new!(self.language(), source)
+) -> QueryCursor raise QueryError {
+  let query = Query::new(self.language(), source)
   let query_cursor = QueryCursor::new()
   query_cursor.exec(query, self)
   return query_cursor

@@ -2,8 +2,8 @@
 type LookaheadIterator
 
 ///|
-#borrow(self)
-extern "c" fn ts_lookahead_iterator_is_null(self : LookaheadIterator) -> Bool = "moonbit_c_is_null"
+#borrow(iterator)
+extern "c" fn ts_lookahead_iterator_is_null(iterator : LookaheadIterator) -> Bool = "moonbit_c_is_null"
 
 ///|
 impl Nullable for LookaheadIterator with is_null(self : LookaheadIterator) -> Bool {
@@ -71,8 +71,8 @@ pub extern "c" fn LookaheadIterator::language(
 /// Advance the lookahead iterator to the next symbol.
 ///
 /// This returns `true` if there is a new symbol and `false` otherwise.
-#borrow(self)
-pub extern "c" fn LookaheadIterator::next(self : LookaheadIterator) -> Bool = "moonbit_ts_lookahead_iterator_next"
+#borrow(iterator)
+pub extern "c" fn LookaheadIterator::next(iterator : LookaheadIterator) -> Bool = "moonbit_ts_lookahead_iterator_next"
 
 ///|
 /// Get the current symbol of the lookahead iterator.
@@ -82,9 +82,9 @@ pub extern "c" fn LookaheadIterator::current_symbol(
 ) -> Symbol = "moonbit_ts_lookahead_iterator_current_symbol"
 
 ///|
-#borrow(self)
+#borrow(iterator)
 extern "c" fn ts_lookahead_iterator_current_symbol_name(
-  self : LookaheadIterator
+  iterator : LookaheadIterator
 ) -> @native.ConstPtr[Byte] = "moonbit_ts_lookahead_iterator_current_symbol_name"
 
 ///|

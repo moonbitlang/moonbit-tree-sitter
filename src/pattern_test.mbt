@@ -31,7 +31,7 @@ struct Query {
 }
 
 ///|
-type! PatternError {
+suberror PatternError {
   NestedPattern(Int)
   MetaVarOutOfPattern(Int)
   UnterminatedPattern
@@ -42,7 +42,7 @@ fn pattern_query(
   parser : @tree_sitter.Parser,
   env : Environment,
   pattern : @string.View
-) -> Query! {
+) -> Query raise {
   struct Context {
     replaced : StringBuilder
     brackets : Array[Int]
@@ -57,8 +57,8 @@ fn pattern_query(
     end: None,
     var: None,
   }
-  loop 0, pattern.view() {
-    offset, ['$', '[', .. pattern] => {
+  loop (0, pattern) {
+    (offset, ['$', '[', .. pattern]) => {
       if context.var is Some(_) {
         raise MetaVarOutOfPattern(offset)
       }
@@ -67,35 +67,35 @@ fn pattern_query(
       }
       context.replaced.write_string("  ")
       context.start = Some(offset)
-      continue offset + 2, pattern
+      continue (offset + 2, pattern)
     }
-    offset, ['[', .. pattern] => {
+    (offset, ['[', .. pattern]) => {
       context.replaced.write_char('[')
       if context.start is Some(_) {
         context.brackets.push(offset)
       }
-      continue offset + 1, pattern
+      continue (offset + 1, pattern)
     }
-    offset, [']', .. pattern] =>
+    (offset, [']', .. pattern]) =>
       match context.start {
         None => {
           context.replaced.write_char(']')
-          continue offset + 1, pattern
+          continue (offset + 1, pattern)
         }
         Some(_) =>
           match context.brackets.pop() {
             None => {
               context.end = Some(offset)
               context.replaced.write_char(' ')
-              continue offset + 1, pattern
+              continue (offset + 1, pattern)
             }
             Some(_) => {
               context.replaced.write_char(']')
-              continue offset + 1, pattern
+              continue (offset + 1, pattern)
             }
           }
       }
-    offset, ['$', .. pattern] => {
+    (offset, ['$', .. pattern]) => {
       if context.start is None {
         raise MetaVarOutOfPattern(offset)
       }
@@ -107,26 +107,26 @@ fn pattern_query(
           context.var = Some((offset, StringBuilder::new()))
         }
       }
-      continue offset + 1, pattern
+      continue (offset + 1, pattern)
     }
-    offset, [char, .. pattern] =>
+    (offset, [char, .. pattern]) =>
       match context.var {
         None => {
           context.replaced.write_char(char)
-          continue offset + 1, pattern
+          continue (offset + 1, pattern)
         }
         Some((start, name)) =>
           if char.is_ascii_alphabetic() {
             context.replaced.write_char(' ')
             name.write_char(char)
-            continue offset + 1, pattern
+            continue (offset + 1, pattern)
           } else {
             context.replaced.write_char(char)
             env.add_var(name.to_string(), (start, offset))
-            continue offset + 1, pattern
+            continue (offset + 1, pattern)
           }
       }
-    offset, [] =>
+    (offset, []) =>
       if context.var is Some((start, name)) {
         env.add_var(name.to_string(), (start, offset))
       }
@@ -135,7 +135,7 @@ fn pattern_query(
     raise UnterminatedPattern
   }
   let context = context.replaced.to_string()
-  let context_tree = parser.parse_string!(context)
+  let context_tree = parser.parse_string(context)
   let context_root = context_tree.root_node()
   let capture_name : Array[String] = []
   fn generate_pattern(
@@ -244,17 +244,16 @@ test "pattern" {
     #|    println("Hello, world!")
     #|  }
     #|}
-  let parser = @tree_sitter.parser!(@tree_sitter_moonbit.language())
-  let source_tree = parser.parse_string!(source)
-  let pattern_query = pattern_query!(parser, env, pattern)
-  inspect!(
+  let parser = @tree_sitter.parser(@tree_sitter_moonbit.language())
+  let source_tree = parser.parse_string(source)
+  let pattern_query = pattern_query(parser, env, pattern)
+  inspect(
     pattern_query.source,
     content=
       #|(binary_expression (_) @A ("==") (_) @A) @pattern
-
     ,
   )
-  let query_cursor = source_tree.query!(pattern_query.source)
+  let query_cursor = source_tree.query(pattern_query.source)
   let ranges = []
   for matched in query_cursor.matches() {
     let meta_var_nodes : Map[String, Array[@tree_sitter.Node]] = {}
@@ -284,5 +283,5 @@ test "pattern" {
       ranges.push((text, start, end))
     }
   }
-  @json.inspect!(ranges, content=[["1 == 1", 15, 21]])
+  @json.inspect(ranges, content=[["1 == 1", 15, 21]])
 }

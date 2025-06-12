@@ -3,8 +3,8 @@ test "roundtrip" {
   let sexp =
     #|(a b c d: (f g))
     #|(h (j) (k (l)))
-  let sexp = @sexp.parse!(sexp)
-  inspect!(
+  let sexp = @sexp.parse(sexp)
+  inspect(
     @sexp.print(sexp),
     content=
       #|(a b c d: (f g))
@@ -18,8 +18,8 @@ test "brackets" {
   let sexp =
     #|[a b c d: [f g]]
     #|[h [j] [k [l]]]
-  let sexp = @sexp.parse!(sexp)
-  inspect!(
+  let sexp = @sexp.parse(sexp)
+  inspect(
     @sexp.print(sexp),
     content=
       #|[a b c d: [f g]]
@@ -32,8 +32,8 @@ test "brackets" {
 test "capture" {
   let sexp =
     #|(capture) @a
-  let sexp = @sexp.parse!(sexp)
-  inspect!(@sexp.print(sexp), content="(capture) @a")
+  let sexp = @sexp.parse(sexp)
+  inspect(@sexp.print(sexp), content="(capture) @a")
 }
 
 ///|
@@ -49,8 +49,8 @@ test "comment" {
     #|(a b ; comment
     #|   c ; comment
     #|   d e f)
-  let sexp = @sexp.parse!(sexp)
-  @json.inspect!(sexp, content=[
+  let sexp = @sexp.parse(sexp)
+  @json.inspect(sexp, content=[
     { "$tag": "Comment", "0": " comment a" },
     { "$tag": "Newline" },
     { "$tag": "Symbol", "0": "a" },
@@ -120,7 +120,7 @@ test "comment" {
       "quantifier": { "$tag": "One" },
     },
   ])
-  inspect!(
+  inspect(
     @sexp.print(sexp),
     content=
       #|; comment a
@@ -145,8 +145,8 @@ test "newline" {
     #|(b
     #|
     #|  c)
-  let sexp = @sexp.parse!(sexp)
-  @json.inspect!(sexp, content=[
+  let sexp = @sexp.parse(sexp)
+  @json.inspect(sexp, content=[
     { "$tag": "Symbol", "0": "a" },
     { "$tag": "Newline" },
     { "$tag": "Newline" },
@@ -162,7 +162,7 @@ test "newline" {
       "quantifier": { "$tag": "One" },
     },
   ])
-  inspect!(
+  inspect(
     @sexp.print(sexp),
     content=
       #|a
@@ -197,8 +197,8 @@ test "pretty" {
     #|)
     #|
     #|; last comment
-  let sexp = @sexp.parse!(sexp)
-  @json.inspect!(sexp, content=[
+  let sexp = @sexp.parse(sexp)
+  @json.inspect(sexp, content=[
     { "$tag": "Symbol", "0": "a" },
     { "$tag": "Comment", "0": " comment after a" },
     { "$tag": "Newline" },
@@ -276,7 +276,7 @@ test "pretty" {
   ])
   let result = []
   @sexp.pretty_to(sexp, result)
-  @json.inspect!(result, content=[
+  @json.inspect(result, content=[
     { "$tag": "Symbol", "0": "a" },
     { "$tag": "Comment", "0": " comment after a" },
     { "$tag": "Newline" },
@@ -347,7 +347,7 @@ test "pretty" {
     { "$tag": "Comment", "0": " last comment" },
     { "$tag": "Newline" },
   ])
-  inspect!(
+  inspect(
     @sexp.print(result),
     content=
       #|a ; comment after a
@@ -380,8 +380,8 @@ test "prettify" {
     #|  (compound_expression)
     #|  (expression)
     #|]) @b))))) ("}")))))
-  inspect!(
-    @sexp.prettify!(source),
+  inspect(
+    @sexp.prettify(source),
     content=
       #|;; exp
       #|(structure

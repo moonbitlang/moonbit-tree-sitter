@@ -1,5 +1,5 @@
 ///|
-fn async_suspend[T](f : ((T) -> Unit) -> Unit) -> T = "%async.suspend"
+fn[T] async_suspend(f : ((T) -> Unit) -> Unit) -> T = "%async.suspend"
 
 ///|
 type Language
@@ -16,7 +16,7 @@ extern "js" fn ts_language_load_bytes(
   #|}
 
 ///|
-pub async fn Language::load(bytes : Bytes) -> Language!Async {
+pub async fn Language::load(bytes : Bytes) -> Language {
   async_suspend(fn(resolve) { ts_language_load_bytes(ts, bytes, resolve) })
 }
 

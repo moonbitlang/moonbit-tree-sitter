@@ -7,7 +7,7 @@ pub enum Quantifier {
 } derive(Eq, ToJson)
 
 ///|
-pub fn Quantifier::from_char(char : Char) -> Quantifier!SexpError {
+pub fn Quantifier::from_char(char : Char) -> Quantifier raise SexpError {
   match char {
     '+' => OneOrMore
     '*' => ZeroOrMore

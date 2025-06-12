@@ -2,7 +2,7 @@
 pub(all) type Language @tree_sitter_language.Language
 
 ///|
-extern "c" fn ts_language_copy(self : Language) -> Language = "moonbit_ts_language_copy"
+extern "c" fn ts_language_copy(language : Language) -> Language = "moonbit_ts_language_copy"
 
 ///|
 /// Get another reference to the given language.
@@ -11,7 +11,7 @@ pub fn Language::copy(self : Language) -> Language {
 }
 
 ///|
-extern "c" fn ts_language_delete(self : Language) = "moonbit_ts_language_delete"
+extern "c" fn ts_language_delete(language : Language) = "moonbit_ts_language_delete"
 
 ///|
 /// Free any dynamically-allocated resources for this language, if
@@ -21,7 +21,7 @@ pub fn Language::delete(self : Language) -> Unit {
 }
 
 ///|
-extern "c" fn ts_language_symbol_count(self : Language) -> UInt = "moonbit_ts_language_symbol_count"
+extern "c" fn ts_language_symbol_count(language : Language) -> UInt = "moonbit_ts_language_symbol_count"
 
 ///|
 /// Get the number of distinct node types in the language.
@@ -30,7 +30,7 @@ pub fn Language::symbol_count(self : Language) -> Int {
 }
 
 ///|
-extern "c" fn ts_language_state_count(self : Language) -> UInt = "moonbit_ts_language_state_count"
+extern "c" fn ts_language_state_count(language : Language) -> UInt = "moonbit_ts_language_state_count"
 
 ///|
 /// Get the number of valid states in this language.
@@ -45,7 +45,7 @@ type Symbol UInt
 /// Get the numerical id for the given node type string.
 #borrow(name)
 extern "c" fn ts_language_symbol_for_name_(
-  self : Language,
+  language : Language,
   name : Bytes
 ) -> UInt16 = "moonbit_ts_language_symbol_for_name"
 
@@ -68,7 +68,7 @@ pub fn Language::symbol_for_name(
 type FieldId UInt16
 
 ///|
-extern "c" fn ts_language_field_count(self : Language) -> Int = "moonbit_ts_language_field_count"
+extern "c" fn ts_language_field_count(language : Language) -> Int = "moonbit_ts_language_field_count"
 
 ///|
 /// Get the number of distinct field names in the language.
@@ -78,7 +78,7 @@ pub fn Language::field_count(self : Language) -> Int {
 
 ///|
 extern "c" fn ts_language_field_name_for_id(
-  self : Language,
+  language : Language,
   id : FieldId
 ) -> @native.ConstPtr[Byte] = "moonbit_ts_language_field_name_for_id"
 
@@ -116,7 +116,7 @@ fn decode_c_string(c_string : @native.ConstPtr[Byte], length? : Int) -> String? 
 ///|
 #borrow(name)
 extern "c" fn ts_language_field_id_for_name(
-  self : Language,
+  language : Language,
   name : Bytes
 ) -> UInt = "moonbit_ts_language_field_id_for_name"
 
@@ -128,7 +128,7 @@ pub fn Language::field_id_for_name(self : Language, name : @string.View) -> Int 
 }
 
 ///|
-extern "c" fn ts_language_supertypes(self : Language) -> Array[Symbol] = "moonbit_ts_language_supertypes"
+extern "c" fn ts_language_supertypes(language : Language) -> Array[Symbol] = "moonbit_ts_language_supertypes"
 
 ///|
 /// Get a list of all supertype symbols for the language.
@@ -137,7 +137,7 @@ pub fn Language::supertypes(self : Language) -> Array[Symbol] {
 }
 
 ///|
-extern "c" fn ts_language_subtypes(self : Language) -> Array[Symbol] = "moonbit_ts_language_subtypes"
+extern "c" fn ts_language_subtypes(language : Language) -> Array[Symbol] = "moonbit_ts_language_subtypes"
 
 ///|
 /// Get a list of all subtype symbol ids for a given supertype symbol.
@@ -149,7 +149,7 @@ pub fn Language::subtypes(self : Language) -> Array[Symbol] {
 
 ///|
 extern "c" fn ts_language_symbol_name(
-  self : Language,
+  language : Language,
   symbol : Symbol
 ) -> @native.ConstPtr[Byte] = "moonbit_ts_language_symbol_name"
 
@@ -192,7 +192,10 @@ fn SymbolType::to_int(self : SymbolType) -> UInt {
 }
 
 ///|
-extern "c" fn ts_language_symbol_type(self : Language, symbol : Symbol) -> UInt = "moonbit_ts_language_symbol_type"
+extern "c" fn ts_language_symbol_type(
+  language : Language,
+  symbol : Symbol
+) -> UInt = "moonbit_ts_language_symbol_type"
 
 ///|
 /// Check whether the given node type id belongs to named nodes, anonymous nodes,
@@ -204,7 +207,7 @@ pub fn Language::symbol_type(self : Language, symbol : Symbol) -> SymbolType {
 }
 
 ///|
-extern "c" fn ts_language_version(self : Language) -> UInt = "moonbit_ts_language_version"
+extern "c" fn ts_language_version(language : Language) -> UInt = "moonbit_ts_language_version"
 
 ///|
 /// Get the ABI version number for this language. This version number is used
@@ -218,7 +221,7 @@ pub fn Language::version(self : Language) -> Int {
 }
 
 ///|
-extern "c" fn ts_language_abi_version(self : Language) -> UInt = "moonbit_ts_language_abi_version"
+extern "c" fn ts_language_abi_version(language : Language) -> UInt = "moonbit_ts_language_abi_version"
 
 ///|
 /// Get the ABI version number for this language. This version number is used
@@ -255,7 +258,7 @@ pub fn LanguageMetadata::patch_version(self : LanguageMetadata) -> Byte {
 }
 
 ///|
-extern "c" fn ts_language_metadata(self : Language) -> LanguageMetadata = "moonbit_ts_language_metadata"
+extern "c" fn ts_language_metadata(language : Language) -> LanguageMetadata = "moonbit_ts_language_metadata"
 
 ///|
 /// Get the metadata for this language. This information is generated by the
@@ -272,7 +275,7 @@ type StateId UInt16
 
 ///|
 extern "c" fn ts_language_next_state(
-  self : Language,
+  language : Language,
   state : StateId,
   symbol : Symbol
 ) -> StateId = "moonbit_ts_language_next_state"
@@ -290,7 +293,7 @@ pub fn Language::next_state(
 }
 
 ///|
-extern "c" fn ts_language_name(self : Language) -> @native.ConstPtr[Byte] = "moonbit_ts_language_name"
+extern "c" fn ts_language_name(language : Language) -> @native.ConstPtr[Byte] = "moonbit_ts_language_name"
 
 ///|
 /// Get the name of this language. This returns `None` in older parsers.

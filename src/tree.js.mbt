@@ -149,6 +149,9 @@ pub fn Tree::get_changed_ranges(self : Tree, other : Tree) -> Array[Range] {
 }
 
 ///|
-pub fn Tree::query(self : Tree, query : @string.View) -> QueryCursor!QueryError {
-  self.root_node().query!(query)
+pub fn Tree::query(
+  self : Tree,
+  query : @string.View
+) -> QueryCursor raise QueryError {
+  self.root_node().query(query)
 }

@@ -8,7 +8,7 @@ extern "js" fn Query::null() -> Query =
   #|}
 
 ///|
-type! QueryError {
+suberror QueryError {
   Syntax(UInt)
   NodeType(UInt)
   Field(UInt)
@@ -71,7 +71,7 @@ extern "js" fn ts_query_new(
 pub fn Query::new(
   language : Language,
   source : @string.View
-) -> Query!QueryError {
+) -> Query raise QueryError {
   let error = FixedArray::make(2, 0U)
   let query = ts_query_new(ts, language, source.to_string(), error)
   if error[1] == 0 {
@@ -242,7 +242,7 @@ extern "js" fn ts_query_predicates_for_pattern(
   #|}
 
 ///|
-typealias QueryPredicate = Array[QueryPredicateStep]
+typealias Array[QueryPredicateStep] as QueryPredicate
 
 ///|
 pub fn Query::predicates_for_pattern(

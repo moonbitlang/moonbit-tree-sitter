@@ -5,7 +5,7 @@ struct Input[DecodeFunction] {
 }
 
 ///|
-pub fn Input::new[DecodeFunction : DecodeFunction](
+pub fn[DecodeFunction : DecodeFunction] Input::new(
   read : (Int, Point) -> @bytes.View,
   decode : DecodeFunction
 ) -> Input[DecodeFunction] {

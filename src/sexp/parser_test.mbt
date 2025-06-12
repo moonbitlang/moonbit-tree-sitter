@@ -1,7 +1,7 @@
 ///|
 test "parse" {
-  @json.inspect!(
-    @sexp.parse!(
+  @json.inspect(
+    @sexp.parse(
       #|(structure
       #| (structure_item
       #|  (function_definition
@@ -79,8 +79,8 @@ test "parse" {
 
 ///|
 test "[]" {
-  @json.inspect!(
-    @sexp.parse!(
+  @json.inspect(
+    @sexp.parse(
       #|[
       #|  (expression)
       #|  (compound_expression)
@@ -116,8 +116,8 @@ test "[]" {
 
 ///|
 test "capture" {
-  @json.inspect!(
-    @sexp.parse!(
+  @json.inspect(
+    @sexp.parse(
       #|(capture) @a
       ,
     ),
@@ -135,8 +135,8 @@ test "capture" {
 
 ///|
 test "void" {
-  @json.inspect!(
-    @sexp.parse!(
+  @json.inspect(
+    @sexp.parse(
       #|
       ,
     ),
@@ -146,8 +146,8 @@ test "void" {
 
 ///|
 test "unit" {
-  @json.inspect!(
-    @sexp.parse!(
+  @json.inspect(
+    @sexp.parse(
       #|()
       ,
     ),
@@ -159,8 +159,8 @@ test "unit" {
 
 ///|
 test "pair" {
-  @json.inspect!(
-    @sexp.parse!(
+  @json.inspect(
+    @sexp.parse(
       #|(key: value)
       ,
     ),
@@ -177,8 +177,8 @@ test "pair" {
 
 ///|
 test "pair with multiple values" {
-  @json.inspect!(
-    @sexp.parse!(
+  @json.inspect(
+    @sexp.parse(
       #|(key: value1 value2)
       ,
     ),
@@ -198,8 +198,8 @@ test "pair with multiple values" {
 
 ///|
 test "comment" {
-  @json.inspect!(
-    @sexp.parse!(
+  @json.inspect(
+    @sexp.parse(
       #|; comment
       ,
     ),
@@ -209,8 +209,8 @@ test "comment" {
 
 ///|
 test "newline" {
-  @json.inspect!(
-    @sexp.parse!(
+  @json.inspect(
+    @sexp.parse(
       #|
       #|
       #|(a
