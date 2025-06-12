@@ -312,6 +312,7 @@ fn Quantifier::of_uint(value : UInt) -> Quantifier {
   }
 }
 
+///|
 #borrow(query)
 extern "c" fn ts_query_capture_quantifier_for_id(
   query : Query,

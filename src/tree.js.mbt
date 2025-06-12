@@ -22,7 +22,7 @@ extern "js" fn ts_tree_null() -> Tree =
   #|}
 
 ///|
-extern "js" fn ts_tree_is_null(self : Tree) -> Bool =
+extern "js" fn ts_tree_is_null(tree : Tree) -> Bool =
   #|(tree) => {
   #|  return tree === null || tree === undefined;
   #|}
@@ -33,7 +33,7 @@ impl Nullable for Tree with is_null(self : Tree) -> Bool {
 }
 
 ///|
-extern "js" fn ts_tree_copy(self : Tree) -> Tree =
+extern "js" fn ts_tree_copy(tree : Tree) -> Tree =
   #|(tree) => {
   #|  return tree.copy();
   #|}
@@ -48,7 +48,7 @@ pub fn Tree::copy(self : Tree) -> Tree {
 }
 
 ///|
-extern "js" fn ts_tree_root_node(self : Tree) -> Node =
+extern "js" fn ts_tree_root_node(tree : Tree) -> Node =
   #|(tree) => {
   #|  return tree.rootNode;
   #|}
@@ -60,7 +60,7 @@ pub fn Tree::root_node(self : Tree) -> Node {
 
 ///|
 extern "js" fn ts_tree_root_node_with_offset(
-  self : Tree,
+  tree : Tree,
   offset_bytes : UInt,
   offset_extent : Point
 ) -> Node =
@@ -80,7 +80,7 @@ pub fn Tree::root_node_with_offset(
 }
 
 ///|
-extern "js" fn ts_tree_language(self : Tree) -> Language =
+extern "js" fn ts_tree_language(tree : Tree) -> Language =
   #|(tree) => {
   #|  return tree.language;
   #|}
@@ -92,7 +92,7 @@ pub fn Tree::language(self : Tree) -> Language {
 }
 
 ///|
-extern "js" fn ts_tree_included_ranges(self : Tree) -> Array[Range] =
+extern "js" fn ts_tree_included_ranges(tree : Tree) -> Array[Range] =
   #|(tree) => {
   #|  return tree.getIncludedRanges();
   #|}
@@ -104,7 +104,7 @@ pub fn Tree::included_ranges(self : Tree) -> Array[Range] {
 }
 
 ///|
-extern "js" fn ts_tree_edit(self : Tree, edit : InputEdit) =
+extern "js" fn ts_tree_edit(tree : Tree, edit : InputEdit) =
   #|(tree, edit) => {
   #|  return tree.edit(edit);
   #|}
@@ -121,7 +121,7 @@ pub fn Tree::edit(self : Tree, edit : InputEdit) -> Unit {
 
 ///|
 extern "js" fn ts_tree_get_changed_ranges(
-  self : Tree,
+  tree : Tree,
   other : Tree
 ) -> Array[Range] =
   #|(tree, other) => {

@@ -82,9 +82,9 @@ pub fn Query::new(
 }
 
 ///|
-extern "js" fn ts_query_pattern_count(self : Query) -> UInt =
+extern "js" fn ts_query_pattern_count(query : Query) -> UInt =
   #|() => {
-  #|  return self.patternCount;
+  #|  return query.patternCount;
   #|}
 
 ///|
@@ -94,9 +94,9 @@ pub fn Query::pattern_count(self : Query) -> Int {
 }
 
 ///|
-extern "js" fn ts_query_capture_count(self : Query) -> UInt =
-  #|() => {
-  #|  return self.captureCount;
+extern "js" fn ts_query_capture_count(query : Query) -> UInt =
+  #|(query) => {
+  #|  return query.captureCount;
   #|}
 
 ///|
@@ -106,9 +106,9 @@ pub fn Query::capture_count(self : Query) -> Int {
 }
 
 ///|
-extern "js" fn ts_query_string_count(self : Query) -> UInt =
-  #|() => {
-  #|  return self.stringCount;
+extern "js" fn ts_query_string_count(query : Query) -> UInt =
+  #|(query) => {
+  #|  return query.stringCount;
   #|}
 
 ///|
@@ -119,11 +119,11 @@ pub fn Query::string_count(self : Query) -> Int {
 
 ///|
 extern "js" fn ts_query_start_byte_for_pattern(
-  self : Query,
+  query : Query,
   pattern_index : UInt
 ) -> UInt =
-  #|(patternIndex) => {
-  #|  return self.startIndexForPattern(patternIndex);
+  #|(query, patternIndex) => {
+  #|  return query.startIndexForPattern(patternIndex);
   #|}
 
 ///|
@@ -138,7 +138,7 @@ pub fn Query::start_byte_for_pattern(self : Query, pattern_index : Int) -> Int {
 
 ///|
 extern "js" fn ts_query_end_byte_for_pattern(
-  self : Query,
+  query : Query,
   pattern_index : UInt
 ) -> UInt =
   #|(patternIndex) => {
@@ -234,11 +234,11 @@ extern "js" fn TSQueryPredicate::operands(
 
 ///|
 extern "js" fn ts_query_predicates_for_pattern(
-  self : Query,
+  query : Query,
   pattern_index : Int
 ) -> Array[TSQueryPredicate] =
-  #|(self, patternIndex) => {
-  #|  return self.predicates[patternIndex];
+  #|(query, patternIndex) => {
+  #|  return query.predicates[patternIndex];
   #|}
 
 ///|
@@ -272,7 +272,7 @@ pub fn Query::predicates_for_pattern(
 
 ///|
 extern "js" fn ts_query_is_pattern_rooted(
-  self : Query,
+  query : Query,
   pattern_index : UInt
 ) -> Bool =
   #|(query, patternIndex) => {
@@ -287,7 +287,7 @@ pub fn Query::is_pattern_rooted(self : Query, pattern_index : Int) -> Bool {
 
 ///|
 extern "js" fn ts_query_is_pattern_non_local(
-  self : Query,
+  query : Query,
   pattern_index : UInt
 ) -> Bool =
   #|(query, patternIndex) => {
@@ -307,7 +307,7 @@ pub fn Query::is_pattern_non_local(self : Query, pattern_index : Int) -> Bool {
 
 ///|
 extern "js" fn ts_query_is_pattern_guaranteed_at_step(
-  self : Query,
+  query : Query,
   byte_offset : UInt
 ) -> Bool =
   #|(query, byteIndex) => {
@@ -326,7 +326,7 @@ pub fn Query::is_pattern_guaranteed_at_step(
 
 ///|
 extern "js" fn ts_query_capture_name_for_id(
-  self : Query,
+  query : Query,
   capture_id : UInt
 ) -> String =
   #|(query, captureId) => {
@@ -367,7 +367,7 @@ fn Quantifier::of_uint(value : UInt) -> Quantifier {
 
 ///|
 extern "js" fn ts_query_capture_quantifier_for_id(
-  self : Query,
+  query : Query,
   pattern_index : UInt,
   capture_index : UInt
 ) -> UInt =
@@ -391,7 +391,7 @@ pub fn Query::capture_quantifier_for_id(
 }
 
 ///|
-extern "js" fn ts_query_disable_capture(self : Query, name : String) =
+extern "js" fn ts_query_disable_capture(query : Query, name : String) =
   #|(query, name) => {
   #|  return query.disableCapture(name);
   #|}
@@ -407,7 +407,7 @@ pub fn Query::disable_capture(self : Query, name : @string.View) -> Unit {
 }
 
 ///|
-extern "js" fn ts_query_disable_pattern(self : Query, pattern_index : UInt) =
+extern "js" fn ts_query_disable_pattern(query : Query, pattern_index : UInt) =
   #|(query, patternIndex) => {
   #|  return query.disablePattern(patternIndex);
   #|}
@@ -423,7 +423,7 @@ pub fn Query::disable_pattern(self : Query, pattern_index : Int) -> Unit {
 
 ///|
 extern "js" fn ts_query_matches(
-  self : Query,
+  query : Query,
   node : Node
 ) -> Array[TSQueryMatch] =
   #|(query, node) => {

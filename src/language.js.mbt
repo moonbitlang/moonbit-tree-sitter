@@ -32,7 +32,7 @@ impl Nullable for Language with is_null(self : Language) -> Bool {
 }
 
 ///|
-extern "js" fn ts_language_symbol_count(self : Language) -> UInt =
+extern "js" fn ts_language_symbol_count(language : Language) -> UInt =
   #|(language) => {
   #|  return language.nodeTypeCount;
   #|}
@@ -44,7 +44,7 @@ pub fn Language::symbol_count(self : Language) -> Int {
 }
 
 ///|
-extern "js" fn ts_language_state_count(self : Language) -> UInt =
+extern "js" fn ts_language_state_count(language : Language) -> UInt =
   #|(language) => {
   #|  return language.stateCount;
   #|}
@@ -61,7 +61,7 @@ type Symbol UInt derive(Eq)
 ///|
 /// Get the numerical id for the given node type string.
 extern "js" fn ts_language_symbol_for_name_(
-  self : Language,
+  language : Language,
   name : Bytes
 ) -> UInt16 =
   #|(language, name) => {
@@ -87,7 +87,7 @@ pub fn Language::symbol_for_name(
 type FieldId UInt16
 
 ///|
-extern "js" fn ts_language_field_count(self : Language) -> Int =
+extern "js" fn ts_language_field_count(language : Language) -> Int =
   #|(language) => {
   #|  return language.fieldCount;
   #|}
@@ -111,7 +111,7 @@ impl Nullable for String with is_null(self : String) -> Bool {
 
 ///|
 extern "js" fn ts_language_field_name_for_id(
-  self : Language,
+  language : Language,
   id : FieldId
 ) -> String =
   #|(language, id) => {
@@ -133,7 +133,7 @@ pub fn Language::field_name_for_id(
 
 ///|
 extern "js" fn ts_language_field_id_for_name(
-  self : Language,
+  language : Language,
   name : String
 ) -> UInt =
   #|(language, name) => {
@@ -147,7 +147,7 @@ pub fn Language::field_id_for_name(self : Language, name : @string.View) -> Int 
 }
 
 ///|
-extern "js" fn ts_language_supertypes(self : Language) -> Array[Symbol] =
+extern "js" fn ts_language_supertypes(language : Language) -> Array[Symbol] =
   #|(language) => {
   #|  return language.supertypes;
   #|}
@@ -159,7 +159,7 @@ pub fn Language::supertypes(self : Language) -> Array[Symbol] {
 }
 
 ///|
-extern "js" fn ts_language_subtypes(self : Language) -> Array[Symbol] =
+extern "js" fn ts_language_subtypes(language : Language) -> Array[Symbol] =
   #|(language) => {
   #|  return language.subtypes;
   #|}
@@ -174,7 +174,7 @@ pub fn Language::subtypes(self : Language) -> Array[Symbol] {
 
 ///|
 extern "js" fn ts_language_symbol_name(
-  self : Language,
+  language : Language,
   symbol : Symbol
 ) -> String =
   #|(language, symbol) => {
@@ -224,7 +224,7 @@ fn SymbolType::to_int(self : SymbolType) -> UInt {
 
 ///|
 extern "js" fn ts_language_symbol_is_named(
-  self : Language,
+  language : Language,
   symbol : Symbol
 ) -> Bool =
   #|(language, symbol) => {
@@ -233,7 +233,7 @@ extern "js" fn ts_language_symbol_is_named(
 
 ///|
 extern "js" fn ts_language_symbol_is_visible(
-  self : Language,
+  language : Language,
   symbol : Symbol
 ) -> Bool =
   #|(language, symbol) => {
@@ -261,7 +261,7 @@ pub fn Language::symbol_type(self : Language, symbol : Symbol) -> SymbolType {
 }
 
 ///|
-extern "js" fn ts_language_version(self : Language) -> UInt =
+extern "js" fn ts_language_version(language : Language) -> UInt =
   #|(language) => {
   #|  return language.version;
   #|}
@@ -278,7 +278,7 @@ pub fn Language::version(self : Language) -> Int {
 }
 
 ///|
-extern "js" fn ts_language_abi_version(self : Language) -> UInt =
+extern "js" fn ts_language_abi_version(language : Language) -> UInt =
   #|(language) => {
   #|  return language.abiVersion;
   #|}
@@ -327,7 +327,7 @@ pub extern "js" fn LanguageMetadata::patch_version(
   #|}
 
 ///|
-extern "js" fn ts_language_metadata(self : Language) -> LanguageMetadata =
+extern "js" fn ts_language_metadata(language : Language) -> LanguageMetadata =
   #|(language) => {
   #|  return language.metadata;
   #|}
@@ -347,7 +347,7 @@ type StateId UInt16
 
 ///|
 extern "js" fn ts_language_next_state(
-  self : Language,
+  language : Language,
   state : StateId,
   symbol : Symbol
 ) -> StateId =
@@ -368,7 +368,7 @@ pub fn Language::next_state(
 }
 
 ///|
-extern "js" fn ts_language_name(self : Language) -> String =
+extern "js" fn ts_language_name(language : Language) -> String =
   #|(language) => {
   #|  return language.name;
   #|}

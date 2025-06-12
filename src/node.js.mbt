@@ -2,13 +2,13 @@
 type Node
 
 ///|
-extern "js" fn ts_node_tree(self : Node) -> Tree =
+extern "js" fn ts_node_tree(node : Node) -> Tree =
   #|(node) => {
   #|  return node.tree;
   #|}
 
 ///|
-extern "js" fn ts_node_type(self : Node) -> String =
+extern "js" fn ts_node_type(node : Node) -> String =
   #|(node) => {
   #|  return node.type;
   #|}
@@ -32,7 +32,7 @@ pub fn Node::language(self : Node) -> Language {
 }
 
 ///|
-extern "js" fn ts_node_grammar_type(self : Node) -> String =
+extern "js" fn ts_node_grammar_type(node : Node) -> String =
   #|(node) => {
   #|  return node.grammarType;
   #|}
@@ -44,7 +44,7 @@ pub fn Node::grammar_type(self : Node) -> @string.View {
 }
 
 ///|
-extern "js" fn ts_node_grammar_symbol(self : Node) -> Symbol =
+extern "js" fn ts_node_grammar_symbol(node : Node) -> Symbol =
   #|(node) => {
   #|  return node.grammarId;
   #|}
@@ -58,7 +58,7 @@ pub fn Node::grammar_symbol(self : Node) -> Symbol {
 }
 
 ///|
-extern "js" fn ts_node_start_byte(self : Node) -> Int =
+extern "js" fn ts_node_start_byte(node : Node) -> Int =
   #|(node) => {
   #|  return node.startIndex;
   #|}
@@ -70,7 +70,7 @@ pub fn Node::start_byte(self : Node) -> Int {
 }
 
 ///|
-extern "js" fn ts_node_start_point(self : Node) -> Point =
+extern "js" fn ts_node_start_point(node : Node) -> Point =
   #|(node) => {
   #|  return node.startPosition;
   #|}
@@ -82,7 +82,7 @@ pub fn Node::start_point(self : Node) -> Point {
 }
 
 ///|
-extern "js" fn ts_node_end_byte(self : Node) -> Int =
+extern "js" fn ts_node_end_byte(node : Node) -> Int =
   #|(node) => {
   #|  return node.endIndex;
   #|}
@@ -94,7 +94,7 @@ pub fn Node::end_byte(self : Node) -> Int {
 }
 
 ///|
-extern "js" fn ts_node_string(self : Node) -> String =
+extern "js" fn ts_node_string(node : Node) -> String =
   #|(node) => {
   #|  return node.toString();
   #|}
@@ -116,7 +116,7 @@ pub impl Show for Node with output(self : Node, logger : &@builtin.Logger) -> Un
 
 ///|
 /// Get the node's end position in terms of rows and columns.
-extern "js" fn ts_node_end_point(self : Node) -> Point =
+extern "js" fn ts_node_end_point(node : Node) -> Point =
   #|(node) => {
   #|  return node.endPosition;
   #|}
@@ -127,7 +127,7 @@ pub fn Node::end_point(self : Node) -> Point {
 }
 
 ///|
-extern "js" fn ts_node_is_null(self : Node) -> Bool =
+extern "js" fn ts_node_is_null(node : Node) -> Bool =
   #|(node) => {
   #|  return node == null || node == undefined;
   #|}
@@ -141,7 +141,7 @@ pub fn Node::is_null(self : Node) -> Bool {
 }
 
 ///|
-extern "js" fn ts_node_is_named(self : Node) -> Bool =
+extern "js" fn ts_node_is_named(node : Node) -> Bool =
   #|(node) => {
   #|  return node.isNamed;
   #|}
@@ -155,7 +155,7 @@ pub fn Node::is_named(self : Node) -> Bool {
 }
 
 ///|
-extern "js" fn ts_node_is_missing(self : Node) -> Bool =
+extern "js" fn ts_node_is_missing(node : Node) -> Bool =
   #|(node) => {
   #|  return node.isMissing;
   #|}
@@ -168,7 +168,7 @@ pub fn Node::is_missing(self : Node) -> Bool {
 }
 
 ///|
-extern "js" fn ts_node_is_extra(self : Node) -> Bool =
+extern "js" fn ts_node_is_extra(node : Node) -> Bool =
   #|(node) => {
   #|  return node.isExtra;
   #|}
@@ -181,7 +181,7 @@ pub fn Node::is_extra(self : Node) -> Bool {
 }
 
 ///|
-extern "js" fn ts_node_has_changes(self : Node) -> Bool =
+extern "js" fn ts_node_has_changes(node : Node) -> Bool =
   #|(node) => {
   #|  return node.hasChanges;
   #|}
@@ -193,7 +193,7 @@ pub fn Node::has_changes(self : Node) -> Bool {
 }
 
 ///|
-extern "js" fn ts_node_has_error(self : Node) -> Bool =
+extern "js" fn ts_node_has_error(node : Node) -> Bool =
   #|(node) => {
   #|  return node.hasError;
   #|}
@@ -205,7 +205,7 @@ pub fn Node::has_error(self : Node) -> Bool {
 }
 
 ///|
-extern "js" fn ts_node_is_error(self : Node) -> Bool =
+extern "js" fn ts_node_is_error(node : Node) -> Bool =
   #|(node) => {
   #|  return node.isError;
   #|}
@@ -217,7 +217,7 @@ pub fn Node::is_error(self : Node) -> Bool {
 }
 
 ///|
-extern "js" fn ts_node_parse_state(self : Node) -> StateId =
+extern "js" fn ts_node_parse_state(node : Node) -> StateId =
   #|(node) => {
   #|  return node.parseState;
   #|}
@@ -229,7 +229,7 @@ pub fn Node::parse_state(self : Node) -> StateId {
 }
 
 ///|
-extern "js" fn ts_node_next_parse_state(self : Node) -> StateId =
+extern "js" fn ts_node_next_parse_state(node : Node) -> StateId =
   #|(node) => {
   #|  return node.nextParseState;
   #|}
@@ -241,7 +241,7 @@ pub fn Node::next_parse_state(self : Node) -> StateId {
 }
 
 ///|
-extern "js" fn ts_node_parent(self : Node) -> Node =
+extern "js" fn ts_node_parent(node : Node) -> Node =
   #|(node) => {
   #|  return node.parent;
   #|}
@@ -260,7 +260,7 @@ pub fn Node::parent(self : Node) -> Node? {
 
 ///|
 extern "js" fn ts_node_child_with_descendant(
-  self : Node,
+  node : Node,
   descendant : Node
 ) -> Node =
   #|(node, descendant) => {
@@ -281,7 +281,7 @@ pub fn Node::child_with_descendant(self : Node, descendant : Node) -> Node? {
 }
 
 ///|
-extern "js" fn ts_node_child(self : Node, index : UInt) -> Node =
+extern "js" fn ts_node_child(node : Node, index : UInt) -> Node =
   #|(node, index) => {
   #|  return node.child(index);
   #|}
@@ -328,7 +328,7 @@ pub fn Node::children(self : Node) -> Iter[Node] {
 
 ///|
 extern "js" fn ts_node_field_name_for_child(
-  self : Node,
+  node : Node,
   child_index : UInt
 ) -> String =
   #|(node, tree, child_index) => {
@@ -353,7 +353,7 @@ pub fn Node::field_name_for_child(
 
 ///|
 extern "js" fn ts_node_field_name_for_named_child(
-  self : Node,
+  node : Node,
   child_index : UInt
 ) -> String =
   #|(node, child_index) => {
@@ -377,7 +377,7 @@ pub fn Node::field_name_for_named_child(
 }
 
 ///|
-extern "js" fn ts_node_child_count(self : Node) -> UInt =
+extern "js" fn ts_node_child_count(node : Node) -> UInt =
   #|(node) => {
   #|  return node.childCount;
   #|}
@@ -389,7 +389,7 @@ pub fn Node::child_count(self : Node) -> Int {
 }
 
 ///|
-extern "js" fn ts_node_named_child(self : Node, child_index : UInt) -> Node =
+extern "js" fn ts_node_named_child(node : Node, child_index : UInt) -> Node =
   #|(node, tree, child_index) => {
   #|  return node.namedChild(child_index);
   #|}
@@ -409,7 +409,7 @@ pub fn Node::named_child(self : Node, child_index : Int) -> Node? {
 }
 
 ///|
-extern "js" fn ts_node_named_child_count(self : Node) -> UInt =
+extern "js" fn ts_node_named_child_count(node : Node) -> UInt =
   #|(node) => {
   #|  return node.namedChildCount;
   #|}
@@ -439,7 +439,7 @@ pub fn Node::named_children(self : Node) -> Iter[Node] {
 
 ///|
 /// Get the node's child with the given field name.
-extern "js" fn ts_node_child_by_field_name(self : Node, name : String) -> Node =
+extern "js" fn ts_node_child_by_field_name(node : Node, name : String) -> Node =
   #|(node, name) => {
   #|  return node.childForFieldName(name);
   #|}
@@ -456,7 +456,7 @@ pub fn Node::child_by_field_name(self : Node, name : @string.View) -> Node? {
 }
 
 ///|
-extern "js" fn ts_node_child_by_field_id(self : Node, id : FieldId) -> Node =
+extern "js" fn ts_node_child_by_field_id(node : Node, id : FieldId) -> Node =
   #|(node, id) => {
   #|  return node.childForFieldId(id);
   #|}
@@ -476,7 +476,7 @@ pub fn Node::child_by_field_id(self : Node, id : FieldId) -> Node? {
 }
 
 ///|
-extern "js" fn ts_node_next_sibling(self : Node) -> Node =
+extern "js" fn ts_node_next_sibling(node : Node) -> Node =
   #|(node) => {
   #|  return node.nextSibling;
   #|}
@@ -493,7 +493,7 @@ pub fn Node::next_sibling(self : Node) -> Node? {
 }
 
 ///|
-extern "js" fn ts_node_prev_sibling(self : Node) -> Node =
+extern "js" fn ts_node_prev_sibling(node : Node) -> Node =
   #|(node) => {
   #|  return node.prevSibling;
   #|}
@@ -510,7 +510,7 @@ pub fn Node::prev_sibling(self : Node) -> Node? {
 }
 
 ///|
-extern "js" fn ts_node_next_named_sibling(self : Node) -> Node =
+extern "js" fn ts_node_next_named_sibling(node : Node) -> Node =
   #|(node) => {
   #|  return node.nextNamedSibling;
   #|}
@@ -527,7 +527,7 @@ pub fn Node::next_named_sibling(self : Node) -> Node? {
 }
 
 ///|
-extern "js" fn ts_node_prev_named_sibling(self : Node) -> Node = "moonbit_ts_node_prev_named_sibling"
+extern "js" fn ts_node_prev_named_sibling(node : Node) -> Node = "moonbit_ts_node_prev_named_sibling"
 
 ///|
 /// Get the node's previous *named* sibling.
@@ -541,7 +541,7 @@ pub fn Node::prev_named_sibling(self : Node) -> Node? {
 }
 
 ///|
-extern "js" fn ts_node_first_child_for_byte(self : Node, byte : UInt) -> Node =
+extern "js" fn ts_node_first_child_for_byte(node : Node, byte : UInt) -> Node =
   #|(node, byte) => {
   #|  return node.firstChildForIndex(byte);
   #|}
@@ -560,7 +560,7 @@ pub fn Node::first_child_for_byte(self : Node, byte : Int) -> Node? {
 
 ///|
 extern "js" fn ts_node_first_named_child_for_byte(
-  self : Node,
+  node : Node,
   byte : UInt
 ) -> Node =
   #|(node, byte) => {
@@ -580,7 +580,7 @@ pub fn Node::first_named_child_for_byte(self : Node, byte : Int) -> Node? {
 }
 
 ///|
-extern "js" fn ts_node_descendant_count(self : Node) -> Int =
+extern "js" fn ts_node_descendant_count(node : Node) -> Int =
   #|(node) => {
   #|  return node.descendantCount;
   #|}
@@ -593,7 +593,7 @@ pub fn Node::descendant_count(self : Node) -> Int {
 
 ///|
 extern "js" fn ts_node_descendant_for_byte_range(
-  self : Node,
+  node : Node,
   start_byte : UInt,
   end_byte : UInt
 ) -> Node =
@@ -620,7 +620,7 @@ pub fn Node::descendant_for_byte_range(
 
 ///|
 extern "js" fn ts_node_descendant_for_point_range(
-  self : Node,
+  node : Node,
   start_point : Point,
   end_point : Point
 ) -> Node =
@@ -648,7 +648,7 @@ pub fn Node::descendant_for_point_range(
 
 ///|
 extern "js" fn ts_node_named_descendant_for_byte_range(
-  self : Node,
+  node : Node,
   start_byte : UInt,
   end_byte : UInt
 ) -> Node =
@@ -678,7 +678,7 @@ pub fn Node::named_descendant_for_byte_range(
 
 ///|
 extern "js" fn ts_node_named_descendant_for_point_range(
-  self : Node,
+  node : Node,
   start_point : Point,
   end_point : Point
 ) -> Node =
@@ -705,7 +705,7 @@ pub fn Node::named_descendant_for_point_range(
 }
 
 ///|
-extern "js" fn ts_node_edit(self : Node, edit : InputEdit) =
+extern "js" fn ts_node_edit(node : Node, edit : InputEdit) =
   #|(node, tree, edit) => {
   #|  return node.edit(edit);
   #|}
@@ -723,9 +723,9 @@ pub fn Node::edit(self : Node, edit : InputEdit) -> Unit {
 }
 
 ///|
-extern "js" fn ts_node_eq(self : Node, other : Node) -> Bool =
-  #|(self, other) => {
-  #|  return self.equals(other)
+extern "js" fn ts_node_eq(node : Node, other : Node) -> Bool =
+  #|(node, other) => {
+  #|  return node.equals(other)
   #|}
 
 ///|
@@ -764,7 +764,7 @@ pub impl Hash for Node with hash_combine(self, hasher) {
 }
 
 ///|
-extern "js" fn ts_node_text(self : Node) -> String =
+extern "js" fn ts_node_text(node : Node) -> String =
   #|(node) => {
   #|  return node.text;
   #|}

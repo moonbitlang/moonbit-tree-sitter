@@ -27,9 +27,9 @@ pub fn parser(language : Language) -> Parser raise LanguageError {
 }
 
 ///|
-extern "js" fn ts_parser_language(self : Parser) -> Language =
-  #|(self) => {
-  #|  return self.language;
+extern "js" fn ts_parser_language(parser : Parser) -> Language =
+  #|(parser) => {
+  #|  return parser.language;
   #|}
 
 ///|
@@ -40,12 +40,12 @@ pub fn Parser::language(self : Parser) -> Language? {
 
 ///|
 extern "js" fn ts_parser_set_language(
-  self : Parser,
+  parser : Parser,
   language : Language
 ) -> Bool =
-  #|(self, language) => {
+  #|(parser, language) => {
   #|  try {
-  #|    self.setLanguage(language);
+  #|    parser.setLanguage(language);
   #|    return true;
   #|  } catch (error) {
   #|    console.error("Error setting parser language:", error);
@@ -100,9 +100,9 @@ pub const LANGUAGE_VERSION = 15
 pub const MIN_COMPATIBLE_LANGUAGE_VERSION = 13
 
 ///|
-extern "js" fn ts_parser_included_ranges(self : Parser) -> Array[Range] =
-  #|(self) => {
-  #|  return self.getIncludedRanges();
+extern "js" fn ts_parser_included_ranges(parser : Parser) -> Array[Range] =
+  #|(parser) => {
+  #|  return parser.getIncludedRanges();
   #|}
 
 ///|
@@ -131,12 +131,12 @@ fn raise_parse_error(self : Parser, tree : Tree?) -> Tree raise ParseError {
 
 ///|
 extern "js" fn ts_parser_parse_string(
-  self : Parser,
+  parser : Parser,
   string : String,
   old_tree : Tree
 ) -> Tree =
-  #|(self, string, oldTree) => {
-  #|  return self.parse(string, oldTree);
+  #|(parser, string, oldTree) => {
+  #|  return parser.parse(string, oldTree);
   #|}
 
 ///|
@@ -157,9 +157,9 @@ pub fn Parser::parse_string(
 }
 
 ///|
-extern "js" fn ts_parser_reset(self : Parser) =
-  #|(self) => {
-  #|  return self.reset();
+extern "js" fn ts_parser_reset(parser : Parser) =
+  #|(parser) => {
+  #|  return parser.reset();
   #|}
 
 ///|
@@ -192,16 +192,15 @@ fn Logger::new(log : (LogType, @string.View) -> Unit) -> Logger {
 }
 
 ///|
-// @move logger
 extern "js" fn ts_parser_set_logger(
-  self : Parser,
+  parser : Parser,
   logger : (String, Bool) -> Unit
 ) =
-  #|(self, logger) => {
-  #|  return self.setLogger(logger);
+  #|(parser, logger) => {
+  #|  return parser.setLogger(logger);
   #|}
 
-///|
+///|g
 /// Set the logger that a parser should use during parsing.
 ///
 /// The parser does not take ownership over the logger payload. If a logger was
@@ -212,9 +211,9 @@ pub fn Parser::set_logger(self : Parser, logger : Logger) -> Unit {
 }
 
 ///|
-extern "js" fn ts_parser_logger(self : Parser) -> (String, Bool) -> Unit =
-  #|() => {
-  #|  return self.getLogger();
+extern "js" fn ts_parser_logger(parser : Parser) -> (String, Bool) -> Unit =
+  #|(parser) => {
+  #|  return parser.getLogger();
   #|}
 
 ///|

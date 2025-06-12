@@ -1,4 +1,3 @@
-
 ///|
 priv type TSTree
 
@@ -80,6 +79,7 @@ pub fn Tree::root_node_with_offset(
   { node, tree: self.tree, text: self.text }
 }
 
+///|
 #borrow(tree)
 extern "c" fn ts_tree_language(tree : TSTree) -> Language = "moonbit_ts_tree_language"
 
