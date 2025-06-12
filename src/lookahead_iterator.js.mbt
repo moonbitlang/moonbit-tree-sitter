@@ -93,7 +93,9 @@ extern "js" fn ts_lookahead_iterator_current_symbol_name(
 pub fn LookaheadIterator::current_symbol_name(
   self : LookaheadIterator
 ) -> @string.View? {
-  let bytes = ts_lookahead_iterator_current_symbol_name(self).to_option()
+  let bytes = Nullable::to_option(
+    ts_lookahead_iterator_current_symbol_name(self),
+  )
   if bytes is Some(bytes) {
     Some(bytes)
   } else {

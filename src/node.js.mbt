@@ -343,7 +343,9 @@ pub fn Node::field_name_for_child(
   child_index : Int
 ) -> @string.View? {
   let child_index = int_to_uint(child_index)
-  let field_name = ts_node_field_name_for_child(self, child_index).to_option()
+  let field_name = Nullable::to_option(
+    ts_node_field_name_for_child(self, child_index),
+  )
   if field_name is Some(field_name) {
     return Some(field_name)
   } else {
@@ -368,7 +370,9 @@ pub fn Node::field_name_for_named_child(
   child_index : Int
 ) -> @string.View? {
   let child_index = int_to_uint(child_index)
-  let field_name = ts_node_field_name_for_named_child(self, child_index).to_option()
+  let field_name = Nullable::to_option(
+    ts_node_field_name_for_named_child(self, child_index),
+  )
   if field_name is Some(field_name) {
     return Some(field_name)
   } else {

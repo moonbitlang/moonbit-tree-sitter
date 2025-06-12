@@ -153,7 +153,7 @@ pub fn Parser::parse_string(
     Some(tree) => tree
   }
   let tree = ts_parser_parse_string(self, string.to_string(), old_ts_tree).to_option()
-  raise_parse_error(self, tree)
+  self.raise_parse_error(tree)
 }
 
 ///|
