@@ -13,59 +13,51 @@ const LANGUAGE_VERSION : Int = 15
 
 const MIN_COMPATIBLE_LANGUAGE_VERSION : Int = 13
 
-fn parser(Language) -> Parser
+fn parser(Language) -> Parser raise LanguageError
 
 // Types and methods
 type DecodeResult
-impl DecodeResult {
-  new(code_point~ : Char, bytes_read~ : Int) -> Self
-}
+fn DecodeResult::new(code_point~ : Char, bytes_read~ : Int) -> Self
 
 type FieldId
 
 type Input[DecodeFunction]
-impl Input {
-  new[DecodeFunction : DecodeFunction]((Int, Point) -> @bytes.View, DecodeFunction) -> Self[DecodeFunction]
-}
+fn[DecodeFunction : DecodeFunction] Input::new((Int, Point) -> @bytes.View, DecodeFunction) -> Self[DecodeFunction]
 
 type InputEdit
-impl InputEdit {
-  new(start_byte~ : Int, old_end_byte~ : Int, new_end_byte~ : Int, start_point~ : Point, old_end_point~ : Point, new_end_point~ : Point) -> Self
-}
+fn InputEdit::new(start_byte~ : Int, old_end_byte~ : Int, new_end_byte~ : Int, start_point~ : Point, old_end_point~ : Point, new_end_point~ : Point) -> Self
 
 type InputEncoding
-impl InputEncoding {
-  custom() -> Self
-}
+fn InputEncoding::custom() -> Self
 
 pub(all) type Language @tree_sitter_language.Language
-impl Language {
-  abi_version(Self) -> Int
-  copy(Self) -> Self
-  delete(Self) -> Unit
-  field_count(Self) -> Int
-  field_id_for_name(Self, @string.StringView) -> Int
-  field_name_for_id(Self, FieldId) -> String?
-  metadata(Self) -> LanguageMetadata
-  name(Self) -> String?
-  next_state(Self, StateId, Symbol) -> StateId
-  state_count(Self) -> Int
-  subtypes(Self) -> Array[Symbol]
-  supertypes(Self) -> Array[Symbol]
-  symbol_count(Self) -> Int
-  symbol_for_name(Self, @string.StringView) -> Symbol?
-  symbol_name(Self, Symbol) -> String?
-  symbol_type(Self, Symbol) -> SymbolType
-  #deprecated
-  version(Self) -> Int
-}
+fn Language::abi_version(Self) -> Int
+fn Language::copy(Self) -> Self
+fn Language::delete(Self) -> Unit
+fn Language::field_count(Self) -> Int
+fn Language::field_id_for_name(Self, @string.StringView) -> Int
+fn Language::field_name_for_id(Self, FieldId) -> String?
+fn Language::metadata(Self) -> LanguageMetadata
+fn Language::name(Self) -> String?
+fn Language::next_state(Self, StateId, Symbol) -> StateId
+fn Language::state_count(Self) -> Int
+fn Language::subtypes(Self) -> Array[Symbol]
+fn Language::supertypes(Self) -> Array[Symbol]
+fn Language::symbol_count(Self) -> Int
+fn Language::symbol_for_name(Self, @string.StringView) -> Symbol?
+fn Language::symbol_name(Self, Symbol) -> String?
+fn Language::symbol_type(Self, Symbol) -> SymbolType
+#deprecated
+fn Language::version(Self) -> Int
+
+type LanguageError
+impl Show for LanguageError
+impl ToJson for LanguageError
 
 type LanguageMetadata
-impl LanguageMetadata {
-  major_version(Self) -> Byte
-  minor_version(Self) -> Byte
-  patch_version(Self) -> Byte
-}
+fn LanguageMetadata::major_version(Self) -> Byte
+fn LanguageMetadata::minor_version(Self) -> Byte
+fn LanguageMetadata::patch_version(Self) -> Byte
 
 pub enum LogType {
   Parse
@@ -75,85 +67,81 @@ pub enum LogType {
 type Logger
 
 type LookaheadIterator
-impl LookaheadIterator {
-  current_symbol(Self) -> Symbol
-  current_symbol_name(Self) -> String?
-  language(Self) -> Language
-  new(Language, StateId) -> Self?
-  next(Self) -> Bool
-  reset(Self, Language, StateId) -> Bool
-  reset_state(Self, StateId) -> Bool
-}
+fn LookaheadIterator::current_symbol(Self) -> Symbol
+fn LookaheadIterator::current_symbol_name(Self) -> String?
+fn LookaheadIterator::language(Self) -> Language
+fn LookaheadIterator::new(Language, StateId) -> Self?
+fn LookaheadIterator::next(Self) -> Bool
+fn LookaheadIterator::reset(Self, Language, StateId) -> Bool
+fn LookaheadIterator::reset_state(Self, StateId) -> Bool
 
 type Node
-impl Node {
-  child(Self, Int) -> Self?
-  child_by_field_id(Self, FieldId) -> Self?
-  child_by_field_name(Self, @string.StringView) -> Self?
-  child_count(Self) -> Int
-  child_with_descendant(Self, Self) -> Self?
-  children(Self) -> Iter[Self]
-  descendant_count(Self) -> Int
-  descendant_for_byte_range(Self, Int, Int) -> Self?
-  descendant_for_point_range(Self, Point, Point) -> Self?
-  edit(Self, InputEdit) -> Unit
-  end_byte(Self) -> Int
-  end_point(Self) -> Point
-  eq(Self, Self) -> Bool
-  field_name_for_child(Self, Int) -> String?
-  field_name_for_named_child(Self, Int) -> String?
-  first_child_for_byte(Self, Int) -> Self?
-  first_named_child_for_byte(Self, Int) -> Self?
-  grammar_symbol(Self) -> Symbol
-  grammar_type(Self) -> String
-  has_changes(Self) -> Bool
-  has_error(Self) -> Bool
-  is_error(Self) -> Bool
-  is_extra(Self) -> Bool
-  is_missing(Self) -> Bool
-  is_named(Self) -> Bool
-  is_null(Self) -> Bool
-  language(Self) -> Language
-  named_child(Self, Int) -> Self?
-  named_child_count(Self) -> Int
-  named_children(Self) -> Iter[Self]
-  named_descendant_for_byte_range(Self, Int, Int) -> Self?
-  named_descendant_for_point_range(Self, Point, Point) -> Self?
-  next_named_sibling(Self) -> Self?
-  next_parse_state(Self) -> StateId
-  next_sibling(Self) -> Self?
-  next_symbol_names(Self) -> Iter[String]
-  next_symbols(Self) -> Iter[Symbol]
-  parent(Self) -> Self?
-  parse_state(Self) -> StateId
-  prev_named_sibling(Self) -> Self?
-  prev_sibling(Self) -> Self?
-  query(Self, @string.StringView) -> QueryCursor!QueryError
-  range(Self) -> Range
-  start_byte(Self) -> Int
-  start_point(Self) -> Point
-  string(Self) -> String
-  symbol(Self) -> Symbol
-  symbols(Self) -> Iter[Symbol]
-  text(Self) -> @string.StringView
-  type_(Self) -> String
-  walk(Self) -> TreeCursor
-}
+fn Node::child(Self, Int) -> Self?
+fn Node::child_by_field_id(Self, FieldId) -> Self?
+fn Node::child_by_field_name(Self, @string.StringView) -> Self?
+fn Node::child_count(Self) -> Int
+fn Node::child_with_descendant(Self, Self) -> Self?
+fn Node::children(Self) -> Iter[Self]
+fn Node::descendant_count(Self) -> Int
+fn Node::descendant_for_byte_range(Self, Int, Int) -> Self?
+fn Node::descendant_for_point_range(Self, Point, Point) -> Self?
+fn Node::edit(Self, InputEdit) -> Unit
+fn Node::end_byte(Self) -> Int
+fn Node::end_point(Self) -> Point
+fn Node::eq(Self, Self) -> Bool
+fn Node::field_name_for_child(Self, Int) -> String?
+fn Node::field_name_for_named_child(Self, Int) -> String?
+fn Node::first_child_for_byte(Self, Int) -> Self?
+fn Node::first_named_child_for_byte(Self, Int) -> Self?
+fn Node::grammar_symbol(Self) -> Symbol
+fn Node::grammar_type(Self) -> String
+fn Node::has_changes(Self) -> Bool
+fn Node::has_error(Self) -> Bool
+fn Node::is_error(Self) -> Bool
+fn Node::is_extra(Self) -> Bool
+fn Node::is_missing(Self) -> Bool
+fn Node::is_named(Self) -> Bool
+fn Node::is_null(Self) -> Bool
+fn Node::language(Self) -> Language
+fn Node::named_child(Self, Int) -> Self?
+fn Node::named_child_count(Self) -> Int
+fn Node::named_children(Self) -> Iter[Self]
+fn Node::named_descendant_for_byte_range(Self, Int, Int) -> Self?
+fn Node::named_descendant_for_point_range(Self, Point, Point) -> Self?
+fn Node::next_named_sibling(Self) -> Self?
+fn Node::next_parse_state(Self) -> StateId
+fn Node::next_sibling(Self) -> Self?
+fn Node::next_symbol_names(Self) -> Iter[String]
+fn Node::next_symbols(Self) -> Iter[Symbol]
+fn Node::parent(Self) -> Self?
+fn Node::parse_state(Self) -> StateId
+fn Node::prev_named_sibling(Self) -> Self?
+fn Node::prev_sibling(Self) -> Self?
+fn Node::query(Self, @string.StringView) -> QueryCursor raise QueryError
+fn Node::range(Self) -> Range
+fn Node::start_byte(Self) -> Int
+fn Node::start_point(Self) -> Point
+fn Node::string(Self) -> String
+fn Node::symbol(Self) -> Symbol
+fn Node::symbol_names(Self) -> Iter[String]
+fn Node::symbols(Self) -> Iter[Symbol]
+fn Node::text(Self) -> @string.StringView
+fn Node::type_(Self) -> String
+fn Node::walk(Self) -> TreeCursor
 impl Eq for Node
 impl Hash for Node
 impl Show for Node
 impl ToJson for Node
 
-pub type! ParseError {
+pub suberror ParseError {
   MissingLanguage
   Cancelled
 }
 impl Show for ParseError
+impl ToJson for ParseError
 
 type ParseOptions
-impl ParseOptions {
-  new((ParseState) -> Bool) -> Self
-}
+fn ParseOptions::new((ParseState) -> Bool) -> Self
 
 pub struct ParseState {
   current_byte_offset : Int
@@ -161,26 +149,22 @@ pub struct ParseState {
 }
 
 type Parser
-impl Parser {
-  included_ranges(Self) -> Array[Range]
-  language(Self) -> Language?
-  logger(Self) -> Logger
-  new() -> Self
-  parse[Encoding : DecodeFunction](Self, old_tree? : Tree, Input[Encoding], options? : ParseOptions) -> Tree!ParseError
-  parse_bytes(Self, old_tree? : Tree, Bytes, encoding~ : @encoding.Encoding) -> Tree!ParseError
-  parse_string(Self, old_tree? : Tree, @string.StringView) -> Tree!ParseError
-  reset(Self) -> Unit
-  set_included_ranges(Self, Array[Range]) -> Bool
-  set_language(Self, Language) -> Unit
-  set_logger(Self, Logger) -> Unit
-}
+fn Parser::included_ranges(Self) -> Array[Range]
+fn Parser::language(Self) -> Language?
+fn Parser::logger(Self) -> Logger
+fn Parser::new() -> Self
+fn[Encoding : DecodeFunction] Parser::parse(Self, old_tree? : Tree, Input[Encoding], options? : ParseOptions) -> Tree raise ParseError
+fn Parser::parse_bytes(Self, old_tree? : Tree, Bytes, encoding~ : @encoding.Encoding) -> Tree raise ParseError
+fn Parser::parse_string(Self, old_tree? : Tree, @string.StringView) -> Tree raise ParseError
+fn Parser::reset(Self) -> Unit
+fn Parser::set_included_ranges(Self, Array[Range]) -> Bool
+fn Parser::set_language(Self, Language) -> Unit raise LanguageError
+fn Parser::set_logger(Self, Logger) -> Unit
 
 type Point
-impl Point {
-  column(Self) -> Int
-  new(Int, Int) -> Self
-  row(Self) -> Int
-}
+fn Point::column(Self) -> Int
+fn Point::new(Int, Int) -> Self
+fn Point::row(Self) -> Int
 impl Show for Point
 
 pub enum Quantifier {
@@ -193,56 +177,48 @@ pub enum Quantifier {
 impl Show for Quantifier
 
 type Query
-impl Query {
-  capture_count(Self) -> Int
-  capture_name_for_id(Self, Int) -> String
-  capture_quantifier_for_id(Self, Int, Int) -> Quantifier
-  captures(Self, Node) -> Iter[QueryCapture]
-  disable_capture(Self, @string.StringView) -> Unit
-  disable_pattern(Self, Int) -> Unit
-  end_byte_for_pattern(Self, Int) -> Int
-  is_pattern_guaranteed_at_step(Self, Int) -> Bool
-  is_pattern_non_local(Self, Int) -> Bool
-  is_pattern_rooted(Self, Int) -> Bool
-  matches(Self, Node) -> Iter[QueryMatch]
-  new(Language, @string.StringView) -> Self!QueryError
-  pattern_count(Self) -> Int
-  predicates_for_pattern(Self, Int) -> Array[Array[QueryPredicateStep]]
-  start_byte_for_pattern(Self, Int) -> Int
-  string_count(Self) -> Int
-  string_value_for_id(Self, Int) -> String
-}
+fn Query::capture_count(Self) -> Int
+fn Query::capture_name_for_id(Self, Int) -> String
+fn Query::capture_quantifier_for_id(Self, Int, Int) -> Quantifier
+fn Query::captures(Self, Node) -> Iter[QueryCapture]
+fn Query::disable_capture(Self, @string.StringView) -> Unit
+fn Query::disable_pattern(Self, Int) -> Unit
+fn Query::end_byte_for_pattern(Self, Int) -> Int
+fn Query::is_pattern_guaranteed_at_step(Self, Int) -> Bool
+fn Query::is_pattern_non_local(Self, Int) -> Bool
+fn Query::is_pattern_rooted(Self, Int) -> Bool
+fn Query::matches(Self, Node) -> Iter[QueryMatch]
+fn Query::new(Language, @string.StringView) -> Self raise QueryError
+fn Query::pattern_count(Self) -> Int
+fn Query::predicates_for_pattern(Self, Int) -> Array[Array[QueryPredicateStep]]
+fn Query::start_byte_for_pattern(Self, Int) -> Int
+fn Query::string_count(Self) -> Int
+fn Query::string_value_for_id(Self, Int) -> String?
 
 type QueryCapture
-impl QueryCapture {
-  index(Self) -> Int
-  name(Self) -> String
-  node(Self) -> Node
-}
+fn QueryCapture::index(Self) -> Int
+fn QueryCapture::name(Self) -> String
+fn QueryCapture::node(Self) -> Node
 impl Show for QueryCapture
 impl ToJson for QueryCapture
 
 type QueryCursor
-impl QueryCursor {
-  captures(Self) -> Iter[QueryCapture]
-  did_exceed_match_limit(Self) -> Bool
-  exec(Self, Query, Node, options? : QueryCursorOptions) -> Unit
-  match_limit(Self) -> Int
-  matches(Self) -> Iter[QueryMatch]
-  new() -> Self
-  next_capture(Self) -> QueryCapture?
-  next_match(Self) -> QueryMatch?
-  remove_match(Self, Int) -> Unit
-  set_byte_range(Self, Int, Int) -> Unit
-  set_match_limit(Self, Int) -> Unit
-  set_max_start_depth(Self, Int) -> Unit
-  set_point_range(Self, Point, Point) -> Unit
-}
+fn QueryCursor::captures(Self) -> Iter[QueryCapture]
+fn QueryCursor::did_exceed_match_limit(Self) -> Bool
+fn QueryCursor::exec(Self, Query, Node, options? : QueryCursorOptions) -> Unit
+fn QueryCursor::match_limit(Self) -> Int
+fn QueryCursor::matches(Self) -> Iter[QueryMatch]
+fn QueryCursor::new() -> Self
+fn QueryCursor::next_capture(Self) -> QueryCapture?
+fn QueryCursor::next_match(Self) -> QueryMatch?
+fn QueryCursor::remove_match(Self, Int) -> Unit
+fn QueryCursor::set_byte_range(Self, Int, Int) -> Unit
+fn QueryCursor::set_match_limit(Self, Int) -> Unit
+fn QueryCursor::set_max_start_depth(Self, Int) -> Unit
+fn QueryCursor::set_point_range(Self, Point, Point) -> Unit
 
 type QueryCursorOptions
-impl QueryCursorOptions {
-  new(progress_callback~ : (QueryCursorState) -> Unit) -> Self
-}
+fn QueryCursorOptions::new(progress_callback~ : (QueryCursorState) -> Unit) -> Self
 
 pub struct QueryCursorState {
   current_byte_offset : Int
@@ -250,14 +226,13 @@ pub struct QueryCursorState {
 
 type QueryError
 impl Show for QueryError
+impl ToJson for QueryError
 
 type QueryMatch
-impl QueryMatch {
-  captures(Self) -> Iter[QueryCapture]
-  id(Self) -> Int
-  pattern_index(Self) -> Int
-  predicates(Self) -> Array[Array[QueryPredicateStep]]
-}
+fn QueryMatch::captures(Self) -> Iter[QueryCapture]
+fn QueryMatch::id(Self) -> Int
+fn QueryMatch::pattern_index(Self) -> Int
+fn QueryMatch::predicates(Self) -> Array[Array[QueryPredicateStep]]
 impl ToJson for QueryMatch
 
 pub enum QueryPredicateStep {
@@ -268,13 +243,11 @@ impl Show for QueryPredicateStep
 impl ToJson for QueryPredicateStep
 
 type Range
-impl Range {
-  end_byte(Self) -> Int
-  end_point(Self) -> Point
-  new(Point, Point, Int, Int) -> Self
-  start_byte(Self) -> Int
-  start_point(Self) -> Point
-}
+fn Range::end_byte(Self) -> Int
+fn Range::end_point(Self) -> Point
+fn Range::new(Point, Point, Int, Int) -> Self
+fn Range::start_byte(Self) -> Int
+fn Range::start_point(Self) -> Point
 impl Show for Range
 
 type StateId
@@ -284,38 +257,34 @@ type Symbol
 type SymbolType
 
 type Tree
-impl Tree {
-  copy(Self) -> Self
-  edit(Self, InputEdit) -> Unit
-  get_changed_ranges(Self, Self) -> Array[Range]
-  included_ranges(Self) -> Array[Range]
-  language(Self) -> Language
-  query(Self, @string.StringView) -> QueryCursor!QueryError
-  root_node(Self) -> Node
-  root_node_with_offset(Self, Int, Point) -> Node
-  walk(Self) -> TreeCursor
-}
+fn Tree::copy(Self) -> Self
+fn Tree::edit(Self, InputEdit) -> Unit
+fn Tree::get_changed_ranges(Self, Self) -> Array[Range]
+fn Tree::included_ranges(Self) -> Array[Range]
+fn Tree::language(Self) -> Language
+fn Tree::query(Self, @string.StringView) -> QueryCursor raise QueryError
+fn Tree::root_node(Self) -> Node
+fn Tree::root_node_with_offset(Self, Int, Point) -> Node
+fn Tree::walk(Self) -> TreeCursor
 
 type TreeCursor
-impl TreeCursor {
-  copy(Self) -> Self
-  current_depth(Self) -> Int
-  current_descendant_index(Self) -> Int
-  current_field_id(Self) -> FieldId
-  current_field_name(Self) -> String?
-  current_node(Self) -> Node
-  goto_descendant(Self, Int) -> Unit
-  goto_first_child(Self) -> Bool
-  goto_first_child_for_byte(Self, Int) -> Bool
-  goto_first_child_for_point(Self, Point) -> Bool
-  goto_last_child(Self) -> Bool
-  goto_next_sibling(Self) -> Bool
-  goto_parent(Self) -> Bool
-  goto_previous_sibling(Self) -> Bool
-  new(Node) -> Self
-  reset(Self, Node) -> Unit
-  reset_to(Self, Self) -> Unit
-}
+fn TreeCursor::copy(Self) -> Self
+fn TreeCursor::current_depth(Self) -> Int
+fn TreeCursor::current_descendant_index(Self) -> Int
+fn TreeCursor::current_field_id(Self) -> FieldId
+fn TreeCursor::current_field_name(Self) -> String?
+fn TreeCursor::current_node(Self) -> Node
+fn TreeCursor::goto_descendant(Self, Int) -> Unit
+fn TreeCursor::goto_first_child(Self) -> Bool
+fn TreeCursor::goto_first_child_for_byte(Self, Int) -> Bool
+fn TreeCursor::goto_first_child_for_point(Self, Point) -> Bool
+fn TreeCursor::goto_last_child(Self) -> Bool
+fn TreeCursor::goto_next_sibling(Self) -> Bool
+fn TreeCursor::goto_parent(Self) -> Bool
+fn TreeCursor::goto_previous_sibling(Self) -> Bool
+fn TreeCursor::new(Node) -> Self
+fn TreeCursor::reset(Self, Node) -> Unit
+fn TreeCursor::reset_to(Self, Self) -> Unit
 
 // Type aliases
 pub typealias Grammar = @tonyfettes/tree_sitter/grammar.Grammar
