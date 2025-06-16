@@ -20,22 +20,19 @@ test {
       #|   (comment))))
     ,
   )
-  let expr = Expr::capture(
-    Expr::node(
-      Node::and_(
-        Node::type_("structure"),
-        Node::descendant(
+  let expr = Expr::node(
+    Node::and_(
+      Node::type_("structure"),
+      Node::descendant(
+        Expr::seq(
+          Expr::repeat(Expr::node(Node::truthy())),
           Expr::seq(
+            Expr::capture(Expr::node(Node::type_("comment")), "comment"),
             Expr::repeat(Expr::node(Node::truthy())),
-            Expr::seq(
-              Expr::capture(Expr::node(Node::type_("comment")), "comment"),
-              Expr::repeat(Expr::node(Node::truthy())),
-            ),
           ),
         ),
       ),
     ),
-    "structure",
   )
   @json.inspect(expr.matches([root_node].iter()), content=[
     {
@@ -50,35 +47,83 @@ test {
         },
       ],
       "group": {
-        "structure": [
+        "comment": [
           {
             "value": [
               {
-                "node": "(structure (function_definition (function_identifier (lowercase_identifier)) (block_expression (comment))))",
-                "text": "fn main {\n  // a\n}",
+                "node": "(comment)",
+                "text": "// a",
                 "range": {
-                  "start": { "row": 0, "column": 0 },
+                  "start": { "row": 1, "column": 2 },
+                  "end": { "row": 1, "column": 6 },
+                },
+              },
+            ],
+            "group": {},
+          },
+        ],
+      },
+    },
+  ])
+  let expr = Expr::node(
+    Node::and_(
+      Node::type_("structure"),
+      Node::descendant(
+        Expr::capture(
+          Expr::seq(
+            Expr::repeat(Expr::node(Node::truthy())),
+            Expr::seq(
+              Expr::node(Node::type_("comment")),
+              Expr::repeat(Expr::node(Node::truthy())),
+            ),
+          ),
+          "comment",
+        ),
+      ),
+    ),
+  )
+  @json.inspect(expr.matches([root_node].iter()), content=[
+    {
+      "value": [
+        {
+          "node": "(structure (function_definition (function_identifier (lowercase_identifier)) (block_expression (comment))))",
+          "text": "fn main {\n  // a\n}",
+          "range": {
+            "start": { "row": 0, "column": 0 },
+            "end": { "row": 2, "column": 1 },
+          },
+        },
+      ],
+      "group": {
+        "comment": [
+          {
+            "value": [
+              {
+                "node": "(\"{\")",
+                "text": "{",
+                "range": {
+                  "start": { "row": 0, "column": 8 },
+                  "end": { "row": 0, "column": 9 },
+                },
+              },
+              {
+                "node": "(comment)",
+                "text": "// a",
+                "range": {
+                  "start": { "row": 1, "column": 2 },
+                  "end": { "row": 1, "column": 6 },
+                },
+              },
+              {
+                "node": "(\"}\")",
+                "text": "}",
+                "range": {
+                  "start": { "row": 2, "column": 0 },
                   "end": { "row": 2, "column": 1 },
                 },
               },
             ],
-            "group": {
-              "comment": [
-                {
-                  "value": [
-                    {
-                      "node": "(comment)",
-                      "text": "// a",
-                      "range": {
-                        "start": { "row": 1, "column": 2 },
-                        "end": { "row": 1, "column": 6 },
-                      },
-                    },
-                  ],
-                  "group": {},
-                },
-              ],
-            },
+            "group": {},
           },
         ],
       },
