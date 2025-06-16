@@ -21,15 +21,15 @@ test {
     ,
   )
   let expr = Expr::capture(
-    Node(
-      And(
-        Type("structure"),
-        Descendant(
-          Seq(
-            Repeat(Node(True)),
-            Seq(
-              Expr::capture(Node(Type("comment")), "comment"),
-              Repeat(Node(True)),
+    Expr::node(
+      Node::and_(
+        Node::type_("structure"),
+        Node::descendant(
+          Expr::seq(
+            Expr::repeat(Expr::node(Node::truthy())),
+            Expr::seq(
+              Expr::capture(Expr::node(Node::type_("comment")), "comment"),
+              Expr::repeat(Expr::node(Node::truthy())),
             ),
           ),
         ),

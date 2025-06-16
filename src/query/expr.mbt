@@ -120,6 +120,24 @@ pub fn Node::falsy() -> Node {
 }
 
 ///|
+pub fn Node::bool(b : Bool) -> Node {
+  match b {
+    true => True
+    false => False
+  }
+}
+
+///|
+pub fn Node::child(e : Expr) -> Node {
+  Child(e)
+}
+
+///|
+pub fn Node::descendant(e : Expr) -> Node {
+  Descendant(e)
+}
+
+///|
 test {
   let a = Node::type_("a")
   let b = Node::type_("b")
@@ -225,12 +243,10 @@ fn merge(
 }
 
 ///|
-fn Node::matches(
+pub fn Node::matches(
   self : Node,
   node : @tree_sitter.Node
 ) -> Map[String, Array[Match]]? {
-  println("Node::matches: expr = \{self}")
-  println("Node::matches: node = \{node.type_()}")
   fn matches(
     self : Node,
     node : @tree_sitter.Node,
@@ -533,7 +549,7 @@ fn State::finish(self : State, expr : Expr) -> Bool {
 }
 
 ///|
-priv struct Match {
+struct Match {
   value : ArrayView[@tree_sitter.Node]
   group : Map[String, Array[Match]]
 } derive(Show, ToJson)
@@ -558,7 +574,7 @@ fn State::matches(
 }
 
 ///|
-fn Expr::matches(self : Expr, nodes : Iter[@tree_sitter.Node]) -> Match? {
+pub fn Expr::matches(self : Expr, nodes : Iter[@tree_sitter.Node]) -> Match? {
   let state = State::new()
   let self = state.matches(self, nodes)
   if not(state.finish(self)) {
