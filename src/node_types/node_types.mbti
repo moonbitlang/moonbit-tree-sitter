@@ -33,6 +33,7 @@ impl Show for NodeTypePayload
 
 pub type NodeTypes Array[NodeType]
 fn NodeTypes::from_json(Json) -> Self raise @json.JsonDecodeError
+fn NodeTypes::inner(Self) -> Array[NodeType]
 impl Show for NodeTypes
 impl ToJson for NodeTypes
 impl @json.FromJson for NodeTypes
