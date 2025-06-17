@@ -3,24 +3,6 @@ package "tonyfettes/tree_sitter/query"
 // Values
 
 // Types and methods
-type Expr
-fn Expr::alt(Self, Self) -> Self
-fn Expr::and_(Self, Self) -> Self
-fn Expr::capture(Self, String, id? : Int) -> Self
-fn Expr::node(Node) -> Self
-fn Expr::repeat(Self) -> Self
-fn Expr::seq(Self, Self) -> Self
-impl Eq for Expr
-impl ToJson for Expr
-
-type Node
-fn Node::and_(Self, Self) -> Self
-fn Node::falsy() -> Self
-fn Node::not(Self) -> Self
-fn Node::or_(Self, Self) -> Self
-fn Node::truthy() -> Self
-fn Node::type_(String) -> Self
-impl Eq for Node
 
 // Type aliases
 

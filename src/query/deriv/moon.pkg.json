@@ -1,0 +1,14 @@
+{
+  "import": [
+    "tonyfettes/tree_sitter"
+  ],
+  "test-import": [
+    "tonyfettes/tree_sitter_moonbit"
+  ],
+  "link": {
+    "native": {
+      "cc": "/opt/homebrew/opt/llvm/bin/clang",
+      "cc-flags": "-g"
+    }
+  }
+}

@@ -215,20 +215,6 @@ test {
 }
 
 ///|
-fn Node::simplify(self : Node) -> Node {
-  match self {
-    True => True
-    False => False
-    And(n1, n2) => n1.simplify().and_(n2.simplify())
-    Or(n1, n2) => n1.simplify().or_(n2.simplify())
-    Not(n1) => n1.simplify().not()
-    Type(t) => Type(t)
-    Child(e) => Child(e.simplify())
-    Descendant(e) => Descendant(e.simplify())
-  }
-}
-
-///|
 fn merge(
   self : Map[String, Array[Match]],
   other : Map[String, Array[Match]]
@@ -345,20 +331,6 @@ impl Show for Expr with output(self : Expr, logger : &Logger) -> Unit {
       e.output(logger)
       logger.write_char(')')
     }
-  }
-}
-
-///|
-fn Expr::simplify(self : Expr) -> Expr {
-  match self {
-    Empty => Empty
-    Never => Never
-    Node(n) => Node(n.simplify())
-    Seq(e1, e2) => e1.simplify().seq(e2.simplify())
-    Alt(e1, e2) => e1.simplify().alt(e2.simplify())
-    And(e1, e2) => e1.simplify().and_(e2.simplify())
-    Repeat(e) => e.simplify().repeat()
-    Capture(e, name, id~) => e.simplify().capture(name, id?)
   }
 }
 

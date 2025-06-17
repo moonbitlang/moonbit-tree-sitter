@@ -1,0 +1,41 @@
+package "tonyfettes/tree_sitter/query/deriv"
+
+import(
+  "tonyfettes/tree_sitter"
+)
+
+// Values
+
+// Types and methods
+type Expr
+fn Expr::alt(Self, Self) -> Self
+fn Expr::and_(Self, Self) -> Self
+fn Expr::capture(Self, String, id? : Int) -> Self
+fn Expr::matches(Self, Iter[@tree_sitter.Node]) -> Match?
+fn Expr::node(Node) -> Self
+fn Expr::repeat(Self) -> Self
+fn Expr::seq(Self, Self) -> Self
+impl Eq for Expr
+impl ToJson for Expr
+
+type Match
+impl Show for Match
+impl ToJson for Match
+
+type Node
+fn Node::and_(Self, Self) -> Self
+fn Node::bool(Bool) -> Self
+fn Node::child(Expr) -> Self
+fn Node::descendant(Expr) -> Self
+fn Node::falsy() -> Self
+fn Node::matches(Self, @tree_sitter.Node) -> Map[String, Array[Match]]?
+fn Node::not(Self) -> Self
+fn Node::or_(Self, Self) -> Self
+fn Node::truthy() -> Self
+fn Node::type_(String) -> Self
+impl Eq for Node
+
+// Type aliases
+
+// Traits
+
