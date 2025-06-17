@@ -27,7 +27,7 @@ pub fn Point::new(row : Int, column : Int) -> Point {
 }
 
 ///|
-extern "js" fn ts_point_row(self : Point) -> UInt =
+extern "js" fn ts_point_row(point : Point) -> UInt =
   #|(point) => {
   #|  return point.row;
   #|}
@@ -38,7 +38,7 @@ pub fn Point::row(self : Point) -> Int {
 }
 
 ///|
-extern "js" fn ts_point_column(self : Point) -> UInt =
+extern "js" fn ts_point_column(point : Point) -> UInt =
   #|(point) => {
   #|  return point.column;
   #|}

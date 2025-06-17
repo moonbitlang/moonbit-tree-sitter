@@ -26,8 +26,8 @@ pub fn Point::new(row : Int, column : Int) -> Point {
 }
 
 ///|
-fn ts_point_row(self : Point) -> UInt {
-  self._[0]
+fn ts_point_row(point : Point) -> UInt {
+  point._[0]
 }
 
 ///|
@@ -36,8 +36,8 @@ pub fn Point::row(self : Point) -> Int {
 }
 
 ///|
-fn ts_point_column(self : Point) -> UInt {
-  self._[1]
+fn ts_point_column(point : Point) -> UInt {
+  point._[1]
 }
 
 ///|

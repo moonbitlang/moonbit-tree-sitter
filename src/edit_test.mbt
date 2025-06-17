@@ -6,10 +6,10 @@ struct Edit {
 } derive(Show, ToJson)
 
 ///|
-fn parse_rules(source : Bytes) -> Array[Edit]! {
+fn parse_rules(source : Bytes) -> Array[Edit] raise {
   let yaml = @tree_sitter_yaml.language()
-  let parser = @tree_sitter.parser!(yaml)
-  let source_tree = parser.parse_bytes!(source, encoding=@encoding.UTF8)
+  let parser = @tree_sitter.parser(yaml)
+  let source_tree = parser.parse_bytes(source, encoding=@encoding.UTF8)
   let source_root = source_tree.root_node()
   let query_source =
     #|(block_mapping_pair
@@ -25,7 +25,7 @@ fn parse_rules(source : Bytes) -> Array[Edit]! {
     #|    key: (_) @_replace
     #|    value: (_) @replace)
     #|   (#eq? @_replace "replace"))))
-  let query_cursor = source_root.query!(query_source)
+  let query_cursor = source_root.query(query_source)
   let edits : Array[Edit] = []
   while query_cursor.next_match() is Some(matched) {
     let captures_nodes = {}
@@ -33,22 +33,22 @@ fn parse_rules(source : Bytes) -> Array[Edit]! {
     for capture in matched.captures() {
       let node = capture.node()
       let bytes = source[node.start_byte():node.end_byte()]
-      let text = @encoding.decode!(encoding=UTF8, [..bytes])
+      let text = @encoding.decode(encoding=UTF8, [..bytes])
       captures_nodes[capture.name().to_string()] = node
       captures_texts[capture.name().to_string()] = text
     }
     guard captures_texts.get("name") is Some(name) else {
-      fail!("Error: missing name")
+      fail("Error: missing name")
     }
     guard captures_texts.get("search") is Some(search) else {
-      fail!("Error: missing search")
+      fail("Error: missing search")
     }
     let search = match search.trim_space() {
       ['|', '\n', .. search] => search
       search => search
     }
     guard captures_texts.get("replace") is Some(replace) else {
-      fail!("Error: missing replace")
+      fail("Error: missing replace")
     }
     let replace = match replace.trim_space() {
       ['|', '\n', .. replace] => replace
@@ -104,8 +104,8 @@ test "parse_rules" {
     #|  replace: |
     #|    for $binderDefinition in $rangeLower..<($rangeUpper) $forBody
     #|
-  let rules = parse_rules!(@encoding.encode(encoding=UTF8, rules))
-  @json.inspect!(rules, content=[
+  let rules = parse_rules(@encoding.encode(encoding=UTF8, rules))
+  @json.inspect(rules, content=[
     {
       "name": "suggested-for-in",
       "search": #|((for_expression

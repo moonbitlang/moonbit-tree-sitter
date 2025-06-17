@@ -8,19 +8,19 @@ import(
 
 // Types and methods
 pub struct Grammar {
+  schema : String
   name : String
   rules : Map[String, Rule]
   extras : Array[Rule]
   supertypes : Array[RuleName]
   reserved : Map[String, Rule]
+  precedences : Array[Array[Rule]]
   externals : Array[Rule]
   inline : Array[RuleName]
   conflicts : Array[Array[RuleName]]
   word : RuleName?
 }
-impl Grammar {
-  from_json(Json) -> Self!GrammarParseError
-}
+fn Grammar::from_json(Json) -> Self raise GrammarParseError
 impl Show for Grammar
 impl ToJson for Grammar
 impl @json.FromJson for Grammar
@@ -28,9 +28,14 @@ impl @json.FromJson for Grammar
 type GrammarParseError
 impl Show for GrammarParseError
 
-type Prec
-impl Eq for Prec
-impl Hash for Prec
+type PrecType
+impl Eq for PrecType
+impl Hash for PrecType
+
+type PrecValue
+impl Eq for PrecValue
+impl Hash for PrecValue
+impl Show for PrecValue
 
 pub enum Rule {
   Alias(named~ : Bool, String, Rule)
@@ -43,7 +48,7 @@ pub enum Rule {
   Seq(Array[Rule])
   Field(name~ : String, Rule)
   Token(immediate~ : Bool, Rule)
-  Prec(prec~ : Prec, value~ : Int, Rule)
+  Prec(prec~ : PrecType, value~ : PrecValue, Rule)
   Pattern(String)
 }
 impl Eq for Rule

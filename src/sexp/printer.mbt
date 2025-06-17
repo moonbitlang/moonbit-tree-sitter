@@ -1,7 +1,7 @@
 ///|
 pub fn pretty_to(list : Array[Sexp], result : Array[Sexp]) -> Unit {
-  loop true, list[:] {
-    first, list =>
+  loop (true, list[:]) {
+    (first, list) =>
       match (first, list) {
         (first, [Atom(Newline), Atom(Comment(_)) as comment, .. list]) => {
           if not(first) {
@@ -9,13 +9,13 @@ pub fn pretty_to(list : Array[Sexp], result : Array[Sexp]) -> Unit {
           }
           result.push(comment)
           result.push(Atom(Newline))
-          continue true, list
+          continue (true, list)
         }
-        (first, [Atom(Newline), .. list]) => continue first, list
+        (first, [Atom(Newline), .. list]) => continue (first, list)
         (_, [Atom(Comment(_)) as comment, .. list]) => {
           result.push(comment)
           result.push(Atom(Newline))
-          continue true, list
+          continue (true, list)
         }
         (_, [Atom(Capture(_)) as capture]) => {
           result.push(capture)
@@ -24,14 +24,14 @@ pub fn pretty_to(list : Array[Sexp], result : Array[Sexp]) -> Unit {
         (_, [Atom(Capture(_)) as capture, .. list]) => {
           result.push(capture)
           result.push(Atom(Newline))
-          continue true, list
+          continue (true, list)
         }
         (first, [sexp, .. list]) => {
           if not(first) {
             result.push(Atom(Newline))
           }
           result.push(sexp.pretty())
-          continue false, list
+          continue (false, list)
         }
         (_, []) => break
       }
@@ -141,7 +141,7 @@ test "print" {
   ])
   let buffer = StringBuilder::new()
   sexp.print_to(buffer)
-  inspect!(
+  inspect(
     buffer,
     content=
       #|(a "b" c: (d "e"))
@@ -150,6 +150,6 @@ test "print" {
 }
 
 ///|
-pub fn prettify(source : @string.View) -> @string.View!SexpError {
-  parse!(source) |> pretty() |> print()
+pub fn prettify(source : @string.View) -> @string.View raise SexpError {
+  parse(source) |> pretty() |> print()
 }

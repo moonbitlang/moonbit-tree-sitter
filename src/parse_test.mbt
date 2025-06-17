@@ -1,15 +1,15 @@
 ///|
 test "json" {
   let json = @tree_sitter_json.language()
-  let parser = @tree_sitter.parser!(json)
+  let parser = @tree_sitter.parser(json)
   let source =
     #|{
     #|  "name": "John Doe",
     #|  "age": 43
     #|}
-  let tree = parser.parse_string!(source)
+  let tree = parser.parse_string(source)
   let root_node = tree.root_node()
-  inspect!(
+  inspect(
     root_node,
     content=
       #|(document
@@ -25,8 +25,8 @@ test "json" {
       #|   value: (number))))
     ,
   )
-  let root_node_first_child = root_node.child(0).or_error!(Failure("None"))
-  inspect!(
+  let root_node_first_child = root_node.child(0).or_error(Failure("None"))
+  inspect(
     root_node_first_child,
     content=
       #|(object
@@ -46,7 +46,7 @@ test "json" {
 ///|
 test "moonbit" {
   let moonbit = @tree_sitter_moonbit.language()
-  let parser = @tree_sitter.parser!(moonbit)
+  let parser = @tree_sitter.parser(moonbit)
   let source =
     #|fn main {
     #|  println("Hello, World!")
@@ -62,15 +62,15 @@ test "moonbit" {
     #|    fib(a - 1) + fib(a - 2)
     #|  }
     #|}
-  let tree = parser.parse_string!(source)
+  let tree = parser.parse_string(source)
   let comment_document = []
-  let query_cursor = tree.query!("(comment) @comment")
+  let query_cursor = tree.query("(comment) @comment")
   for match_ in query_cursor.matches() {
     let comment_node = match_
       .captures()
       .filter(fn(x) { x.name() == "comment" })
       .peek()
-      .or_error!(Failure("No comment found"))
+      .or_error(Failure("No comment found"))
       .node()
     let start_byte = comment_node.start_byte()
     let end_byte = comment_node.end_byte()
@@ -83,7 +83,7 @@ test "moonbit" {
     }
   }
   let comment_document = comment_document.join("\n")
-  inspect!(
+  inspect(
     comment_document.to_string(),
     content=
       #|# Heading
@@ -91,10 +91,10 @@ test "moonbit" {
       #|Paragraph with *italic* and **bold** text.
     ,
   )
-  parser.set_language!(@tree_sitter_markdown.language())
-  let markdown_tree = parser.parse_string!(comment_document.to_string())
+  parser.set_language(@tree_sitter_markdown.language())
+  let markdown_tree = parser.parse_string(comment_document.to_string())
   let markdown_root_node = markdown_tree.root_node()
-  inspect!(
+  inspect(
     markdown_root_node,
     content=
       #|(document
@@ -112,7 +112,7 @@ test "moonbit" {
 test "markdown" {
   let moonbit = @tree_sitter_moonbit.language()
   let markdown = @tree_sitter_markdown.language()
-  let parser = @tree_sitter.parser!(markdown)
+  let parser = @tree_sitter.parser(markdown)
   let source =
     #|# Heading
     #|
@@ -123,7 +123,7 @@ test "markdown" {
     #|  println("Hello, World!")
     #|}
     #|```
-  let tree = parser.parse_string!(source)
+  let tree = parser.parse_string(source)
   let root_node = tree.root_node()
   guard root_node.children().collect() is [document]
   guard document.children().collect() is [_, _, fenced_code_block]
@@ -142,7 +142,7 @@ test "markdown" {
     }
   }
   guard not(moonbit_ranges.is_empty())
-  parser.set_language!(moonbit)
+  parser.set_language(moonbit)
   parser.set_included_ranges(moonbit_ranges) |> ignore()
 }
 
@@ -166,7 +166,7 @@ impl @tree_sitter.DecodeFunction for UTF32BE with decode(bytes : @bytes.View) ->
 
 ///|
 test "custom-encoding" {
-  let parser = @tree_sitter.parser!(@tree_sitter_json.language())
+  let parser = @tree_sitter.parser(@tree_sitter_json.language())
   let source =
     #|{
     #|  "name": "John Doe",
@@ -190,9 +190,9 @@ test "custom-encoding" {
     },
     UTF32BE::{  },
   )
-  let tree = parser.parse!(input)
+  let tree = parser.parse(input)
   let root_node = tree.root_node()
-  inspect!(
+  inspect(
     root_node,
     content=
       #|(document

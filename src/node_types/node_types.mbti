@@ -32,9 +32,7 @@ pub enum NodeTypePayload {
 impl Show for NodeTypePayload
 
 pub type NodeTypes Array[NodeType]
-impl NodeTypes {
-  from_json(Json) -> Self!@json.JsonDecodeError
-}
+fn NodeTypes::from_json(Json) -> Self raise @json.JsonDecodeError
 impl Show for NodeTypes
 impl ToJson for NodeTypes
 impl @json.FromJson for NodeTypes

@@ -1,6 +1,6 @@
 ///|
 test "input creation and usage" {
-  let parser = @tree_sitter.parser!(@tree_sitter_json.language())
+  let parser = @tree_sitter.parser(@tree_sitter_json.language())
   let source =
     #|{"key": "value"}
 
@@ -24,11 +24,11 @@ test "input creation and usage" {
   )
 
   // Parse with our custom input
-  let tree = parser.parse!(input)
+  let tree = parser.parse(input)
 
   // Verify the result
   let root = tree.root_node()
-  inspect!(root.child_count() > 0, content="true")
-  let object_node = root.child(0).or_error!(Failure("No object node found"))
-  inspect!(object_node.type_(), content="object")
+  inspect(root.child_count() > 0, content="true")
+  let object_node = root.child(0).or_error(Failure("No object node found"))
+  inspect(object_node.type_(), content="object")
 }

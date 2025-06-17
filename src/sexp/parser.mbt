@@ -1,5 +1,5 @@
 ///|
-pub type! SexpError {
+pub suberror SexpError {
   UnrecognizedCharacter(@string.View)
   UnterminatedString(@string.View)
   UnterminatedList(@string.View)
@@ -14,12 +14,12 @@ pub type! SexpError {
 fn parse_list(
   source : @string.View,
   sexp : Array[Sexp]
-) -> @string.View!SexpError {
+) -> @string.View raise SexpError {
   fn parse_string(
     source : @string.View,
     string : StringBuilder,
     quote : Char
-  ) -> @string.View!SexpError {
+  ) -> @string.View raise SexpError {
     loop source {
       ['\\', '\\', .. source] => {
         string.write_char('\\')
@@ -73,7 +73,7 @@ fn parse_list(
     }
     ['\'' | '"' as quote, .. source] => {
       let string = StringBuilder::new()
-      let source = parse_string!(source, string, quote)
+      let source = parse_string(source, string, quote)
       sexp.push(Atom(String(string.to_string())))
       continue source
     }
@@ -85,9 +85,9 @@ fn parse_list(
       let list = []
       let sexp_list = List::new(open='(', list, close=')')
       sexp.push(Sexp::List(sexp_list))
-      match parse_list!(source, list) {
+      match parse_list(source, list) {
         [')', '+' | '?' | '*' as quantifier, .. source] => {
-          sexp_list.quantifier = Quantifier::from_char!(quantifier)
+          sexp_list.quantifier = Quantifier::from_char(quantifier)
           continue source
         }
         [')', .. source] => continue source
@@ -98,9 +98,9 @@ fn parse_list(
       let list = []
       let sexp_list = List::new(open='[', list, close=']')
       sexp.push(Sexp::List(sexp_list))
-      match parse_list!(source, list) {
+      match parse_list(source, list) {
         [']', '+' | '?' | '*' as quantifier, .. source] => {
-          sexp_list.quantifier = Quantifier::from_char!(quantifier)
+          sexp_list.quantifier = Quantifier::from_char(quantifier)
           continue source
         }
         [']', .. source] => continue source
@@ -111,9 +111,9 @@ fn parse_list(
       let list = []
       let sexp_list = List::new(open='{', list, close='}')
       sexp.push(Sexp::List(sexp_list))
-      match parse_list!(source, list) {
+      match parse_list(source, list) {
         ['}', '+' | '?' | '*' as quantifier, .. source] => {
-          sexp_list.quantifier = Quantifier::from_char!(quantifier)
+          sexp_list.quantifier = Quantifier::from_char(quantifier)
           continue source
         }
         ['}', .. source] => continue source
@@ -157,7 +157,7 @@ fn parse_list(
       match parse_symbol(source, symbol) {
         [':', .. source] => {
           let list = []
-          let source = parse_list!(source, list)
+          let source = parse_list(source, list)
           match list {
             [item, .. list] => {
               sexp.push(Pair(symbol.to_string(), item))
@@ -180,9 +180,9 @@ fn parse_list(
 }
 
 ///|
-pub fn Sexp::parse(source : @string.View) -> Sexp!SexpError {
+pub fn Sexp::parse(source : @string.View) -> Sexp raise SexpError {
   let list = []
-  let source = parse_list!(source, list)
+  let source = parse_list(source, list)
   if source is [_, ..] {
     raise SexpError::UnrecognizedCharacter(source)
   }
@@ -194,9 +194,9 @@ pub fn Sexp::parse(source : @string.View) -> Sexp!SexpError {
 }
 
 ///|
-pub fn parse(source : @string.View) -> Array[Sexp]!SexpError {
+pub fn parse(source : @string.View) -> Array[Sexp] raise SexpError {
   let list = []
-  let source = parse_list!(source, list)
+  let source = parse_list(source, list)
   match source {
     [_, ..] => raise SexpError::UnrecognizedCharacter(source)
     [] => return list

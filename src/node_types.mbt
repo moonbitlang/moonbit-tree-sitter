@@ -1,2 +1,2 @@
 ///|
-pub typealias NodeTypes = @node_types.NodeTypes
+pub typealias @node_types.NodeTypes

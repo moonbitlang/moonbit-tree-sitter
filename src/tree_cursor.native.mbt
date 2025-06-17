@@ -27,8 +27,8 @@ pub fn TreeCursor::new(node : Node) -> TreeCursor {
 }
 
 ///|
-#borrow(self, node)
-extern "c" fn ts_tree_cursor_reset(self : TSTreeCursor, node : TSNode) = "moonbit_ts_tree_cursor_reset"
+#borrow(cursor, node)
+extern "c" fn ts_tree_cursor_reset(cursor : TSTreeCursor, node : TSNode) = "moonbit_ts_tree_cursor_reset"
 
 ///|
 /// Re-initialize a tree cursor to start at the original node that the cursor was
@@ -38,9 +38,9 @@ pub fn TreeCursor::reset(self : TreeCursor, node : Node) -> Unit {
 }
 
 ///|
-#borrow(self, other)
+#borrow(cursor, other)
 extern "c" fn ts_tree_cursor_reset_to(
-  self : TSTreeCursor,
+  cursor : TSTreeCursor,
   other : TSTreeCursor
 ) = "moonbit_ts_tree_cursor_reset_to"
 
@@ -54,8 +54,8 @@ pub fn TreeCursor::reset_to(self : TreeCursor, other : TreeCursor) -> Unit {
 }
 
 ///|
-#borrow(self)
-extern "c" fn ts_tree_cursor_current_node(self : TSTreeCursor) -> TSNode = "moonbit_ts_tree_cursor_current_node"
+#borrow(cursor)
+extern "c" fn ts_tree_cursor_current_node(cursor : TSTreeCursor) -> TSNode = "moonbit_ts_tree_cursor_current_node"
 
 ///|
 /// Get the tree cursor's current node.
@@ -68,9 +68,9 @@ pub fn TreeCursor::current_node(self : TreeCursor) -> Node {
 }
 
 ///|
-#borrow(self)
+#borrow(cursor)
 extern "c" fn ts_tree_cursor_current_field_name(
-  self : TSTreeCursor
+  cursor : TSTreeCursor
 ) -> @native.ConstPtr[Byte] = "moonbit_ts_tree_cursor_current_field_name"
 
 ///|
@@ -84,8 +84,8 @@ pub fn TreeCursor::current_field_name(self : TreeCursor) -> String? {
 }
 
 ///|
-#borrow(self)
-extern "c" fn ts_tree_cursor_current_field_id(self : TSTreeCursor) -> FieldId = "moonbit_ts_tree_cursor_current_field_id"
+#borrow(cursor)
+extern "c" fn ts_tree_cursor_current_field_id(cursor : TSTreeCursor) -> FieldId = "moonbit_ts_tree_cursor_current_field_id"
 
 ///|
 /// Get the field id of the tree cursor's current node.
@@ -97,8 +97,8 @@ pub fn TreeCursor::current_field_id(self : TreeCursor) -> FieldId {
 }
 
 ///|
-#borrow(self)
-extern "c" fn ts_tree_cursor_goto_parent(self : TSTreeCursor) -> Bool = "moonbit_ts_tree_cursor_goto_parent"
+#borrow(cursor)
+extern "c" fn ts_tree_cursor_goto_parent(cursor : TSTreeCursor) -> Bool = "moonbit_ts_tree_cursor_goto_parent"
 
 ///|
 /// Move the cursor to the parent of its current node.
@@ -113,8 +113,8 @@ pub fn TreeCursor::goto_parent(self : TreeCursor) -> Bool {
 }
 
 ///|
-#borrow(self)
-extern "c" fn ts_tree_cursor_goto_next_sibling(self : TSTreeCursor) -> Bool = "moonbit_ts_tree_cursor_goto_next_sibling"
+#borrow(cursor)
+extern "c" fn ts_tree_cursor_goto_next_sibling(cursor : TSTreeCursor) -> Bool = "moonbit_ts_tree_cursor_goto_next_sibling"
 
 ///|
 /// Move the cursor to the next sibling of its current node.
@@ -129,8 +129,10 @@ pub fn TreeCursor::goto_next_sibling(self : TreeCursor) -> Bool {
 }
 
 ///|
-#borrow(self)
-extern "c" fn ts_tree_cursor_goto_previous_sibling(self : TSTreeCursor) -> Bool = "moonbit_ts_tree_cursor_goto_previous_sibling"
+#borrow(cursor)
+extern "c" fn ts_tree_cursor_goto_previous_sibling(
+  cursor : TSTreeCursor
+) -> Bool = "moonbit_ts_tree_cursor_goto_previous_sibling"
 
 ///|
 /// Move the cursor to the previous sibling of its current node.
@@ -148,8 +150,8 @@ pub fn TreeCursor::goto_previous_sibling(self : TreeCursor) -> Bool {
 }
 
 ///|
-#borrow(self)
-extern "c" fn ts_tree_cursor_goto_first_child(self : TSTreeCursor) -> Bool = "moonbit_ts_tree_cursor_goto_first_child"
+#borrow(cursor)
+extern "c" fn ts_tree_cursor_goto_first_child(cursor : TSTreeCursor) -> Bool = "moonbit_ts_tree_cursor_goto_first_child"
 
 ///|
 /// Move the cursor to the first child of its current node.
@@ -161,8 +163,8 @@ pub fn TreeCursor::goto_first_child(self : TreeCursor) -> Bool {
 }
 
 ///|
-#borrow(self)
-extern "c" fn ts_tree_cursor_goto_last_child(self : TSTreeCursor) -> Bool = "moonbit_ts_tree_cursor_goto_last_child"
+#borrow(cursor)
+extern "c" fn ts_tree_cursor_goto_last_child(cursor : TSTreeCursor) -> Bool = "moonbit_ts_tree_cursor_goto_last_child"
 
 ///|
 /// Move the cursor to the last child of its current node.
@@ -178,9 +180,9 @@ pub fn TreeCursor::goto_last_child(self : TreeCursor) -> Bool {
 }
 
 ///|
-#borrow(self)
+#borrow(cursor)
 extern "c" fn ts_tree_cursor_goto_descendant(
-  self : TSTreeCursor,
+  cursor : TSTreeCursor,
   goal_descendant_index : UInt
 ) -> Unit = "moonbit_ts_tree_cursor_goto_descendant"
 
@@ -199,9 +201,9 @@ pub fn TreeCursor::goto_descendant(
 }
 
 ///|
-#borrow(self)
+#borrow(cursor)
 extern "c" fn ts_tree_cursor_current_descendant_index(
-  self : TSTreeCursor
+  cursor : TSTreeCursor
 ) -> UInt = "moonbit_ts_tree_cursor_current_descendant_index"
 
 ///|
@@ -212,8 +214,8 @@ pub fn TreeCursor::current_descendant_index(self : TreeCursor) -> Int {
 }
 
 ///|
-#borrow(self)
-extern "c" fn ts_tree_cursor_current_depth(self : TSTreeCursor) -> UInt = "moonbit_ts_tree_cursor_current_depth"
+#borrow(cursor)
+extern "c" fn ts_tree_cursor_current_depth(cursor : TSTreeCursor) -> UInt = "moonbit_ts_tree_cursor_current_depth"
 
 ///|
 /// Get the depth of the cursor's current node relative to the original
@@ -223,9 +225,9 @@ pub fn TreeCursor::current_depth(self : TreeCursor) -> Int {
 }
 
 ///|
-#borrow(self)
+#borrow(cursor)
 extern "c" fn ts_tree_cursor_goto_first_child_for_byte(
-  self : TSTreeCursor,
+  cursor : TSTreeCursor,
   goal_byte : UInt
 ) -> Bool = "moonbit_ts_tree_cursor_goto_first_child_for_byte"
 
@@ -243,9 +245,9 @@ pub fn TreeCursor::goto_first_child_for_byte(
 }
 
 ///|
-#borrow(self, goal_point)
+#borrow(cursor, goal_point)
 extern "c" fn ts_tree_cursor_goto_first_child_for_point(
-  self : TSTreeCursor,
+  cursor : TSTreeCursor,
   goal_point : Point
 ) -> Bool = "moonbit_ts_tree_cursor_goto_first_child_for_point"
 
@@ -263,8 +265,8 @@ pub fn TreeCursor::goto_first_child_for_point(
 }
 
 ///|
-#borrow(self)
-extern "c" fn ts_tree_cursor_copy(self : TSTreeCursor) -> TSTreeCursor = "moonbit_ts_tree_cursor_copy"
+#borrow(cursor)
+extern "c" fn ts_tree_cursor_copy(cursor : TSTreeCursor) -> TSTreeCursor = "moonbit_ts_tree_cursor_copy"
 
 ///|
 pub fn TreeCursor::copy(self : TreeCursor) -> TreeCursor {

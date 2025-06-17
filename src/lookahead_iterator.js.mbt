@@ -2,9 +2,11 @@
 type LookaheadIterator
 
 ///|
-extern "js" fn ts_lookahead_iterator_is_null(self : LookaheadIterator) -> Bool =
-  #|(self) => {
-  #|  return self === null || self === undefined;
+extern "js" fn ts_lookahead_iterator_is_null(
+  iterator : LookaheadIterator
+) -> Bool =
+  #|(iterator) => {
+  #|  return iterator === null || iterator === undefined;
   #|}
 
 ///|
@@ -80,10 +82,10 @@ pub extern "js" fn LookaheadIterator::current_symbol(
 
 ///|
 extern "js" fn ts_lookahead_iterator_current_symbol_name(
-  self : LookaheadIterator
+  iterator : LookaheadIterator
 ) -> String =
-  #|(self) => {
-  #|  return self.currentType;
+  #|(iterator) => {
+  #|  return iterator.currentType;
   #|}
 
 ///|
@@ -91,7 +93,9 @@ extern "js" fn ts_lookahead_iterator_current_symbol_name(
 pub fn LookaheadIterator::current_symbol_name(
   self : LookaheadIterator
 ) -> @string.View? {
-  let bytes = ts_lookahead_iterator_current_symbol_name(self).to_option()
+  let bytes = Nullable::to_option(
+    ts_lookahead_iterator_current_symbol_name(self),
+  )
   if bytes is Some(bytes) {
     Some(bytes)
   } else {
@@ -103,7 +107,7 @@ pub fn LookaheadIterator::current_symbol_name(
 /// true <=> IterContinue
 /// false <=> IterEnd
 extern "js" fn ts_lookahead_iterator_symbol_names(
-  self : LookaheadIterator,
+  iterator : LookaheadIterator,
   f : (String) -> Bool
 ) -> Bool =
   #|(self, f) => {

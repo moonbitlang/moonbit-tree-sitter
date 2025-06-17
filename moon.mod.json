@@ -1,6 +1,6 @@
 {
   "name": "tonyfettes/tree_sitter",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "deps": {
     "tonyfettes/tree_sitter_language": "0.1.1",
     "illusory0x0/native": "0.1.4",
