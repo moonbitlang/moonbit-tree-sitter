@@ -3,7 +3,7 @@ type Range (Int, Int) derive(Eq, Hash, ToJson)
 
 ///|
 impl Show for Range with output(self : Range, logger : &@builtin.Logger) -> Unit {
-  logger.write_object(self._)
+  logger.write_object(self.inner())
 }
 
 ///|
@@ -180,7 +180,7 @@ fn pattern_query(
     if not(node.is_named()) {
       if node.type_() == "_" {
         for range, name in env.ranges {
-          if node.start_byte() == range._.0 {
+          if node.start_byte() == range.inner().0 {
             let mut exists = false
             for old_name in capture_name {
               if old_name == name {

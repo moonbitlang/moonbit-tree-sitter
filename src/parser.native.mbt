@@ -138,12 +138,12 @@ pub fn Parser::set_included_ranges(
 ) -> Bool {
   let flatten_ranges = FixedArray::make(ranges.length() * 6, 0U)
   for i, range in ranges {
-    flatten_ranges[i * 6] = range._[0]
-    flatten_ranges[i * 6 + 1] = range._[1]
-    flatten_ranges[i * 6 + 2] = range._[2]
-    flatten_ranges[i * 6 + 3] = range._[3]
-    flatten_ranges[i * 6 + 4] = range._[4]
-    flatten_ranges[i * 6 + 5] = range._[5]
+    flatten_ranges[i * 6] = range.inner()[0]
+    flatten_ranges[i * 6 + 1] = range.inner()[1]
+    flatten_ranges[i * 6 + 2] = range.inner()[2]
+    flatten_ranges[i * 6 + 3] = range.inner()[3]
+    flatten_ranges[i * 6 + 4] = range.inner()[4]
+    flatten_ranges[i * 6 + 5] = range.inner()[5]
   }
   return ts_parser_set_included_ranges(self, flatten_ranges)
 }
