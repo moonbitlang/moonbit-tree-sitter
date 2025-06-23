@@ -3,7 +3,7 @@ type Range (Int, Int) derive(Eq, Hash, ToJson)
 
 ///|
 impl Show for Range with output(self : Range, logger : &@builtin.Logger) -> Unit {
-  logger.write_object(self._)
+  logger.write_object(self.inner())
 }
 
 ///|
@@ -48,18 +48,18 @@ fn pattern_query(
     brackets : Array[Int]
     mut start : Int?
     mut end : Int?
-    mut var : (Int, StringBuilder)?
+    mut variable : (Int, StringBuilder)?
   }
   let context = Context::{
     replaced: StringBuilder::new(),
     brackets: [],
     start: None,
     end: None,
-    var: None,
+    variable: None,
   }
   loop (0, pattern) {
     (offset, ['$', '[', .. pattern]) => {
-      if context.var is Some(_) {
+      if context.variable is Some(_) {
         raise MetaVarOutOfPattern(offset)
       }
       if context.start is Some(_) {
@@ -100,17 +100,17 @@ fn pattern_query(
         raise MetaVarOutOfPattern(offset)
       }
       context.replaced.write_char('_')
-      match context.var {
-        None => context.var = Some((offset, StringBuilder::new()))
+      match context.variable {
+        None => context.variable = Some((offset, StringBuilder::new()))
         Some((start, name)) => {
           env.add_var(name.to_string(), (start, offset))
-          context.var = Some((offset, StringBuilder::new()))
+          context.variable = Some((offset, StringBuilder::new()))
         }
       }
       continue (offset + 1, pattern)
     }
     (offset, [char, .. pattern]) =>
-      match context.var {
+      match context.variable {
         None => {
           context.replaced.write_char(char)
           continue (offset + 1, pattern)
@@ -127,7 +127,7 @@ fn pattern_query(
           }
       }
     (offset, []) =>
-      if context.var is Some((start, name)) {
+      if context.variable is Some((start, name)) {
         env.add_var(name.to_string(), (start, offset))
       }
   }
@@ -180,7 +180,7 @@ fn pattern_query(
     if not(node.is_named()) {
       if node.type_() == "_" {
         for range, name in env.ranges {
-          if node.start_byte() == range._.0 {
+          if node.start_byte() == range.inner().0 {
             let mut exists = false
             for old_name in capture_name {
               if old_name == name {
