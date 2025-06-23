@@ -244,17 +244,17 @@ type LanguageMetadata Bytes
 
 ///|
 pub fn LanguageMetadata::major_version(self : LanguageMetadata) -> Byte {
-  self._[0]
+  self.inner()[0]
 }
 
 ///|
 pub fn LanguageMetadata::minor_version(self : LanguageMetadata) -> Byte {
-  self._[1]
+  self.inner()[1]
 }
 
 ///|
 pub fn LanguageMetadata::patch_version(self : LanguageMetadata) -> Byte {
-  self._[2]
+  self.inner()[2]
 }
 
 ///|
@@ -298,6 +298,6 @@ extern "c" fn ts_language_name(language : Language) -> @native.ConstPtr[Byte] = 
 ///|
 /// Get the name of this language. This returns `None` in older parsers.
 pub fn Language::name(self : Language) -> String? {
-  let name = ts_language_name(self._)
+  let name = ts_language_name(self.inner())
   return decode_c_string(name)
 }
