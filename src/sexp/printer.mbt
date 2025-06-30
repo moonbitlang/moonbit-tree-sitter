@@ -1,109 +1,56 @@
 ///|
-pub fn pretty_to(list : Array[Sexp], result : Array[Sexp]) -> Unit {
-  loop (true, list[:]) {
-    (first, list) =>
-      match (first, list) {
-        (first, [Atom(Newline), Atom(Comment(_)) as comment, .. list]) => {
-          if not(first) {
-            result.push(Atom(Newline))
-          }
-          result.push(comment)
-          result.push(Atom(Newline))
-          continue (true, list)
-        }
-        (first, [Atom(Newline), .. list]) => continue (first, list)
-        (_, [Atom(Comment(_)) as comment, .. list]) => {
-          result.push(comment)
-          result.push(Atom(Newline))
-          continue (true, list)
-        }
-        (_, [Atom(Capture(_)) as capture]) => {
-          result.push(capture)
-          break
-        }
-        (_, [Atom(Capture(_)) as capture, .. list]) => {
-          result.push(capture)
-          result.push(Atom(Newline))
-          continue (true, list)
-        }
-        (first, [sexp, .. list]) => {
-          if not(first) {
-            result.push(Atom(Newline))
-          }
-          result.push(sexp.pretty())
-          continue (false, list)
-        }
-        (_, []) => break
-      }
-  }
-}
-
-///|
-pub fn Sexp::pretty(self : Sexp) -> Sexp {
-  match self {
-    Atom(_) => self
-    Pair(key, value) => return Pair(key, value.pretty())
-    List({ open, list, close, quantifier }) => {
-      let result = []
-      pretty_to(list, result)
-      return Sexp::list(open~, result, close~, quantifier~)
-    }
-  }
-}
-
-///|
-pub fn pretty(list : Array[Sexp]) -> Array[Sexp] {
-  let result = []
-  pretty_to(list, result)
-  return result
-}
-
-///|
 pub fn print_to(
-  list : Array[Sexp],
+  list : ArrayView[Sexp],
   logger : &Logger,
   indent~ : Int = 0
 ) -> Unit {
-  loop list[:] {
-    [Atom(Newline), Atom(Comment(_)) as comment, .. list] => {
+  loop list {
+    [] => ()
+    [Atom(Comment(_)) as sexp] => {
+      sexp.print_to(logger, indent~)
       logger.write_char('\n')
-      for i in 0..<indent {
+      for _ in 0..<(indent - 1) {
         logger.write_char(' ')
       }
-      comment.print_to(logger, indent~)
+    }
+    [sexp] => sexp.print_to(logger, indent~)
+    [Atom(Field(name)) as field, value, Atom(Capture(_)) as capture, .. list] => {
+      field.print_to(logger)
+      logger.write_char(' ')
+      value.print_to(logger, indent=indent + name.length() + 2)
+      logger.write_char(' ')
+      capture.print_to(logger)
       continue list
     }
-    [Atom(Newline)] => {
-      logger.write_char('\n')
-      for i in 0..<(indent - 1) {
-        logger.write_char(' ')
-      }
+    [Atom(Field(name)) as field, value] => {
+      field.print_to(logger)
+      logger.write_char(' ')
+      value.print_to(logger, indent=indent + name.length() + 2)
     }
-    [Atom(Newline), Atom(Newline), ..] as list => {
+    [Atom(Field(name)) as field, value, .. list] => {
+      field.print_to(logger)
+      logger.write_char(' ')
+      value.print_to(logger, indent=indent + name.length() + 2)
       logger.write_char('\n')
-      continue list[1:]
-    }
-    [Atom(Newline), .. list] => {
-      logger.write_char('\n')
-      for i in 0..<indent {
+      for _ in 0..<indent {
         logger.write_char(' ')
       }
       continue list
     }
-    [sexp] => {
+    [sexp, Atom(Capture(_)) as capture, .. list] => {
       sexp.print_to(logger, indent~)
-      break
-    }
-    [sexp, Atom(Newline), ..] as list => {
-      sexp.print_to(logger, indent~)
-      continue list[1:]
+      logger.write_char(' ')
+      capture.print_to(logger)
+      continue list
     }
     [sexp, .. list] => {
       sexp.print_to(logger, indent~)
-      logger.write_char(' ')
+      logger.write_char('\n')
+      for _ in 0..<indent {
+        logger.write_char(' ')
+      }
       continue list
     }
-    [] => break
   }
 }
 
@@ -118,15 +65,10 @@ pub fn print(list : Array[Sexp]) -> String {
 pub fn Sexp::print_to(self : Sexp, logger : &Logger, indent~ : Int = 0) -> Unit {
   match self {
     Atom(atom) => logger.write_object(atom)
-    Pair(key, value) => {
-      logger.write_string(key)
-      logger.write_string(": ")
-      value.print_to(logger, indent=indent + key.length() + 2)
-    }
-    List({ open, list, close, quantifier }) => {
-      logger.write_char(open)
+    List(list, delimiter~, quantifier~) => {
+      logger.write_char(delimiter.open())
       print_to(list, logger, indent=indent + 1)
-      logger.write_char(close)
+      logger.write_char(delimiter.close())
       logger.write_object(quantifier)
     }
   }
@@ -137,19 +79,36 @@ test "print" {
   let sexp : Sexp = Sexp::list([
     Atom(Symbol("a")),
     Atom(String("b")),
-    Pair("c", Sexp::list([Atom(Symbol("d")), Atom(String("e"))])),
+    Atom(Field("c")),
+    Sexp::list([Atom(Symbol("d")), Atom(String("e"))]),
   ])
   let buffer = StringBuilder::new()
   sexp.print_to(buffer)
   inspect(
     buffer,
     content=
-      #|(a "b" c: (d "e"))
+      #|(a
+      #| "b"
+      #| c: (d
+      #|     "e"))
     ,
   )
-}
-
-///|
-pub fn prettify(source : @string.View) -> @string.View raise SexpError {
-  parse(source) |> pretty() |> print()
+  let sexp = Sexp::list([
+    Atom(Symbol("a")),
+    Atom(String("b")),
+    Atom(Field("c")),
+    Sexp::list([Atom(Symbol("d")), Atom(String("e"))]),
+    Atom(Capture("f")),
+  ])
+  buffer.reset()
+  sexp.print_to(buffer)
+  inspect(
+    buffer,
+    content=
+      #|(a
+      #| "b"
+      #| c: (d
+      #|     "e") @f)
+    ,
+  )
 }

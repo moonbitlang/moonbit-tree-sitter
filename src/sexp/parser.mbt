@@ -3,7 +3,6 @@ pub suberror SexpError {
   UnrecognizedCharacter(@string.View)
   UnterminatedString(@string.View)
   UnterminatedList(@string.View)
-  MissingValue(@string.View)
   ExtraContent(@array.View[Sexp])
   InvalidPairKey(@string.View)
   InvalidQuantifier(Char)
@@ -66,11 +65,7 @@ fn parse_list(
   }
 
   loop source {
-    [' ' | '\t' | '\r', .. source] => continue source
-    ['\n', .. source] => {
-      sexp.push(Atom(Newline))
-      continue source
-    }
+    [' ' | '\t' | '\n' | '\r', .. source] => continue source
     ['\'' | '"' as quote, .. source] => {
       let string = StringBuilder::new()
       let source = parse_string(source, string, quote)
@@ -83,8 +78,9 @@ fn parse_list(
     }
     ['(', .. source] => {
       let list = []
-      let sexp_list = List::new(open='(', list, close=')')
-      sexp.push(Sexp::List(sexp_list))
+      let sexp_list = Sexp::List(list, delimiter=Parenthesis, quantifier=One)
+      guard sexp_list is (List(_, ..) as sexp_list)
+      sexp.push(sexp_list)
       match parse_list(source, list) {
         [')', '+' | '?' | '*' as quantifier, .. source] => {
           sexp_list.quantifier = Quantifier::from_char(quantifier)
@@ -96,8 +92,9 @@ fn parse_list(
     }
     ['[', .. source] => {
       let list = []
-      let sexp_list = List::new(open='[', list, close=']')
-      sexp.push(Sexp::List(sexp_list))
+      let sexp_list = Sexp::List(list, delimiter=Bracket, quantifier=One)
+      guard sexp_list is (List(_, ..) as sexp_list)
+      sexp.push(sexp_list)
       match parse_list(source, list) {
         [']', '+' | '?' | '*' as quantifier, .. source] => {
           sexp_list.quantifier = Quantifier::from_char(quantifier)
@@ -109,8 +106,9 @@ fn parse_list(
     }
     ['{', .. source] => {
       let list = []
-      let sexp_list = List::new(open='{', list, close='}')
-      sexp.push(Sexp::List(sexp_list))
+      let sexp_list = Sexp::List(list, delimiter=Brace, quantifier=One)
+      guard sexp_list is (List(_, ..) as sexp_list)
+      sexp.push(sexp_list)
       match parse_list(source, list) {
         ['}', '+' | '?' | '*' as quantifier, .. source] => {
           sexp_list.quantifier = Quantifier::from_char(quantifier)
@@ -138,7 +136,10 @@ fn parse_list(
     ['@', .. source] => {
       let capture = StringBuilder::new()
       match parse_symbol(source, capture) {
-        [':', ..] => raise SexpError::InvalidPairKey(capture.to_string())
+        [':', .. source] => {
+          sexp.push(Atom(Narrow(capture.to_string())))
+          continue source
+        }
         [.. source] => {
           sexp.push(Atom(Capture(capture.to_string())))
           continue source
@@ -156,18 +157,8 @@ fn parse_list(
       symbol.write_char(char)
       match parse_symbol(source, symbol) {
         [':', .. source] => {
-          let list = []
-          let source = parse_list(source, list)
-          match list {
-            [item, .. list] => {
-              sexp.push(Pair(symbol.to_string(), item))
-              for item in list {
-                sexp.push(item)
-              }
-              continue source
-            }
-            [] => raise SexpError::MissingValue(source)
-          }
+          sexp.push(Atom(Field(symbol.to_string())))
+          continue source
         }
         [.. source] => {
           sexp.push(Atom(Symbol(symbol.to_string())))

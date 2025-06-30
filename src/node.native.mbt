@@ -131,9 +131,7 @@ pub fn Node::string(self : Node) -> String {
 
 ///|
 pub impl Show for Node with output(self : Node, logger : &@builtin.Logger) -> Unit {
-  try
-    @sexp.parse(self.string()) |> @sexp.pretty() |> @sexp.print_to(logger)
-  catch {
+  try @sexp.parse(self.string()) |> @sexp.print_to(logger) catch {
     _ => logger.write_string(self.string().to_string())
   }
 }

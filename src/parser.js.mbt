@@ -207,7 +207,7 @@ extern "js" fn ts_parser_set_logger(
 /// previously assigned, the caller is responsible for releasing any memory
 /// owned by the previous logger.
 pub fn Parser::set_logger(self : Parser, logger : Logger) -> Unit {
-  ts_parser_set_logger(self, logger._)
+  ts_parser_set_logger(self, logger.inner())
 }
 
 ///|
