@@ -47,7 +47,7 @@ extern "js" fn ts_query_new(
   ts : TS,
   language : Language,
   source : String,
-  error : FixedArray[UInt]
+  error : FixedArray[UInt],
 ) -> Query =
   #|(ts, language, source, error) => {
   #|  try {
@@ -70,7 +70,7 @@ extern "js" fn ts_query_new(
 /// If a pattern is invalid, this raises a `QueryError`.
 pub fn Query::new(
   language : Language,
-  source : @string.View
+  source : @string.View,
 ) -> Query raise QueryError {
   let error = FixedArray::make(2, 0U)
   let query = ts_query_new(ts, language, source.to_string(), error)
@@ -120,7 +120,7 @@ pub fn Query::string_count(self : Query) -> Int {
 ///|
 extern "js" fn ts_query_start_byte_for_pattern(
   query : Query,
-  pattern_index : UInt
+  pattern_index : UInt,
 ) -> UInt =
   #|(query, patternIndex) => {
   #|  return query.startIndexForPattern(patternIndex);
@@ -139,7 +139,7 @@ pub fn Query::start_byte_for_pattern(self : Query, pattern_index : Int) -> Int {
 ///|
 extern "js" fn ts_query_end_byte_for_pattern(
   query : Query,
-  pattern_index : UInt
+  pattern_index : UInt,
 ) -> UInt =
   #|(patternIndex) => {
   #|  return self.endIndexForPattern(patternIndex);
@@ -175,7 +175,7 @@ priv type TSQueryPredicateStep
 
 ///|
 extern "js" fn TSQueryPredicateStep::type_(
-  self : TSQueryPredicateStep
+  self : TSQueryPredicateStep,
 ) -> String =
   #|(self) => {
   #|  return self.type;
@@ -183,7 +183,7 @@ extern "js" fn TSQueryPredicateStep::type_(
 
 ///|
 extern "js" fn TSQueryPredicateStep::value(
-  self : TSQueryPredicateStep
+  self : TSQueryPredicateStep,
 ) -> String =
   #|(self) => {
   #|  if (self.type == "capture") {
@@ -202,7 +202,7 @@ pub enum QueryPredicateStep {
 ///|
 pub impl Show for QueryPredicateStep with output(
   self,
-  logger : &@builtin.Logger
+  logger : &@builtin.Logger,
 ) -> Unit {
   match self {
     Capture(name) => logger.write_string("@\{name}")
@@ -226,7 +226,7 @@ extern "js" fn TSQueryPredicate::operator(self : TSQueryPredicate) -> String =
 
 ///|
 extern "js" fn TSQueryPredicate::operands(
-  self : TSQueryPredicate
+  self : TSQueryPredicate,
 ) -> Array[TSQueryPredicateStep] =
   #|(self) => {
   #|  return self.operands;
@@ -235,7 +235,7 @@ extern "js" fn TSQueryPredicate::operands(
 ///|
 extern "js" fn ts_query_predicates_for_pattern(
   query : Query,
-  pattern_index : Int
+  pattern_index : Int,
 ) -> Array[TSQueryPredicate] =
   #|(query, patternIndex) => {
   #|  return query.predicates[patternIndex];
@@ -247,7 +247,7 @@ typealias Array[QueryPredicateStep] as QueryPredicate
 ///|
 pub fn Query::predicates_for_pattern(
   self : Query,
-  pattern_index : Int
+  pattern_index : Int,
 ) -> Array[QueryPredicate] {
   let ts_predicates = ts_query_predicates_for_pattern(self, pattern_index)
   let predicates = []
@@ -273,7 +273,7 @@ pub fn Query::predicates_for_pattern(
 ///|
 extern "js" fn ts_query_is_pattern_rooted(
   query : Query,
-  pattern_index : UInt
+  pattern_index : UInt,
 ) -> Bool =
   #|(query, patternIndex) => {
   #|  return query.isPatternRooted(patternIndex);
@@ -288,7 +288,7 @@ pub fn Query::is_pattern_rooted(self : Query, pattern_index : Int) -> Bool {
 ///|
 extern "js" fn ts_query_is_pattern_non_local(
   query : Query,
-  pattern_index : UInt
+  pattern_index : UInt,
 ) -> Bool =
   #|(query, patternIndex) => {
   #|  return query.isPatternNonLocal(patternIndex);
@@ -308,7 +308,7 @@ pub fn Query::is_pattern_non_local(self : Query, pattern_index : Int) -> Bool {
 ///|
 extern "js" fn ts_query_is_pattern_guaranteed_at_step(
   query : Query,
-  byte_offset : UInt
+  byte_offset : UInt,
 ) -> Bool =
   #|(query, byteIndex) => {
   #|  return query.isPatternGuaranteedAtStep(byteIndex);
@@ -319,7 +319,7 @@ extern "js" fn ts_query_is_pattern_guaranteed_at_step(
 /// The step is specified by its byte offset in the query's source code.
 pub fn Query::is_pattern_guaranteed_at_step(
   self : Query,
-  byte_offset : Int
+  byte_offset : Int,
 ) -> Bool {
   ts_query_is_pattern_guaranteed_at_step(self, int_to_uint(byte_offset))
 }
@@ -327,7 +327,7 @@ pub fn Query::is_pattern_guaranteed_at_step(
 ///|
 extern "js" fn ts_query_capture_name_for_id(
   query : Query,
-  capture_id : UInt
+  capture_id : UInt,
 ) -> String =
   #|(query, captureId) => {
   #|  return query.captureNames[captureId];
@@ -338,7 +338,7 @@ extern "js" fn ts_query_capture_name_for_id(
 /// numeric id based on the order that it appeared in the query's source.
 pub fn Query::capture_name_for_id(
   self : Query,
-  capture_id : Int
+  capture_id : Int,
 ) -> @string.View {
   let capture_id = int_to_uint(capture_id)
   ts_query_capture_name_for_id(self, capture_id)
@@ -369,7 +369,7 @@ fn Quantifier::of_uint(value : UInt) -> Quantifier {
 extern "js" fn ts_query_capture_quantifier_for_id(
   query : Query,
   pattern_index : UInt,
-  capture_index : UInt
+  capture_index : UInt,
 ) -> UInt =
   #|(query, patternIndex, captureIndex) => {
   #|  return query.captureQuantifiers[patternIndex][captureIndex];
@@ -381,7 +381,7 @@ extern "js" fn ts_query_capture_quantifier_for_id(
 pub fn Query::capture_quantifier_for_id(
   self : Query,
   pattern_index : Int,
-  capture_index : Int
+  capture_index : Int,
 ) -> Quantifier {
   let pattern_index = int_to_uint(pattern_index)
   let capture_index = int_to_uint(capture_index)
@@ -424,7 +424,7 @@ pub fn Query::disable_pattern(self : Query, pattern_index : Int) -> Unit {
 ///|
 extern "js" fn ts_query_matches(
   query : Query,
-  node : Node
+  node : Node,
 ) -> Array[TSQueryMatch] =
   #|(query, node) => {
   #|  return query.matches(node);
@@ -444,7 +444,7 @@ pub fn Query::matches(self : Query, node : Node) -> Array[QueryMatch] {
 ///|
 pub extern "js" fn Query::captures(
   self : Query,
-  node : Node
+  node : Node,
 ) -> Array[QueryCapture] =
   #|(query, node) => {
   #|  return query.captures(node);

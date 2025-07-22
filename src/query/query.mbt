@@ -13,7 +13,7 @@ suberror ParseError {
 ///|
 pub fn Query::new(
   language : @tree_sitter.Language,
-  query : @string.View
+  query : @string.View,
 ) -> Query raise ParseError {
   enum State {
     Search(StringBuilder)
@@ -58,7 +58,7 @@ pub fn Query::new(
 
   fn parse(
     sexp_list : ArrayView[@sexp.Sexp],
-    buffer : StringBuilder
+    buffer : StringBuilder,
   ) -> ArrayView[@sexp.Sexp] {
     match skip_comment(sexp_list) {
       [Atom(Field(_)) as field, .. sexp_list] => {
@@ -161,7 +161,7 @@ pub fn QueryCursor::exec(self : QueryCursor, node : @tree_sitter.Node) -> Unit {
 
 ///|
 pub fn QueryCursor::captures(
-  self : QueryCursor
+  self : QueryCursor,
 ) -> Iter2[String, @tree_sitter.Node] {
   Iter2::new(fn(yield_) {
     captures~: for name, nodes in self.captures {

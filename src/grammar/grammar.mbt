@@ -43,10 +43,10 @@ impl ToJson for PrecValue with to_json(self : PrecValue) -> Json {
 ///|
 impl @json.FromJson for PrecValue with from_json(
   json : Json,
-  json_path : @json.JsonPath
+  json_path : @json.JsonPath,
 ) -> PrecValue raise @json.JsonDecodeError {
   match json {
-    Number(value) => PrecValue::Number(value.to_int())
+    Number(value, ..) => PrecValue::Number(value.to_int())
     String(value) => PrecValue::String(value)
     _ => {
       let message = "PrecValue::from_json: expected number or string, got \{json}"
@@ -74,7 +74,7 @@ pub enum Rule {
 ///|
 fn[E : Error] Rule::visit_rule(
   self : Rule,
-  visitor : (Rule) -> Unit raise E
+  visitor : (Rule) -> Unit raise E,
 ) -> Unit raise E {
   visitor(self)
   match self {
@@ -97,7 +97,7 @@ fn[E : Error] Rule::visit_rule(
 ///|
 impl @json.FromJson for Rule with from_json(
   json : Json,
-  json_path : @json.JsonPath
+  json_path : @json.JsonPath,
 ) -> Rule raise @json.JsonDecodeError {
   match json {
     {
@@ -228,7 +228,7 @@ struct RuleName {
 ///|
 impl @json.FromJson for RuleName with from_json(
   json : Json,
-  json_path : @json.JsonPath
+  json_path : @json.JsonPath,
 ) -> RuleName raise @json.JsonDecodeError {
   guard json is String(name) else {
     let message = "RuleName::from_json: expected string, got \{json}"

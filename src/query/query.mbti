@@ -1,8 +1,22 @@
 package "tonyfettes/tree_sitter/query"
 
+import(
+  "moonbitlang/core/string"
+  "tonyfettes/tree_sitter"
+)
+
 // Values
 
 // Types and methods
+type ParseError
+
+type Query
+fn Query::new(@tree_sitter.Language, @string.StringView) -> Self raise ParseError
+
+type QueryCursor
+fn QueryCursor::captures(Self) -> Iter2[String, @tree_sitter.Node]
+fn QueryCursor::exec(Self, @tree_sitter.Node) -> Unit
+fn QueryCursor::new(Query) -> Self
 
 // Type aliases
 

@@ -2,13 +2,14 @@
 test "parse" {
   @json.inspect(
     @sexp.parse(
-      #|(structure
-      #| (structure_item
-      #|  (function_definition
-      #|   (function_identifier
-      #|    (lowercase_identifier)))))
-      #|(ERROR (UNEXPECTED '`'))
-      ,
+      (
+        #|(structure
+        #| (structure_item
+        #|  (function_definition
+        #|   (function_identifier
+        #|    (lowercase_identifier)))))
+        #|(ERROR (UNEXPECTED '`'))
+      ),
     ),
     content=[
       [
@@ -30,11 +31,12 @@ test "parse" {
 test "[]" {
   @json.inspect(
     @sexp.parse(
-      #|[
-      #|  (expression)
-      #|  (compound_expression)
-      #|]
-      ,
+      (
+        #|[
+        #|  (expression)
+        #|  (compound_expression)
+        #|]
+      ),
     ),
     content=[[["expression"], ["compound_expression"]]],
   )
@@ -44,8 +46,9 @@ test "[]" {
 test "capture" {
   @json.inspect(
     @sexp.parse(
-      #|(capture) @a
-      ,
+      (
+        #|(capture) @a
+      ),
     ),
     content=[["capture"], "@a"],
   )
@@ -55,8 +58,9 @@ test "capture" {
 test "void" {
   @json.inspect(
     @sexp.parse(
-      #|
-      ,
+      (
+        #|
+      ),
     ),
     content=[],
   )
@@ -66,8 +70,9 @@ test "void" {
 test "unit" {
   @json.inspect(
     @sexp.parse(
-      #|()
-      ,
+      (
+        #|()
+      ),
     ),
     content=[[]],
   )
@@ -77,8 +82,9 @@ test "unit" {
 test "pair" {
   @json.inspect(
     @sexp.parse(
-      #|(key: value)
-      ,
+      (
+        #|(key: value)
+      ),
     ),
     content=[["key:", "value"]],
   )
@@ -88,8 +94,9 @@ test "pair" {
 test "pair with multiple values" {
   @json.inspect(
     @sexp.parse(
-      #|(key: value1 value2)
-      ,
+      (
+        #|(key: value1 value2)
+      ),
     ),
     content=[["key:", "value1", "value2"]],
   )
@@ -99,8 +106,9 @@ test "pair with multiple values" {
 test "comment" {
   @json.inspect(
     @sexp.parse(
-      #|; comment
-      ,
+      (
+        #|; comment
+      ),
     ),
     content=["; comment"],
   )
@@ -110,12 +118,13 @@ test "comment" {
 test "newline" {
   @json.inspect(
     @sexp.parse(
-      #|
-      #|
-      #|(a
-      #|
-      #|  b)
-      ,
+      (
+        #|
+        #|
+        #|(a
+        #|
+        #|  b)
+      ),
     ),
     content=[["a", "b"]],
   )

@@ -2,7 +2,7 @@
 pub fn print_to(
   list : ArrayView[Sexp],
   logger : &Logger,
-  indent~ : Int = 0
+  indent~ : Int = 0,
 ) -> Unit {
   loop list {
     [] => ()
@@ -86,12 +86,12 @@ test "print" {
   sexp.print_to(buffer)
   inspect(
     buffer,
-    content=
+    content=(
       #|(a
       #| "b"
       #| c: (d
       #|     "e"))
-    ,
+    ),
   )
   let sexp = Sexp::list([
     Atom(Symbol("a")),
@@ -104,11 +104,11 @@ test "print" {
   sexp.print_to(buffer)
   inspect(
     buffer,
-    content=
+    content=(
       #|(a
       #| "b"
       #| c: (d
       #|     "e") @f)
-    ,
+    ),
   )
 }

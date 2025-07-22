@@ -108,40 +108,41 @@ test "parse_rules" {
   @json.inspect(rules, content=[
     {
       "name": "suggested-for-in",
-      "search": #|((for_expression
-      #|      (for_binder
-      #|       (lowercase_identifier) @binderDefinition
-      #|        (expression
-      #|         (pipeline_expression
-      #|          (compound_expression
-      #|           (simple_expression
-      #|            (atomic_expression
-      #|             (literal
-      #|              (integer_literal) @rangeLower)))))))
-      #|        .
-      #|        (semicolon)
-      #|        (compound_expression
-      #|         (binary_expression
-      #|         (_) @binderConditional
-      #|         "<"
-      #|         (_) @rangeUpper))
-      #|        (semicolon)
-      #|        (for_binder
-      #|         (lowercase_identifier) @binderAssignment
-      #|         (expression
-      #|         (pipeline_expression
-      #|          (compound_expression
-      #|           (binary_expression
-      #|              (_) @binderUpdate
-      #|              "+"
-      #|              (_) @rangeStep)))))
-      #|        (block_expression) @forBody
-      #|        (else_clause)? @forBody)
-      #|     (#eq? @binderDefinition @binderConditional)
-      #|     (#eq? @binderDefinition @binderAssignment)
-      #|     (#eq? @binderDefinition @binderUpdate)
-      #|     (#eq? @rangeStep "1"))
-      ,
+      "search": (
+        #|((for_expression
+        #|      (for_binder
+        #|       (lowercase_identifier) @binderDefinition
+        #|        (expression
+        #|         (pipeline_expression
+        #|          (compound_expression
+        #|           (simple_expression
+        #|            (atomic_expression
+        #|             (literal
+        #|              (integer_literal) @rangeLower)))))))
+        #|        .
+        #|        (semicolon)
+        #|        (compound_expression
+        #|         (binary_expression
+        #|         (_) @binderConditional
+        #|         "<"
+        #|         (_) @rangeUpper))
+        #|        (semicolon)
+        #|        (for_binder
+        #|         (lowercase_identifier) @binderAssignment
+        #|         (expression
+        #|         (pipeline_expression
+        #|          (compound_expression
+        #|           (binary_expression
+        #|              (_) @binderUpdate
+        #|              "+"
+        #|              (_) @rangeStep)))))
+        #|        (block_expression) @forBody
+        #|        (else_clause)? @forBody)
+        #|     (#eq? @binderDefinition @binderConditional)
+        #|     (#eq? @binderDefinition @binderAssignment)
+        #|     (#eq? @binderDefinition @binderUpdate)
+        #|     (#eq? @rangeStep "1"))
+      ),
       "replace": "for $binderDefinition in $rangeLower..<($rangeUpper) $forBody",
     },
   ])

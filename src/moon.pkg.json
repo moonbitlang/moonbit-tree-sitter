@@ -52,10 +52,12 @@
     "illusory0x0/native"
   ],
   "supported-targets": ["native"],
-  "native-stub": ["tree-sitter.c"],
+  "native-stub": [
+    "tree-sitter.c"
+  ],
   "test-import": [
-    "tonyfettes/tree_sitter_moonbit",
     "tonyfettes/tree_sitter_json",
+    "tonyfettes/tree_sitter_moonbit",
     "tonyfettes/tree_sitter_markdown",
     "tonyfettes/tree_sitter_yaml"
   ]

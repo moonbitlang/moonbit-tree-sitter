@@ -12,7 +12,7 @@ struct Node {
 #borrow(node, tree)
 extern "c" fn ts_node_type(
   node : TSNode,
-  tree : TSTree
+  tree : TSTree,
 ) -> @native.ConstPtr[Byte] = "moonbit_ts_node_type"
 
 ///|
@@ -45,7 +45,7 @@ pub fn Node::language(self : Node) -> Language {
 #borrow(node, tree)
 extern "c" fn ts_node_grammar_type(
   node : TSNode,
-  tree : TSTree
+  tree : TSTree,
 ) -> @native.ConstPtr[Byte] = "moonbit_ts_node_grammar_type"
 
 ///|
@@ -254,7 +254,7 @@ extern "c" fn ts_node_child_with_descendant(
   node : TSNode,
   self_tree : TSTree,
   descendant : TSNode,
-  descendant_tree : TSTree
+  descendant_tree : TSTree,
 ) -> TSNode = "moonbit_ts_node_child_with_descendant"
 
 ///|
@@ -280,7 +280,7 @@ pub fn Node::child_with_descendant(self : Node, descendant : Node) -> Node? {
 extern "c" fn ts_node_child(
   node : TSNode,
   tree : TSTree,
-  index : UInt
+  index : UInt,
 ) -> TSNode = "moonbit_ts_node_child"
 
 ///|
@@ -328,7 +328,7 @@ pub fn Node::children(self : Node) -> Iter[Node] {
 extern "c" fn ts_node_field_name_for_child(
   node : TSNode,
   tree : TSTree,
-  child_index : UInt
+  child_index : UInt,
 ) -> @native.ConstPtr[Byte] = "moonbit_ts_node_field_name_for_child"
 
 ///|
@@ -349,7 +349,7 @@ pub fn Node::field_name_for_child(self : Node, child_index : Int) -> String? {
 extern "c" fn ts_node_field_name_for_named_child(
   node : TSNode,
   tree : TSTree,
-  child_index : UInt
+  child_index : UInt,
 ) -> @native.ConstPtr[Byte] = "moonbit_ts_node_field_name_for_named_child"
 
 ///|
@@ -357,7 +357,7 @@ extern "c" fn ts_node_field_name_for_named_child(
 /// represents the first named child. Returns `None`, if no field is found.
 pub fn Node::field_name_for_named_child(
   self : Node,
-  child_index : Int
+  child_index : Int,
 ) -> String? {
   let child_index = int_to_uint(child_index)
   let field_name = ts_node_field_name_for_named_child(
@@ -383,7 +383,7 @@ pub fn Node::child_count(self : Node) -> Int {
 extern "c" fn ts_node_named_child(
   node : TSNode,
   tree : TSTree,
-  child_index : UInt
+  child_index : UInt,
 ) -> TSNode = "moonbit_ts_node_named_child"
 
 ///|
@@ -433,7 +433,7 @@ pub fn Node::named_children(self : Node) -> Iter[Node] {
 extern "c" fn ts_node_child_by_field_name(
   node : TSNode,
   tree : TSTree,
-  name : Bytes
+  name : Bytes,
 ) -> TSNode = "moonbit_ts_node_child_by_field_name"
 
 ///|
@@ -453,7 +453,7 @@ pub fn Node::child_by_field_name(self : Node, name : @string.View) -> Node? {
 extern "c" fn ts_node_child_by_field_id(
   node : TSNode,
   tree : TSTree,
-  id : FieldId
+  id : FieldId,
 ) -> TSNode = "moonbit_ts_node_child_by_field_id"
 
 ///|
@@ -504,7 +504,7 @@ pub fn Node::prev_sibling(self : Node) -> Node? {
 #borrow(node, tree)
 extern "c" fn ts_node_next_named_sibling(
   node : TSNode,
-  tree : TSTree
+  tree : TSTree,
 ) -> TSNode = "moonbit_ts_node_next_named_sibling"
 
 ///|
@@ -522,7 +522,7 @@ pub fn Node::next_named_sibling(self : Node) -> Node? {
 #borrow(node, tree)
 extern "c" fn ts_node_prev_named_sibling(
   node : TSNode,
-  tree : TSTree
+  tree : TSTree,
 ) -> TSNode = "moonbit_ts_node_prev_named_sibling"
 
 ///|
@@ -541,7 +541,7 @@ pub fn Node::prev_named_sibling(self : Node) -> Node? {
 extern "c" fn ts_node_first_child_for_byte(
   node : TSNode,
   tree : TSTree,
-  byte : UInt
+  byte : UInt,
 ) -> TSNode = "moonbit_ts_node_first_child_for_byte"
 
 ///|
@@ -561,7 +561,7 @@ pub fn Node::first_child_for_byte(self : Node, byte : Int) -> Node? {
 extern "c" fn ts_node_first_named_child_for_byte(
   node : TSNode,
   tree : TSTree,
-  byte : UInt
+  byte : UInt,
 ) -> TSNode = "moonbit_ts_node_first_named_child_for_byte"
 
 ///|
@@ -592,7 +592,7 @@ extern "c" fn ts_node_descendant_for_byte_range(
   node : TSNode,
   tree : TSTree,
   start_byte : UInt,
-  end_byte : UInt
+  end_byte : UInt,
 ) -> TSNode = "moonbit_ts_node_descendant_for_byte_range"
 
 ///|
@@ -600,7 +600,7 @@ extern "c" fn ts_node_descendant_for_byte_range(
 pub fn Node::descendant_for_byte_range(
   self : Node,
   start_byte : Int,
-  end_byte : Int
+  end_byte : Int,
 ) -> Node? {
   let start_byte = int_to_uint(start_byte)
   let end_byte = int_to_uint(end_byte)
@@ -623,7 +623,7 @@ extern "c" fn ts_node_descendant_for_point_range(
   node : TSNode,
   tree : TSTree,
   start_point : Point,
-  end_point : Point
+  end_point : Point,
 ) -> TSNode = "moonbit_ts_node_descendant_for_point_range"
 
 ///|
@@ -632,7 +632,7 @@ extern "c" fn ts_node_descendant_for_point_range(
 pub fn Node::descendant_for_point_range(
   self : Node,
   start_point : Point,
-  end_point : Point
+  end_point : Point,
 ) -> Node? {
   let descendant = ts_node_descendant_for_point_range(
     self.node,
@@ -653,7 +653,7 @@ extern "c" fn ts_node_named_descendant_for_byte_range(
   node : TSNode,
   tree : TSTree,
   start_byte : UInt,
-  end_byte : UInt
+  end_byte : UInt,
 ) -> TSNode = "moonbit_ts_node_named_descendant_for_byte_range"
 
 ///|
@@ -662,7 +662,7 @@ extern "c" fn ts_node_named_descendant_for_byte_range(
 pub fn Node::named_descendant_for_byte_range(
   self : Node,
   start_byte : Int,
-  end_byte : Int
+  end_byte : Int,
 ) -> Node? {
   let start_byte = int_to_uint(start_byte)
   let end_byte = int_to_uint(end_byte)
@@ -685,7 +685,7 @@ extern "c" fn ts_node_named_descendant_for_point_range(
   node : TSNode,
   tree : TSTree,
   start_point : Point,
-  end_point : Point
+  end_point : Point,
 ) -> TSNode = "moonbit_ts_node_named_descendant_for_point_range"
 
 ///|
@@ -694,7 +694,7 @@ extern "c" fn ts_node_named_descendant_for_point_range(
 pub fn Node::named_descendant_for_point_range(
   self : Node,
   start_point : Point,
-  end_point : Point
+  end_point : Point,
 ) -> Node? {
   let descendant = ts_node_named_descendant_for_point_range(
     self.node,
@@ -731,7 +731,7 @@ extern "c" fn ts_node_eq(
   node : TSNode,
   self_tree : TSTree,
   other : TSNode,
-  other_tree : TSTree
+  other_tree : TSTree,
 ) -> Bool = "moonbit_ts_node_eq"
 
 ///|
@@ -775,7 +775,7 @@ pub fn Node::walk(self : Node) -> TreeCursor {
 ///|
 pub fn Node::query(
   self : Node,
-  source : @string.View
+  source : @string.View,
 ) -> QueryCursor raise QueryError {
   let query = Query::new(self.language(), source)
   let query_cursor = QueryCursor::new()

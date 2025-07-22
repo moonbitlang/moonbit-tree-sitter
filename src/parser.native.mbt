@@ -40,7 +40,7 @@ pub fn Parser::language(self : Parser) -> Language? {
 #borrow(parser)
 extern "c" fn ts_parser_set_language(
   parser : Parser,
-  language : Language
+  language : Language,
 ) -> Bool = "moonbit_ts_parser_set_language"
 
 ///|
@@ -79,7 +79,7 @@ pub impl ToJson for LanguageError with to_json(self) -> Json {
 /// and `MIN_COMPATIBLE_LANGUAGE_VERSION` constants.
 pub fn Parser::set_language(
   self : Parser,
-  language : Language
+  language : Language,
 ) -> Unit raise LanguageError {
   let succeed = ts_parser_set_language(self, language)
   if not(succeed) {
@@ -109,7 +109,7 @@ pub const MIN_COMPATIBLE_LANGUAGE_VERSION = 13
 #borrow(parser, ranges)
 extern "c" fn ts_parser_set_included_ranges(
   parser : Parser,
-  ranges : FixedArray[UInt]
+  ranges : FixedArray[UInt],
 ) -> Bool = "moonbit_ts_parser_set_included_ranges"
 
 ///|
@@ -134,7 +134,7 @@ extern "c" fn ts_parser_set_included_ranges(
 /// this function returns `true`
 pub fn Parser::set_included_ranges(
   self : Parser,
-  ranges : Array[Range]
+  ranges : Array[Range],
 ) -> Bool {
   let flatten_ranges = FixedArray::make(ranges.length() * 6, 0U)
   for i, range in ranges {
@@ -175,7 +175,7 @@ extern "c" fn ts_parser_parse(
   encoding : InputEncoding,
   decode : @c.Nullable[
     FuncRef[(@native.ConstPtr[Byte], UInt, @native.Ptr[Int]) -> Int],
-  ]
+  ],
 ) -> TSTree = "moonbit_ts_parser_parse"
 
 ///|
@@ -194,7 +194,7 @@ struct ParseOptions {
 ///|
 /// Create new parse options with the given progress callback.
 pub fn ParseOptions::new(
-  progress_callback : (ParseState) -> Bool
+  progress_callback : (ParseState) -> Bool,
 ) -> ParseOptions {
   ParseOptions::{ progress_callback, }
 }
@@ -209,7 +209,7 @@ extern "c" fn ts_parser_parse_with_options(
   decode : @c.Nullable[
     FuncRef[(@native.ConstPtr[Byte], UInt, @native.Ptr[Int]) -> Int],
   ],
-  progress_callback : (UInt, Bool) -> Bool
+  progress_callback : (UInt, Bool) -> Bool,
 ) -> TSTree = "moonbit_ts_parser_parse_with_options"
 
 ///|
@@ -255,7 +255,7 @@ pub fn[Encoding : DecodeFunction] Parser::parse(
   self : Parser,
   old_tree? : Tree,
   input : Input[Encoding],
-  options? : ParseOptions
+  options? : ParseOptions,
 ) -> Tree raise ParseError {
   let encoding = input.decode.encoding()
   let decode : @c.Nullable[
@@ -284,7 +284,7 @@ pub fn[Encoding : DecodeFunction] Parser::parse(
   let read : (UInt, Point, FixedArray[UInt]) -> Bytes = fn(
     offset : UInt,
     point : Point,
-    range : FixedArray[UInt]
+    range : FixedArray[UInt],
   ) {
     let bytes_view = (input.read)(offset, point)
     stage = [..stage, ..bytes_view]
@@ -342,7 +342,7 @@ pub fn[Encoding : DecodeFunction] Parser::parse(
 extern "c" fn ts_parser_parse_bytes(
   parser : Parser,
   old_tree : TSTree,
-  string : Bytes
+  string : Bytes,
 ) -> TSTree = "moonbit_ts_parser_parse_string"
 
 ///|
@@ -351,7 +351,7 @@ extern "c" fn ts_parser_parse_bytes_encoding(
   parser : Parser,
   old_tree : TSTree,
   string : Bytes,
-  encoding : UInt
+  encoding : UInt,
 ) -> TSTree = "moonbit_ts_parser_parse_string_encoding"
 
 ///|
@@ -363,7 +363,7 @@ pub fn Parser::parse_bytes(
   self : Parser,
   old_tree? : Tree,
   bytes : Bytes,
-  encoding~ : @encoding.Encoding
+  encoding~ : @encoding.Encoding,
 ) -> Tree raise ParseError {
   let old_ts_tree = match old_tree {
     None => ts_tree_null()
@@ -406,7 +406,7 @@ fn raise_parse_error(self : Parser, tree : TSTree?) -> TSTree raise ParseError {
 pub fn Parser::parse_string(
   self : Parser,
   old_tree? : Tree,
-  string : @string.View
+  string : @string.View,
 ) -> Tree raise ParseError {
   let old_ts_tree = match old_tree {
     None => ts_tree_null()

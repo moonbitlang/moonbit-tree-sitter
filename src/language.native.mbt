@@ -46,14 +46,14 @@ type Symbol UInt
 #borrow(name)
 extern "c" fn ts_language_symbol_for_name_(
   language : Language,
-  name : Bytes
+  name : Bytes,
 ) -> UInt16 = "moonbit_ts_language_symbol_for_name"
 
 ///|
 /// Get the numerical id for the given node type string.
 pub fn Language::symbol_for_name(
   self : Language,
-  name : @string.View
+  name : @string.View,
 ) -> Symbol? {
   let name_bytes = @encoding.encode(encoding=UTF8, name)
   let symbol = ts_language_symbol_for_name_(self, name_bytes)
@@ -79,7 +79,7 @@ pub fn Language::field_count(self : Language) -> Int {
 ///|
 extern "c" fn ts_language_field_name_for_id(
   language : Language,
-  id : FieldId
+  id : FieldId,
 ) -> @native.ConstPtr[Byte] = "moonbit_ts_language_field_name_for_id"
 
 ///|
@@ -117,7 +117,7 @@ fn decode_c_string(c_string : @native.ConstPtr[Byte], length? : Int) -> String? 
 #borrow(name)
 extern "c" fn ts_language_field_id_for_name(
   language : Language,
-  name : Bytes
+  name : Bytes,
 ) -> UInt = "moonbit_ts_language_field_id_for_name"
 
 ///|
@@ -150,7 +150,7 @@ pub fn Language::subtypes(self : Language) -> Array[Symbol] {
 ///|
 extern "c" fn ts_language_symbol_name(
   language : Language,
-  symbol : Symbol
+  symbol : Symbol,
 ) -> @native.ConstPtr[Byte] = "moonbit_ts_language_symbol_name"
 
 ///|
@@ -194,7 +194,7 @@ fn SymbolType::to_int(self : SymbolType) -> UInt {
 ///|
 extern "c" fn ts_language_symbol_type(
   language : Language,
-  symbol : Symbol
+  symbol : Symbol,
 ) -> UInt = "moonbit_ts_language_symbol_type"
 
 ///|
@@ -277,7 +277,7 @@ type StateId UInt16
 extern "c" fn ts_language_next_state(
   language : Language,
   state : StateId,
-  symbol : Symbol
+  symbol : Symbol,
 ) -> StateId = "moonbit_ts_language_next_state"
 
 ///|
@@ -287,7 +287,7 @@ extern "c" fn ts_language_next_state(
 pub fn Language::next_state(
   self : Language,
   state : StateId,
-  symbol : Symbol
+  symbol : Symbol,
 ) -> StateId {
   return ts_language_next_state(self, state, symbol)
 }

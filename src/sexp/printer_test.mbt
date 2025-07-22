@@ -6,7 +6,7 @@ test "roundtrip" {
   let sexp = @sexp.parse(sexp)
   inspect(
     @sexp.print(sexp),
-    content=
+    content=(
       #|(a
       #| b
       #| c
@@ -16,7 +16,7 @@ test "roundtrip" {
       #| (j)
       #| (k
       #|  (l)))
-    ,
+    ),
   )
 }
 
@@ -28,7 +28,7 @@ test "brackets" {
   let sexp = @sexp.parse(sexp)
   inspect(
     @sexp.print(sexp),
-    content=
+    content=(
       #|[a
       #| b
       #| c
@@ -38,7 +38,7 @@ test "brackets" {
       #| [j]
       #| [k
       #|  [l]]]
-    ,
+    ),
   )
 }
 
@@ -49,10 +49,10 @@ test "capture" {
   let sexp = @sexp.parse(sexp)
   inspect(
     @sexp.print(sexp),
-    content=
+    content=(
       #|((capture
       #|  a) @a)
-    ,
+    ),
   )
 }
 
@@ -84,7 +84,7 @@ test "comment" {
   ])
   inspect(
     @sexp.print(sexp),
-    content=
+    content=(
       #|; comment a
       #|a
       #|b
@@ -108,7 +108,7 @@ test "comment" {
       #| d
       #| e
       #| f)
-    ,
+    ),
   )
 }
 
@@ -124,10 +124,10 @@ test "newline" {
   @json.inspect(sexp, content=["a", ["b", "c"]])
   inspect(
     @sexp.print(sexp),
-    content=
+    content=(
       #|a
       #|(b
       #| c)
-    ,
+    ),
   )
 }

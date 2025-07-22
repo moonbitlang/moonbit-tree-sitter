@@ -50,7 +50,7 @@ extern "c" fn ts_query_cursor_exec(
   cursor : TSQueryCursor,
   query : Query,
   node : TSNode,
-  tree : TSTree
+  tree : TSTree,
 ) = "moonbit_ts_query_cursor_exec"
 
 ///|
@@ -60,7 +60,7 @@ extern "c" fn ts_query_cursor_exec_with_options(
   query : Query,
   node : TSNode,
   tree : TSTree,
-  progress_callback : (UInt) -> Unit
+  progress_callback : (UInt) -> Unit,
 ) = "moonbit_ts_query_cursor_exec_with_options"
 
 ///|
@@ -75,7 +75,7 @@ struct QueryCursorOptions {
 
 ///|
 pub fn QueryCursorOptions::new(
-  progress_callback~ : (QueryCursorState) -> Unit
+  progress_callback~ : (QueryCursorState) -> Unit,
 ) -> QueryCursorOptions {
   QueryCursorOptions::{ progress_callback, }
 }
@@ -86,7 +86,7 @@ pub fn QueryCursor::exec(
   self : QueryCursor,
   query : Query,
   node : Node,
-  options? : QueryCursorOptions
+  options? : QueryCursorOptions,
 ) -> Unit {
   match options {
     None => ts_query_cursor_exec(self.cursor, query, node.node, node.tree)
@@ -110,7 +110,7 @@ pub fn QueryCursor::exec(
 ///|
 #borrow(cursor)
 extern "c" fn ts_query_cursor_did_exceed_match_limit(
-  cursor : TSQueryCursor
+  cursor : TSQueryCursor,
 ) -> Bool = "moonbit_ts_query_cursor_did_exceed_match_limit"
 
 ///|
@@ -142,7 +142,7 @@ pub fn QueryCursor::match_limit(self : QueryCursor) -> Int {
 #borrow(cursor)
 extern "c" fn ts_query_cursor_set_match_limit(
   cursor : TSQueryCursor,
-  limit : UInt
+  limit : UInt,
 ) = "moonbit_ts_query_cursor_set_match_limit"
 
 ///|
@@ -158,7 +158,7 @@ pub fn QueryCursor::set_match_limit(self : QueryCursor, limit : Int) -> Unit {
 extern "c" fn ts_query_cursor_set_byte_range(
   cursor : TSQueryCursor,
   start_byte : UInt,
-  end_byte : UInt
+  end_byte : UInt,
 ) = "moonbit_ts_query_cursor_set_byte_range"
 
 ///|
@@ -171,7 +171,7 @@ extern "c" fn ts_query_cursor_set_byte_range(
 pub fn QueryCursor::set_byte_range(
   self : QueryCursor,
   start_byte : Int,
-  end_byte : Int
+  end_byte : Int,
 ) -> Unit {
   ts_query_cursor_set_byte_range(
     self.cursor,
@@ -185,7 +185,7 @@ pub fn QueryCursor::set_byte_range(
 extern "c" fn ts_query_cursor_set_point_range(
   cursor : TSQueryCursor,
   start_point : Point,
-  end_point : Point
+  end_point : Point,
 ) = "moonbit_ts_query_cursor_set_point_range"
 
 ///|
@@ -198,7 +198,7 @@ extern "c" fn ts_query_cursor_set_point_range(
 pub fn QueryCursor::set_point_range(
   self : QueryCursor,
   start_point : Point,
-  end_point : Point
+  end_point : Point,
 ) -> Unit {
   ts_query_cursor_set_point_range(self.cursor, start_point, end_point)
 }
@@ -301,21 +301,21 @@ extern "c" fn ts_query_match_pattern_index(match_ : TSQueryMatch) -> UInt = "moo
 ///|
 #borrow(query_match)
 extern "c" fn ts_query_match_capture_count(
-  query_match : TSQueryMatch
+  query_match : TSQueryMatch,
 ) -> UInt16 = "moonbit_ts_query_match_capture_count"
 
 ///|
 #borrow(query_match)
 extern "c" fn ts_query_match_captures_get_node(
   query_match : TSQueryMatch,
-  index : UInt
+  index : UInt,
 ) -> TSNode = "moonbit_ts_query_match_captures_get_node"
 
 ///|
 #borrow(query)
 extern "c" fn ts_query_match_captures_get_index(
   query : TSQueryMatch,
-  index : UInt
+  index : UInt,
 ) -> UInt = "moonbit_ts_query_match_captures_get_index"
 
 ///|
@@ -323,7 +323,7 @@ extern "c" fn ts_query_match_captures_get_index(
 extern "c" fn ts_query_cursor_next_match(
   cursor : TSQueryCursor,
   query : Query,
-  tree : TSTree
+  tree : TSTree,
 ) -> TSQueryMatch = "moonbit_ts_query_cursor_next_match"
 
 ///|
@@ -371,7 +371,7 @@ extern "c" fn ts_query_cursor_remove_match(
   cursor : TSQueryCursor,
   query : Query,
   tree : TSTree,
-  match_id : UInt
+  match_id : UInt,
 ) = "moonbit_ts_query_cursor_remove_match"
 
 ///|
@@ -391,7 +391,7 @@ extern "c" fn ts_query_cursor_next_capture(
   cursor : TSQueryCursor,
   query : Query,
   tree : TSTree,
-  match_id : FixedArray[UInt]
+  match_id : FixedArray[UInt],
 ) -> @c.Nullable[TSQueryMatch] = "moonbit_ts_query_cursor_next_capture"
 
 ///|
@@ -434,7 +434,7 @@ pub fn QueryCursor::captures(self : QueryCursor) -> Iter[QueryCapture] {
 #borrow(cursor)
 extern "c" fn ts_query_cursor_set_max_start_depth(
   cursor : TSQueryCursor,
-  max_start_depth : UInt
+  max_start_depth : UInt,
 ) = "moonbit_ts_query_cursor_set_max_start_depth"
 
 ///|
@@ -452,7 +452,7 @@ extern "c" fn ts_query_cursor_set_max_start_depth(
 /// Set to `@uint.max_value` to remove the maximum start depth.
 pub fn QueryCursor::set_max_start_depth(
   self : QueryCursor,
-  max_start_depth : Int
+  max_start_depth : Int,
 ) -> Unit {
   ts_query_cursor_set_max_start_depth(self.cursor, int_to_uint(max_start_depth))
 }

@@ -8,7 +8,7 @@ pub struct ChildType {
 ///|
 impl @json.FromJson for ChildType with from_json(
   json : Json,
-  path : @json.JsonPath
+  path : @json.JsonPath,
 ) -> ChildType raise @json.JsonDecodeError {
   match json {
     {
@@ -45,7 +45,7 @@ pub struct NodeType {
 ///|
 pub impl @json.FromJson for NodeType with from_json(
   json : Json,
-  path : @json.JsonPath
+  path : @json.JsonPath,
 ) -> NodeType raise @json.JsonDecodeError {
   match json {
     {
@@ -111,7 +111,7 @@ pub type NodeTypes Array[NodeType] derive(@json.FromJson, ToJson, Show)
 
 ///|
 pub fn NodeTypes::from_json(
-  json : Json
+  json : Json,
 ) -> NodeTypes raise @json.JsonDecodeError {
   @json.from_json(json)
 }

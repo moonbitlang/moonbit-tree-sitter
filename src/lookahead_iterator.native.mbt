@@ -4,7 +4,7 @@ type LookaheadIterator
 ///|
 #borrow(iterator)
 extern "c" fn ts_lookahead_iterator_is_null(
-  iterator : LookaheadIterator
+  iterator : LookaheadIterator,
 ) -> Bool = "moonbit_c_is_null"
 
 ///|
@@ -15,7 +15,7 @@ impl Nullable for LookaheadIterator with is_null(self : LookaheadIterator) -> Bo
 ///|
 extern "c" fn ts_lookahead_iterator_new(
   language : Language,
-  state : StateId
+  state : StateId,
 ) -> LookaheadIterator = "moonbit_ts_lookahead_iterator_new"
 
 ///|
@@ -34,7 +34,7 @@ extern "c" fn ts_lookahead_iterator_new(
 /// iterator created on the previous non-extra leaf node may be appropriate.
 pub fn LookaheadIterator::new(
   language : Language,
-  state : StateId
+  state : StateId,
 ) -> LookaheadIterator? {
   ts_lookahead_iterator_new(language, state).to_option()
 }
@@ -47,7 +47,7 @@ pub fn LookaheadIterator::new(
 #borrow(self)
 pub extern "c" fn LookaheadIterator::reset_state(
   self : LookaheadIterator,
-  state : StateId
+  state : StateId,
 ) -> Bool = "moonbit_ts_lookahead_iterator_reset_state"
 
 ///|
@@ -59,14 +59,14 @@ pub extern "c" fn LookaheadIterator::reset_state(
 pub extern "c" fn LookaheadIterator::reset(
   self : LookaheadIterator,
   language : Language,
-  state : StateId
+  state : StateId,
 ) -> Bool = "moonbit_ts_lookahead_iterator_reset"
 
 ///|
 /// Get the current language of the lookahead iterator.
 #borrow(self)
 pub extern "c" fn LookaheadIterator::language(
-  self : LookaheadIterator
+  self : LookaheadIterator,
 ) -> Language = "moonbit_ts_lookahead_iterator_language"
 
 ///|
@@ -80,19 +80,19 @@ pub extern "c" fn LookaheadIterator::next(iterator : LookaheadIterator) -> Bool 
 /// Get the current symbol of the lookahead iterator.
 #borrow(self)
 pub extern "c" fn LookaheadIterator::current_symbol(
-  self : LookaheadIterator
+  self : LookaheadIterator,
 ) -> Symbol = "moonbit_ts_lookahead_iterator_current_symbol"
 
 ///|
 #borrow(iterator)
 extern "c" fn ts_lookahead_iterator_current_symbol_name(
-  iterator : LookaheadIterator
+  iterator : LookaheadIterator,
 ) -> @native.ConstPtr[Byte] = "moonbit_ts_lookahead_iterator_current_symbol_name"
 
 ///|
 /// Get the current symbol type of the lookahead iterator as a string.
 pub fn LookaheadIterator::current_symbol_name(
-  self : LookaheadIterator
+  self : LookaheadIterator,
 ) -> String? {
   let bytes = ts_lookahead_iterator_current_symbol_name(self)
   decode_c_string(bytes)

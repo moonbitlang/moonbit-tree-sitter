@@ -44,7 +44,7 @@ fn QueryError::from(offset : UInt, type_ : UInt) -> QueryError {
 extern "c" fn ts_query_new(
   language : Language,
   source : Bytes,
-  error : FixedArray[UInt]
+  error : FixedArray[UInt],
 ) -> Query = "moonbit_ts_query_new"
 
 ///|
@@ -56,7 +56,7 @@ extern "c" fn ts_query_new(
 /// If a pattern is invalid, this raises a `QueryError`.
 pub fn Query::new(
   language : Language,
-  source : @string.View
+  source : @string.View,
 ) -> Query raise QueryError {
   let error = FixedArray::make(2, 0U)
   let source = @encoding.encode(encoding=UTF8, source)
@@ -105,7 +105,7 @@ pub fn Query::string_count(self : Query) -> Int {
 #borrow(query)
 extern "c" fn ts_query_start_byte_for_pattern(
   query : Query,
-  pattern_index : UInt
+  pattern_index : UInt,
 ) -> UInt = "moonbit_ts_query_start_byte_for_pattern"
 
 ///|
@@ -122,7 +122,7 @@ pub fn Query::start_byte_for_pattern(self : Query, pattern_index : Int) -> Int {
 #borrow(query)
 extern "c" fn ts_query_end_byte_for_pattern(
   query : Query,
-  pattern_index : UInt
+  pattern_index : UInt,
 ) -> UInt = "moonbit_ts_query_end_byte_for_pattern"
 
 ///|
@@ -139,7 +139,7 @@ pub fn Query::end_byte_for_pattern(self : Query, pattern_index : Int) -> Int {
 #borrow(query)
 extern "c" fn ts_query_predicates_for_pattern(
   query : Query,
-  pattern_index : UInt
+  pattern_index : UInt,
 ) -> FixedArray[UInt] = "moonbit_ts_query_predicates_for_pattern"
 
 ///|
@@ -147,7 +147,7 @@ priv enum QueryPredicateStepType {
   Done
   Capture
   String
-} derive(Show)
+}
 
 ///|
 fn QueryPredicateStepType::of_uint(value : UInt) -> QueryPredicateStepType {
@@ -168,7 +168,7 @@ pub enum QueryPredicateStep {
 ///|
 pub impl Show for QueryPredicateStep with output(
   self,
-  logger : &@builtin.Logger
+  logger : &@builtin.Logger,
 ) -> Unit {
   match self {
     Capture(name) => logger.write_string("@\{name}")
@@ -197,7 +197,7 @@ pub typealias Array[QueryPredicateStep] as QueryPredicate
 ///    `Query::string_value_for_id` function to obtain their string value.
 pub fn Query::predicates_for_pattern(
   self : Query,
-  pattern_index : Int
+  pattern_index : Int,
 ) -> Array[QueryPredicate] {
   let pattern_index = int_to_uint(pattern_index)
   let flatten_predicates = ts_query_predicates_for_pattern(self, pattern_index)
@@ -229,7 +229,7 @@ pub fn Query::predicates_for_pattern(
 #borrow(query)
 extern "c" fn ts_query_is_pattern_rooted(
   query : Query,
-  pattern_index : UInt
+  pattern_index : UInt,
 ) -> Bool = "moonbit_ts_query_is_pattern_rooted"
 
 ///|
@@ -242,7 +242,7 @@ pub fn Query::is_pattern_rooted(self : Query, pattern_index : Int) -> Bool {
 #borrow(query)
 extern "c" fn ts_query_is_pattern_non_local(
   query : Query,
-  pattern_index : UInt
+  pattern_index : UInt,
 ) -> Bool = "moonbit_ts_query_is_pattern_non_local"
 
 ///|
@@ -260,7 +260,7 @@ pub fn Query::is_pattern_non_local(self : Query, pattern_index : Int) -> Bool {
 #borrow(query)
 extern "c" fn ts_query_is_pattern_guaranteed_at_step(
   query : Query,
-  byte_offset : UInt
+  byte_offset : UInt,
 ) -> Bool = "moonbit_ts_query_is_pattern_guaranteed_at_step"
 
 ///|
@@ -268,7 +268,7 @@ extern "c" fn ts_query_is_pattern_guaranteed_at_step(
 /// The step is specified by its byte offset in the query's source code.
 pub fn Query::is_pattern_guaranteed_at_step(
   self : Query,
-  byte_offset : Int
+  byte_offset : Int,
 ) -> Bool {
   ts_query_is_pattern_guaranteed_at_step(self, int_to_uint(byte_offset))
 }
@@ -278,7 +278,7 @@ pub fn Query::is_pattern_guaranteed_at_step(
 extern "c" fn ts_query_capture_name_for_id(
   query : Query,
   capture_id : UInt,
-  length : FixedArray[UInt]
+  length : FixedArray[UInt],
 ) -> @native.ConstPtr[Byte] = "moonbit_ts_query_capture_name_for_id"
 
 ///|
@@ -317,7 +317,7 @@ fn Quantifier::of_uint(value : UInt) -> Quantifier {
 extern "c" fn ts_query_capture_quantifier_for_id(
   query : Query,
   pattern_index : UInt,
-  capture_index : UInt
+  capture_index : UInt,
 ) -> UInt = "moonbit_ts_query_capture_quantifier_for_id"
 
 ///|
@@ -326,7 +326,7 @@ extern "c" fn ts_query_capture_quantifier_for_id(
 pub fn Query::capture_quantifier_for_id(
   self : Query,
   pattern_index : Int,
-  capture_index : Int
+  capture_index : Int,
 ) -> Quantifier {
   let pattern_index = int_to_uint(pattern_index)
   let capture_index = int_to_uint(capture_index)
@@ -339,7 +339,7 @@ pub fn Query::capture_quantifier_for_id(
 #borrow(query)
 extern "c" fn ts_query_string_value_for_id(
   query : Query,
-  string_id : UInt
+  string_id : UInt,
 ) -> @c.Nullable[Bytes] = "moonbit_ts_query_string_value_for_id"
 
 ///|
