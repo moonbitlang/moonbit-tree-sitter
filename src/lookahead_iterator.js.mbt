@@ -3,7 +3,7 @@ type LookaheadIterator
 
 ///|
 extern "js" fn ts_lookahead_iterator_is_null(
-  iterator : LookaheadIterator
+  iterator : LookaheadIterator,
 ) -> Bool =
   #|(iterator) => {
   #|  return iterator === null || iterator === undefined;
@@ -17,7 +17,7 @@ impl Nullable for LookaheadIterator with is_null(self : LookaheadIterator) -> Bo
 ///|
 extern "js" fn ts_lookahead_iterator_new(
   language : Language,
-  state : StateId
+  state : StateId,
 ) -> LookaheadIterator =
   #|(language, state) => {
   #|  return language.lookaheadIterator(state);
@@ -39,7 +39,7 @@ extern "js" fn ts_lookahead_iterator_new(
 /// iterator created on the previous non-extra leaf node may be appropriate.
 pub fn LookaheadIterator::new(
   language : Language,
-  state : StateId
+  state : StateId,
 ) -> LookaheadIterator? {
   ts_lookahead_iterator_new(language, state).to_option()
 }
@@ -51,7 +51,7 @@ pub fn LookaheadIterator::new(
 /// otherwise.
 pub extern "js" fn LookaheadIterator::reset_state(
   self : LookaheadIterator,
-  state : StateId
+  state : StateId,
 ) -> Bool =
   #|(self, state) => {
   #|  return self.resetState(state);
@@ -65,7 +65,7 @@ pub extern "js" fn LookaheadIterator::reset_state(
 pub extern "js" fn LookaheadIterator::reset(
   self : LookaheadIterator,
   language : Language,
-  state : StateId
+  state : StateId,
 ) -> Bool =
   #|(self, language, state) => {
   #|  return self.reset(language, state);
@@ -74,7 +74,7 @@ pub extern "js" fn LookaheadIterator::reset(
 ///|
 /// Get the current symbol of the lookahead iterator.
 pub extern "js" fn LookaheadIterator::current_symbol(
-  self : LookaheadIterator
+  self : LookaheadIterator,
 ) -> Symbol =
   #|(self) => {
   #|  return self.currentTypeId;
@@ -82,7 +82,7 @@ pub extern "js" fn LookaheadIterator::current_symbol(
 
 ///|
 extern "js" fn ts_lookahead_iterator_current_symbol_name(
-  iterator : LookaheadIterator
+  iterator : LookaheadIterator,
 ) -> String =
   #|(iterator) => {
   #|  return iterator.currentType;
@@ -91,7 +91,7 @@ extern "js" fn ts_lookahead_iterator_current_symbol_name(
 ///|
 /// Get the current symbol type of the lookahead iterator as a string.
 pub fn LookaheadIterator::current_symbol_name(
-  self : LookaheadIterator
+  self : LookaheadIterator,
 ) -> @string.View? {
   let bytes = Nullable::to_option(
     ts_lookahead_iterator_current_symbol_name(self),
@@ -108,7 +108,7 @@ pub fn LookaheadIterator::current_symbol_name(
 /// false <=> IterEnd
 extern "js" fn ts_lookahead_iterator_symbol_names(
   iterator : LookaheadIterator,
-  f : (String) -> Bool
+  f : (String) -> Bool,
 ) -> Bool =
   #|(self, f) => {
   #|  for (const name of self) {
@@ -123,7 +123,7 @@ extern "js" fn ts_lookahead_iterator_symbol_names(
 
 ///|
 pub fn LookaheadIterator::symbol_names(
-  self : LookaheadIterator
+  self : LookaheadIterator,
 ) -> Iter[String] {
   Iter::new(fn(yield_) {
     if ts_lookahead_iterator_symbol_names(self, fn(name) {

@@ -12,7 +12,7 @@ test "Query::new" {
   let tree = parser.parse_string(source)
   inspect(
     tree.root_node(),
-    content=
+    content=(
       #|(document
       #| (object
       #|  (pair
@@ -30,7 +30,7 @@ test "Query::new" {
       #|         (string_content))
       #|   value: (string
       #|           (string_content)))))
-    ,
+    ),
   )
   let query =
     #|(object) @object
@@ -131,7 +131,7 @@ test "query/return" {
   let tree = parser.parse_string(source)
   inspect(
     tree.root_node(),
-    content=
+    content=(
       #|(structure
       #| (function_definition
       #|  (function_identifier
@@ -166,7 +166,7 @@ test "query/return" {
       #|       (atomic_expression
       #|        (literal
       #|         (integer_literal))))))))))
-    ,
+    ),
   )
   let query =
     #|(function_definition

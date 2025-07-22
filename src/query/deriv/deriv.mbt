@@ -217,7 +217,7 @@ test {
 ///|
 fn merge(
   self : Map[String, Array[Match]],
-  other : Map[String, Array[Match]]
+  other : Map[String, Array[Match]],
 ) -> Unit {
   for name, captures in other {
     if self.get(name) is Some(existing) {
@@ -231,12 +231,12 @@ fn merge(
 ///|
 pub fn Node::matches(
   self : Node,
-  node : @tree_sitter.Node
+  node : @tree_sitter.Node,
 ) -> Map[String, Array[Match]]? {
   fn matches(
     self : Node,
     node : @tree_sitter.Node,
-    group : Map[String, Array[Match]]
+    group : Map[String, Array[Match]],
   ) -> Bool {
     let result = match self {
       True => true
@@ -415,7 +415,7 @@ priv struct State {
   table : Map[String, Array[Int]] // name -> ids
   group : Array[Map[String, Array[Match]]] // captures for each node
   ids : Array[Array[Int]] // ids for each node
-} derive(Show, ToJson)
+}
 
 ///|
 fn State::new() -> State {
@@ -530,7 +530,7 @@ struct Match {
 fn State::matches(
   self : State,
   expr : Expr,
-  nodes : Iter[@tree_sitter.Node]
+  nodes : Iter[@tree_sitter.Node],
 ) -> Expr {
   let mut expr = expr
   for node in nodes {

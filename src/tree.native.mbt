@@ -60,7 +60,7 @@ pub fn Tree::root_node(self : Tree) -> Node {
 extern "c" fn ts_tree_root_node_with_offset(
   tree : TSTree,
   offset_bytes : UInt,
-  offset_extent : Point
+  offset_extent : Point,
 ) -> TSNode = "moonbit_ts_tree_root_node_with_offset"
 
 ///|
@@ -69,7 +69,7 @@ extern "c" fn ts_tree_root_node_with_offset(
 pub fn Tree::root_node_with_offset(
   self : Tree,
   offset_bytes : Int,
-  offset_extent : Point
+  offset_extent : Point,
 ) -> Node {
   let node = ts_tree_root_node_with_offset(
     self.tree,
@@ -125,7 +125,7 @@ pub fn Tree::edit(self : Tree, edit : InputEdit) -> Unit {
 #borrow(tree, other)
 extern "c" fn ts_tree_get_changed_ranges(
   tree : TSTree,
-  other : TSTree
+  other : TSTree,
 ) -> FixedArray[UInt] = "moonbit_ts_tree_get_changed_ranges"
 
 ///|
@@ -164,7 +164,7 @@ pub fn Tree::walk(self : Tree) -> TreeCursor {
 ///|
 pub fn Tree::query(
   self : Tree,
-  source : @string.View
+  source : @string.View,
 ) -> QueryCursor raise QueryError {
   self.root_node().query(source)
 }

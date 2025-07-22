@@ -41,7 +41,7 @@ pub fn Parser::language(self : Parser) -> Language? {
 ///|
 extern "js" fn ts_parser_set_language(
   parser : Parser,
-  language : Language
+  language : Language,
 ) -> Bool =
   #|(parser, language) => {
   #|  try {
@@ -73,7 +73,7 @@ suberror LanguageError {
 /// `MIN_COMPATIBLE_LANGUAGE_VERSION` constants.
 pub fn Parser::set_language(
   self : Parser,
-  language : Language
+  language : Language,
 ) -> Unit raise LanguageError {
   let succeed = ts_parser_set_language(self, language)
   if not(succeed) {
@@ -133,7 +133,7 @@ fn raise_parse_error(self : Parser, tree : Tree?) -> Tree raise ParseError {
 extern "js" fn ts_parser_parse_string(
   parser : Parser,
   string : String,
-  old_tree : Tree
+  old_tree : Tree,
 ) -> Tree =
   #|(parser, string, oldTree) => {
   #|  return parser.parse(string, oldTree);
@@ -146,7 +146,7 @@ extern "js" fn ts_parser_parse_string(
 pub fn Parser::parse_string(
   self : Parser,
   old_tree? : Tree,
-  string : @string.View
+  string : @string.View,
 ) -> Tree raise ParseError {
   let old_ts_tree = match old_tree {
     None => ts_tree_null()
@@ -194,7 +194,7 @@ fn Logger::new(log : (LogType, @string.View) -> Unit) -> Logger {
 ///|
 extern "js" fn ts_parser_set_logger(
   parser : Parser,
-  logger : (String, Bool) -> Unit
+  logger : (String, Bool) -> Unit,
 ) =
   #|(parser, logger) => {
   #|  return parser.setLogger(logger);

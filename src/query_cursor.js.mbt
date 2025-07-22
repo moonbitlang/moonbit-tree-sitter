@@ -24,7 +24,7 @@ priv type TSQueryMatch
 
 ///|
 extern "js" fn TSQueryMatch::captures(
-  self : TSQueryMatch
+  self : TSQueryMatch,
 ) -> Array[QueryCapture] =
   #|(self) => {
   #|  return self.captures;
@@ -72,7 +72,7 @@ pub fn QueryCursor::new() -> QueryCursor {
 pub fn QueryCursor::exec(
   self : QueryCursor,
   query : Query,
-  node : Node
+  node : Node,
 ) -> Unit {
   self.query = Some(query)
   self.node = Some(node)

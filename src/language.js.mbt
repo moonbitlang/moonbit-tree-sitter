@@ -8,7 +8,7 @@ type Language
 extern "js" fn ts_language_load_bytes(
   ts : TS,
   bytes : Bytes,
-  resolve : (Language) -> Unit
+  resolve : (Language) -> Unit,
 ) -> Unit =
   #|(ts, bytes, resolve) => {
   #|  console.log("ts", ts);
@@ -16,7 +16,7 @@ extern "js" fn ts_language_load_bytes(
   #|}
 
 ///|
-pub async fn Language::load(bytes : Bytes) -> Language {
+pub async fn Language::load(bytes : Bytes) -> Language noraise {
   async_suspend(fn(resolve) { ts_language_load_bytes(ts, bytes, resolve) })
 }
 
@@ -62,7 +62,7 @@ type Symbol UInt derive(Eq)
 /// Get the numerical id for the given node type string.
 extern "js" fn ts_language_symbol_for_name_(
   language : Language,
-  name : Bytes
+  name : Bytes,
 ) -> UInt16 =
   #|(language, name) => {
   #|  return language.idForNodeType(name, true) || language.idForNodeType(name, false);
@@ -72,7 +72,7 @@ extern "js" fn ts_language_symbol_for_name_(
 /// Get the numerical id for the given node type string.
 pub fn Language::symbol_for_name(
   self : Language,
-  name : @string.View
+  name : @string.View,
 ) -> Symbol? {
   let name_bytes = @encoding.encode(encoding=UTF8, name)
   let symbol = ts_language_symbol_for_name_(self, name_bytes)
@@ -112,7 +112,7 @@ impl Nullable for String with is_null(self : String) -> Bool {
 ///|
 extern "js" fn ts_language_field_name_for_id(
   language : Language,
-  id : FieldId
+  id : FieldId,
 ) -> String =
   #|(language, id) => {
   #|  return language.fieldNameForId(id);
@@ -122,7 +122,7 @@ extern "js" fn ts_language_field_name_for_id(
 /// Get the field name string for the given numerical id.
 pub fn Language::field_name_for_id(
   self : Language,
-  id : FieldId
+  id : FieldId,
 ) -> @string.View? {
   if Nullable::to_option(ts_language_field_name_for_id(self, id))
     is Some(string) {
@@ -135,7 +135,7 @@ pub fn Language::field_name_for_id(
 ///|
 extern "js" fn ts_language_field_id_for_name(
   language : Language,
-  name : String
+  name : String,
 ) -> UInt =
   #|(language, name) => {
   #|  return language.fieldIdForName(name);
@@ -176,7 +176,7 @@ pub fn Language::subtypes(self : Language) -> Array[Symbol] {
 ///|
 extern "js" fn ts_language_symbol_name(
   language : Language,
-  symbol : Symbol
+  symbol : Symbol,
 ) -> String =
   #|(language, symbol) => {
   #|  return language.nodeTypeForId(symbol);
@@ -226,7 +226,7 @@ fn SymbolType::to_int(self : SymbolType) -> UInt {
 ///|
 extern "js" fn ts_language_symbol_is_named(
   language : Language,
-  symbol : Symbol
+  symbol : Symbol,
 ) -> Bool =
   #|(language, symbol) => {
   #|  return language.nodeTypeIsNamed(symbol);
@@ -235,7 +235,7 @@ extern "js" fn ts_language_symbol_is_named(
 ///|
 extern "js" fn ts_language_symbol_is_visible(
   language : Language,
-  symbol : Symbol
+  symbol : Symbol,
 ) -> Bool =
   #|(language, symbol) => {
   #|  return language.nodeTypeIsVisible(symbol);
@@ -305,7 +305,7 @@ type LanguageMetadata
 
 ///|
 pub extern "js" fn LanguageMetadata::major_version(
-  self : LanguageMetadata
+  self : LanguageMetadata,
 ) -> Byte =
   #|(metadata) => {
   #|  return metadata.major_version;
@@ -313,7 +313,7 @@ pub extern "js" fn LanguageMetadata::major_version(
 
 ///|
 pub extern "js" fn LanguageMetadata::minor_version(
-  self : LanguageMetadata
+  self : LanguageMetadata,
 ) -> Byte =
   #|(metadata) => {
   #|  return metadata.minor_version;
@@ -321,7 +321,7 @@ pub extern "js" fn LanguageMetadata::minor_version(
 
 ///|
 pub extern "js" fn LanguageMetadata::patch_version(
-  self : LanguageMetadata
+  self : LanguageMetadata,
 ) -> Byte =
   #|(metadata) => {
   #|  return metadata.patch_version;
@@ -350,7 +350,7 @@ type StateId UInt16
 extern "js" fn ts_language_next_state(
   language : Language,
   state : StateId,
-  symbol : Symbol
+  symbol : Symbol,
 ) -> StateId =
   #|(language, state, symbol) => {
   #|  return language.nextState(state, symbol);
@@ -363,7 +363,7 @@ extern "js" fn ts_language_next_state(
 pub fn Language::next_state(
   self : Language,
   state : StateId,
-  symbol : Symbol
+  symbol : Symbol,
 ) -> StateId {
   return ts_language_next_state(self, state, symbol)
 }

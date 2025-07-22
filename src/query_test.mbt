@@ -27,9 +27,9 @@ test "query with predicates" {
   // Test string_value_for_id for a string in the query
   inspect(
     query.string_value_for_id(0),
-    content=
+    content=(
       #|Some("eq?")
-    ,
+    ),
   )
 }
 

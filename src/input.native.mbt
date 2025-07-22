@@ -5,9 +5,9 @@ struct Input[DecodeFunction] {
 }
 
 ///|
-pub fn[DecodeFunction : DecodeFunction] Input::new(
+pub fn[DecodeFunction] Input::new(
   read : (Int, Point) -> @bytes.View,
-  decode : DecodeFunction
+  decode : DecodeFunction,
 ) -> Input[DecodeFunction] {
   {
     read: fn(byte, point) {
@@ -28,7 +28,7 @@ fn ts_input_edit_new(
   new_end_byte : UInt,
   start_point : Point,
   old_end_point : Point,
-  new_end_point : Point
+  new_end_point : Point,
 ) -> InputEdit {
   [
     start_byte,
@@ -50,7 +50,7 @@ pub fn InputEdit::new(
   new_end_byte~ : Int,
   start_point~ : Point,
   old_end_point~ : Point,
-  new_end_point~ : Point
+  new_end_point~ : Point,
 ) -> InputEdit {
   let start_byte = int_to_uint(start_byte)
   let old_end_byte = int_to_uint(old_end_byte)

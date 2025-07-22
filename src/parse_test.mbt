@@ -11,7 +11,7 @@ test "json" {
   let root_node = tree.root_node()
   inspect(
     root_node,
-    content=
+    content=(
       #|(document
       #| (object
       #|  (pair
@@ -23,12 +23,12 @@ test "json" {
       #|   key: (string
       #|         (string_content))
       #|   value: (number))))
-    ,
+    ),
   )
   let root_node_first_child = root_node.child(0).or_error(Failure("None"))
   inspect(
     root_node_first_child,
-    content=
+    content=(
       #|(object
       #| (pair
       #|  key: (string
@@ -39,7 +39,7 @@ test "json" {
       #|  key: (string
       #|        (string_content))
       #|  value: (number)))
-    ,
+    ),
   )
 }
 
@@ -85,18 +85,18 @@ test "moonbit" {
   let comment_document = comment_document.join("\n")
   inspect(
     comment_document.to_string(),
-    content=
+    content=(
       #|# Heading
       #|
       #|Paragraph with *italic* and **bold** text.
-    ,
+    ),
   )
   parser.set_language(@tree_sitter_markdown.language())
   let markdown_tree = parser.parse_string(comment_document.to_string())
   let markdown_root_node = markdown_tree.root_node()
   inspect(
     markdown_root_node,
-    content=
+    content=(
       #|(document
       #| (section
       #|  (atx_heading
@@ -104,7 +104,7 @@ test "moonbit" {
       #|   heading_content: (inline))
       #|  (paragraph
       #|   (inline))))
-    ,
+    ),
   )
 }
 
@@ -185,7 +185,7 @@ test "custom-encoding" {
   let input = @tree_sitter.Input::new(
     fn(offset, _) {
       let start = offset
-      let end = @math.minimum(offset + 4, source_bytes.length())
+      let end = @cmp.minimum(offset + 4, source_bytes.length())
       return source_bytes[start:end]
     },
     UTF32BE::{  },
@@ -194,7 +194,7 @@ test "custom-encoding" {
   let root_node = tree.root_node()
   inspect(
     root_node,
-    content=
+    content=(
       #|(document
       #| (object
       #|  (pair
@@ -206,6 +206,6 @@ test "custom-encoding" {
       #|   key: (string
       #|         (string_content))
       #|   value: (number))))
-    ,
+    ),
   )
 }

@@ -7,36 +7,32 @@ import(
 // Values
 fn parse(@string.StringView) -> Array[Sexp] raise SexpError
 
-fn prettify(@string.StringView) -> @string.StringView raise SexpError
-
-fn pretty(Array[Sexp]) -> Array[Sexp]
-
-fn pretty_to(Array[Sexp], Array[Sexp]) -> Unit
-
 fn print(Array[Sexp]) -> String
 
-fn print_to(Array[Sexp], &Logger, indent~ : Int = ..) -> Unit
+fn print_to(ArrayView[Sexp], &Logger, indent~ : Int = ..) -> Unit
 
 // Types and methods
 pub enum Atom {
+  Field(String)
   Symbol(String)
   String(String)
+  Narrow(String)
   Anchor
   Capture(String)
   Comment(String)
-  Newline
   Predicate(String)
   Directive(String)
 }
 impl Eq for Atom
 impl Show for Atom
-impl ToJson for Atom
 
-type List
-fn List::new(open~ : Char = .., Array[Sexp], close~ : Char = .., quantifier~ : Quantifier = ..) -> Self
-impl Eq for List
-impl Show for List
-impl ToJson for List
+pub enum Delimiter {
+  Bracket
+  Parenthesis
+  Brace
+}
+impl Eq for Delimiter
+impl Show for Delimiter
 
 pub enum Quantifier {
   ZeroOrOne
@@ -51,12 +47,10 @@ impl ToJson for Quantifier
 
 pub enum Sexp {
   Atom(Atom)
-  Pair(String, Sexp)
-  List(List)
+  List(Array[Sexp], delimiter~ : Delimiter, mut quantifier~ : Quantifier)
 }
-fn Sexp::list(open~ : Char = .., Array[Self], close~ : Char = .., quantifier~ : Quantifier = ..) -> Self
+fn Sexp::list(Array[Self], delimiter~ : Delimiter = .., quantifier~ : Quantifier = ..) -> Self
 fn Sexp::parse(@string.StringView) -> Self raise SexpError
-fn Sexp::pretty(Self) -> Self
 fn Sexp::print_to(Self, &Logger, indent~ : Int = ..) -> Unit
 impl Eq for Sexp
 impl Show for Sexp
@@ -66,7 +60,6 @@ pub suberror SexpError {
   UnrecognizedCharacter(@string.StringView)
   UnterminatedString(@string.StringView)
   UnterminatedList(@string.StringView)
-  MissingValue(@string.StringView)
   ExtraContent(ArrayView[Sexp])
   InvalidPairKey(@string.StringView)
   InvalidQuantifier(Char)

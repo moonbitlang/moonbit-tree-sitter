@@ -261,7 +261,7 @@ pub fn Node::parent(self : Node) -> Node? {
 ///|
 extern "js" fn ts_node_child_with_descendant(
   node : Node,
-  descendant : Node
+  descendant : Node,
 ) -> Node =
   #|(node, descendant) => {
   #|  return node.childWithDescendant(descendant);
@@ -329,7 +329,7 @@ pub fn Node::children(self : Node) -> Iter[Node] {
 ///|
 extern "js" fn ts_node_field_name_for_child(
   node : Node,
-  child_index : UInt
+  child_index : UInt,
 ) -> String =
   #|(node, tree, child_index) => {
   #|  return node.fieldNameForChild(child_index);
@@ -340,7 +340,7 @@ extern "js" fn ts_node_field_name_for_child(
 /// the first child. Returns `None`, if no field is found.
 pub fn Node::field_name_for_child(
   self : Node,
-  child_index : Int
+  child_index : Int,
 ) -> @string.View? {
   let child_index = int_to_uint(child_index)
   let field_name = Nullable::to_option(
@@ -356,7 +356,7 @@ pub fn Node::field_name_for_child(
 ///|
 extern "js" fn ts_node_field_name_for_named_child(
   node : Node,
-  child_index : UInt
+  child_index : UInt,
 ) -> String =
   #|(node, child_index) => {
   #|  return node.fieldNameForNamedChild(child_index);
@@ -367,7 +367,7 @@ extern "js" fn ts_node_field_name_for_named_child(
 /// represents the first named child. Returns `None`, if no field is found.
 pub fn Node::field_name_for_named_child(
   self : Node,
-  child_index : Int
+  child_index : Int,
 ) -> @string.View? {
   let child_index = int_to_uint(child_index)
   let field_name = Nullable::to_option(
@@ -565,7 +565,7 @@ pub fn Node::first_child_for_byte(self : Node, byte : Int) -> Node? {
 ///|
 extern "js" fn ts_node_first_named_child_for_byte(
   node : Node,
-  byte : UInt
+  byte : UInt,
 ) -> Node =
   #|(node, byte) => {
   #|  return node.firstNamedChildForIndex(byte);
@@ -599,7 +599,7 @@ pub fn Node::descendant_count(self : Node) -> Int {
 extern "js" fn ts_node_descendant_for_byte_range(
   node : Node,
   start_byte : UInt,
-  end_byte : UInt
+  end_byte : UInt,
 ) -> Node =
   #|(node, start_byte, end_byte) => {
   #|  return node.descendantForIndex(start_byte, end_byte);
@@ -610,7 +610,7 @@ extern "js" fn ts_node_descendant_for_byte_range(
 pub fn Node::descendant_for_byte_range(
   self : Node,
   start_byte : Int,
-  end_byte : Int
+  end_byte : Int,
 ) -> Node? {
   let start_byte = int_to_uint(start_byte)
   let end_byte = int_to_uint(end_byte)
@@ -626,7 +626,7 @@ pub fn Node::descendant_for_byte_range(
 extern "js" fn ts_node_descendant_for_point_range(
   node : Node,
   start_point : Point,
-  end_point : Point
+  end_point : Point,
 ) -> Node =
   #|(node, start_point, end_point) => {
   #|  return node.descendantForPosition(start_point, end_point);
@@ -638,7 +638,7 @@ extern "js" fn ts_node_descendant_for_point_range(
 pub fn Node::descendant_for_point_range(
   self : Node,
   start_point : Point,
-  end_point : Point
+  end_point : Point,
 ) -> Node? {
   let descendant = ts_node_descendant_for_point_range(
     self, start_point, end_point,
@@ -654,7 +654,7 @@ pub fn Node::descendant_for_point_range(
 extern "js" fn ts_node_named_descendant_for_byte_range(
   node : Node,
   start_byte : UInt,
-  end_byte : UInt
+  end_byte : UInt,
 ) -> Node =
   #|(node, start_byte, end_byte) => {
   #|  return node.namedDescendantForIndex(start_byte, end_byte);
@@ -666,7 +666,7 @@ extern "js" fn ts_node_named_descendant_for_byte_range(
 pub fn Node::named_descendant_for_byte_range(
   self : Node,
   start_byte : Int,
-  end_byte : Int
+  end_byte : Int,
 ) -> Node? {
   let start_byte = int_to_uint(start_byte)
   let end_byte = int_to_uint(end_byte)
@@ -684,7 +684,7 @@ pub fn Node::named_descendant_for_byte_range(
 extern "js" fn ts_node_named_descendant_for_point_range(
   node : Node,
   start_point : Point,
-  end_point : Point
+  end_point : Point,
 ) -> Node =
   #|(node, start_point, end_point) => {
   #|  return node.namedDescendantForPosition(start_point, end_point);
@@ -696,7 +696,7 @@ extern "js" fn ts_node_named_descendant_for_point_range(
 pub fn Node::named_descendant_for_point_range(
   self : Node,
   start_point : Point,
-  end_point : Point
+  end_point : Point,
 ) -> Node? {
   let descendant = ts_node_named_descendant_for_point_range(
     self, start_point, end_point,
@@ -797,7 +797,7 @@ pub fn Node::next_symbol_names(self : Node) -> Iter[String] {
 ///|
 pub fn Node::query(
   self : Node,
-  source : @string.View
+  source : @string.View,
 ) -> QueryCursor raise QueryError {
   let query = Query::new(self.language(), source)
   let query_cursor = QueryCursor::new()

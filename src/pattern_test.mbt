@@ -2,11 +2,6 @@
 type Range (Int, Int) derive(Eq, Hash, ToJson)
 
 ///|
-impl Show for Range with output(self : Range, logger : &@builtin.Logger) -> Unit {
-  logger.write_object(self.inner())
-}
-
-///|
 struct Environment {
   vars : Map[String, Array[Range]]
   ranges : Map[Range, String]
@@ -16,7 +11,7 @@ struct Environment {
 fn Environment::add_var(
   self : Environment,
   name : String,
-  range : Range
+  range : Range,
 ) -> Unit {
   self.ranges[range] = name
   match self.vars.get(name) {
@@ -41,7 +36,7 @@ suberror PatternError {
 fn pattern_query(
   parser : @tree_sitter.Parser,
   env : Environment,
-  pattern : @string.View
+  pattern : @string.View,
 ) -> Query raise {
   struct Context {
     replaced : StringBuilder
@@ -140,7 +135,7 @@ fn pattern_query(
   let capture_name : Array[String] = []
   fn generate_pattern(
     node : @tree_sitter.Node,
-    stripping : Bool?
+    stripping : Bool?,
   ) -> @string.View {
     if node.start_byte() <= pattern_start || node.end_byte() >= pattern_end {
       let child_patterns = []
@@ -249,9 +244,9 @@ test "pattern" {
   let pattern_query = pattern_query(parser, env, pattern)
   inspect(
     pattern_query.source,
-    content=
+    content=(
       #|(binary_expression (_) @A ("==") (_) @A) @pattern
-    ,
+    ),
   )
   let query_cursor = source_tree.query(pattern_query.source)
   let ranges = []

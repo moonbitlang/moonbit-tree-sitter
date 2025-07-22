@@ -11,14 +11,14 @@ test {
   let root_node = tree.root_node()
   inspect(
     root_node,
-    content=
+    content=(
       #|(structure
       #| (function_definition
       #|  (function_identifier
       #|   (lowercase_identifier))
       #|  (block_expression
       #|   (comment))))
-    ,
+    ),
   )
   let expr = Expr::node(
     Node::and_(
@@ -146,7 +146,7 @@ test "bench" (b : @bench.T) {
   let root_node = tree.root_node()
   inspect(
     root_node,
-    content=
+    content=(
       #|(structure
       #| (function_definition
       #|  (function_identifier
@@ -164,7 +164,7 @@ test "bench" (b : @bench.T) {
       #|         (string_fragment
       #|          (unescaped_string_fragment))))))))
       #|   (comment))))
-    ,
+    ),
   )
   let comment_matcher = Expr::node(Node::type_("comment"))
   let comment_capture = Expr::capture(comment_matcher, "comment")
@@ -221,11 +221,12 @@ test "bench" (b : @bench.T) {
   ])
   let query = @tree_sitter.Query::new(
     moonbit,
-    #|(structure
-    #| (function_definition
-    #|  (block_expression
-    #|   (comment) @comment)))
-    ,
+    (
+      #|(structure
+      #| (function_definition
+      #|  (block_expression
+      #|   (comment) @comment)))
+    ),
   )
   @json.inspect(query.matches(root_node).collect(), content=[
     {

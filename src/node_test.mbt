@@ -29,9 +29,9 @@ test "node basic operations" {
   let name_value = name_value_node.string()
   inspect(
     name_value,
-    content=
+    content=(
       #|(":")
-    ,
+    ),
   )
 }
 
@@ -56,9 +56,9 @@ test "node advanced operations" {
   let name_value_node = object_node.descendant_for_byte_range(12, 18)
   inspect(
     name_value_node.map(Node::text(_)),
-    content=
+    content=(
       #|Some("\"name\": \"test\"")
-    ,
+    ),
   )
 
   // Test descendant_for_point_range
@@ -68,9 +68,9 @@ test "node advanced operations" {
   )
   inspect(
     point_node.map(Node::text(_)),
-    content=
+    content=(
       #|Some("\"name\": \"test\"")
-    ,
+    ),
   )
 
   // Test has_changes

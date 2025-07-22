@@ -13,7 +13,7 @@ fn ts_range_new(
   start_point : Point,
   end_point : Point,
   start_byte : UInt,
-  end_byte : UInt
+  end_byte : UInt,
 ) -> Range {
   [
     ts_point_row(start_point),
@@ -30,7 +30,7 @@ pub fn Range::new(
   start_point : Point,
   end_point : Point,
   start_byte : Int,
-  end_byte : Int
+  end_byte : Int,
 ) -> Range {
   let start_byte = int_to_uint(start_byte)
   let end_byte = int_to_uint(end_byte)

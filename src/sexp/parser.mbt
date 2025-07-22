@@ -12,12 +12,12 @@ pub suberror SexpError {
 ///|
 fn parse_list(
   source : @string.View,
-  sexp : Array[Sexp]
+  sexp : Array[Sexp],
 ) -> @string.View raise SexpError {
   fn parse_string(
     source : @string.View,
     string : StringBuilder,
-    quote : Char
+    quote : Char,
   ) -> @string.View raise SexpError {
     loop source {
       ['\\', '\\', .. source] => {
@@ -39,7 +39,7 @@ fn parse_list(
 
   fn parse_symbol(
     source : @string.View,
-    symbol : StringBuilder
+    symbol : StringBuilder,
   ) -> @string.View {
     loop source {
       ['a'..<'z' | 'A'..<'Z' | '0'..<'9' | '_' as char, .. source] => {
@@ -52,7 +52,7 @@ fn parse_list(
 
   fn parse_comment(
     source : @string.View,
-    comment : StringBuilder
+    comment : StringBuilder,
   ) -> @string.View {
     loop source {
       ['\n', ..] as source => return source

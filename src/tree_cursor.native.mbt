@@ -41,7 +41,7 @@ pub fn TreeCursor::reset(self : TreeCursor, node : Node) -> Unit {
 #borrow(cursor, other)
 extern "c" fn ts_tree_cursor_reset_to(
   cursor : TSTreeCursor,
-  other : TSTreeCursor
+  other : TSTreeCursor,
 ) = "moonbit_ts_tree_cursor_reset_to"
 
 ///|
@@ -70,7 +70,7 @@ pub fn TreeCursor::current_node(self : TreeCursor) -> Node {
 ///|
 #borrow(cursor)
 extern "c" fn ts_tree_cursor_current_field_name(
-  cursor : TSTreeCursor
+  cursor : TSTreeCursor,
 ) -> @native.ConstPtr[Byte] = "moonbit_ts_tree_cursor_current_field_name"
 
 ///|
@@ -131,7 +131,7 @@ pub fn TreeCursor::goto_next_sibling(self : TreeCursor) -> Bool {
 ///|
 #borrow(cursor)
 extern "c" fn ts_tree_cursor_goto_previous_sibling(
-  cursor : TSTreeCursor
+  cursor : TSTreeCursor,
 ) -> Bool = "moonbit_ts_tree_cursor_goto_previous_sibling"
 
 ///|
@@ -183,7 +183,7 @@ pub fn TreeCursor::goto_last_child(self : TreeCursor) -> Bool {
 #borrow(cursor)
 extern "c" fn ts_tree_cursor_goto_descendant(
   cursor : TSTreeCursor,
-  goal_descendant_index : UInt
+  goal_descendant_index : UInt,
 ) -> Unit = "moonbit_ts_tree_cursor_goto_descendant"
 
 ///|
@@ -192,7 +192,7 @@ extern "c" fn ts_tree_cursor_goto_descendant(
 /// zero represents the original node itself.
 pub fn TreeCursor::goto_descendant(
   self : TreeCursor,
-  goal_descendant_index : Int
+  goal_descendant_index : Int,
 ) -> Unit {
   ts_tree_cursor_goto_descendant(
     self.cursor,
@@ -203,7 +203,7 @@ pub fn TreeCursor::goto_descendant(
 ///|
 #borrow(cursor)
 extern "c" fn ts_tree_cursor_current_descendant_index(
-  cursor : TSTreeCursor
+  cursor : TSTreeCursor,
 ) -> UInt = "moonbit_ts_tree_cursor_current_descendant_index"
 
 ///|
@@ -228,7 +228,7 @@ pub fn TreeCursor::current_depth(self : TreeCursor) -> Int {
 #borrow(cursor)
 extern "c" fn ts_tree_cursor_goto_first_child_for_byte(
   cursor : TSTreeCursor,
-  goal_byte : UInt
+  goal_byte : UInt,
 ) -> Bool = "moonbit_ts_tree_cursor_goto_first_child_for_byte"
 
 ///|
@@ -239,7 +239,7 @@ extern "c" fn ts_tree_cursor_goto_first_child_for_byte(
 /// if no such child was found.
 pub fn TreeCursor::goto_first_child_for_byte(
   self : TreeCursor,
-  goal_byte : Int
+  goal_byte : Int,
 ) -> Bool {
   ts_tree_cursor_goto_first_child_for_byte(self.cursor, int_to_uint(goal_byte))
 }
@@ -248,7 +248,7 @@ pub fn TreeCursor::goto_first_child_for_byte(
 #borrow(cursor, goal_point)
 extern "c" fn ts_tree_cursor_goto_first_child_for_point(
   cursor : TSTreeCursor,
-  goal_point : Point
+  goal_point : Point,
 ) -> Bool = "moonbit_ts_tree_cursor_goto_first_child_for_point"
 
 ///|
@@ -259,7 +259,7 @@ extern "c" fn ts_tree_cursor_goto_first_child_for_point(
 /// if no such child was found.
 pub fn TreeCursor::goto_first_child_for_point(
   self : TreeCursor,
-  goal_point : Point
+  goal_point : Point,
 ) -> Bool {
   ts_tree_cursor_goto_first_child_for_point(self.cursor, goal_point)
 }
