@@ -5,15 +5,6 @@ type Parser
 extern "c" fn ts_parser_new() -> Parser = "moonbit_ts_parser_new"
 
 ///|
-#borrow(parser)
-extern "c" fn ts_parser_is_null(parser : Parser) -> Bool = "moonbit_c_is_null"
-
-///|
-impl Nullable for Parser with is_null(self : Parser) -> Bool {
-  ts_parser_is_null(self)
-}
-
-///|
 /// Create a new parser.
 pub fn Parser::new() -> Parser {
   ts_parser_new()
@@ -443,14 +434,6 @@ pub enum LogType {
 }
 
 ///|
-fn LogType::to_uint(self : LogType) -> UInt {
-  match self {
-    Parse => 0
-    Lex => 1
-  }
-}
-
-///|
 fn LogType::of_uint(value : UInt) -> LogType {
   match value {
     0 => Parse
@@ -463,7 +446,7 @@ fn LogType::of_uint(value : UInt) -> LogType {
 struct Logger((UInt, Bytes) -> Unit)
 
 ///|
-fn Logger::new(log : (LogType, @string.View) -> Unit) -> Logger {
+pub fn Logger::new(log : (LogType, @string.View) -> Unit) -> Logger {
   fn(log_type, message) {
     log(
       LogType::of_uint(log_type),

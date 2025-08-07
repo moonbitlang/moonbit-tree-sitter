@@ -8,12 +8,6 @@ extern "js" fn ts_parser_new(ts : TS) -> Parser =
   #|}
 
 ///|
-extern "js" fn Parser::is_null(self : Parser) -> Bool =
-  #|() => {
-  #|  return self === null || self === undefined;
-  #|}
-
-///|
 /// Create a new parser.
 pub fn Parser::new() -> Parser {
   ts_parser_new(ts)
@@ -184,7 +178,7 @@ pub enum LogType {
 struct Logger((String, Bool) -> Unit)
 
 ///|
-fn Logger::new(log : (LogType, @string.View) -> Unit) -> Logger {
+pub fn Logger::new(log : (LogType, @string.View) -> Unit) -> Logger {
   fn(message, isLex) {
     let logType = if isLex { LogType::Lex } else { LogType::Parse }
     log(logType, message)

@@ -15,18 +15,6 @@ suberror QueryError {
 } derive(Show)
 
 ///|
-fn QueryError::offset(self : QueryError) -> UInt {
-  match self {
-    QueryError::Syntax(offset) => offset
-    QueryError::NodeType(offset) => offset
-    QueryError::Field(offset) => offset
-    QueryError::Capture(offset) => offset
-    QueryError::Structure(offset) => offset
-    QueryError::Language(offset) => offset
-  }
-}
-
-///|
 fn QueryError::from(offset : UInt, type_ : UInt) -> QueryError {
   match type_ {
     1 => QueryError::Syntax(offset)

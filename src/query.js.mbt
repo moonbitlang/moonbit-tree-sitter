@@ -2,12 +2,6 @@
 type Query
 
 ///|
-extern "js" fn Query::null() -> Query =
-  #|() => {
-  #|  return null;
-  #|}
-
-///|
 suberror QueryError {
   Syntax(UInt)
   NodeType(UInt)
@@ -159,7 +153,7 @@ pub fn Query::end_byte_for_pattern(self : Query, pattern_index : Int) -> Int {
 priv enum QueryPredicateStepType {
   Capture
   String
-} derive(Show)
+}
 
 ///|
 fn QueryPredicateStepType::of_string(value : String) -> QueryPredicateStepType {

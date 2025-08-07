@@ -56,7 +56,6 @@ pub enum Quantifier {
 fn Quantifier::from_char(Char) -> Self raise SexpError
 impl Eq for Quantifier
 impl Show for Quantifier
-impl ToJson for Quantifier
 
 pub enum Sexp {
   Atom(Atom)

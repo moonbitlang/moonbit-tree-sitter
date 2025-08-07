@@ -195,32 +195,11 @@ pub fn Language::symbol_name(self : Language, symbol : Symbol) -> @string.View? 
 ///|
 /// Check whether the given node type id belongs to named nodes, anonymous nodes,
 /// or a hidden nodes.
-enum SymbolType {
+pub enum SymbolType {
   Regular
   Anonymous
   Supertype
   Auxiliary
-}
-
-///|
-fn SymbolType::of_int(value : UInt) -> SymbolType {
-  match value {
-    0 => SymbolType::Regular
-    1 => SymbolType::Anonymous
-    2 => SymbolType::Supertype
-    3 => SymbolType::Auxiliary
-    value => abort("Invalid SymbolType: \{value}")
-  }
-}
-
-///|
-fn SymbolType::to_int(self : SymbolType) -> UInt {
-  match self {
-    SymbolType::Regular => 0
-    SymbolType::Anonymous => 1
-    SymbolType::Supertype => 2
-    SymbolType::Auxiliary => 3
-  }
 }
 
 ///|

@@ -163,11 +163,11 @@ pub fn Language::symbol_name(self : Language, symbol : Symbol) -> String? {
 ///|
 /// Check whether the given node type id belongs to named nodes, anonymous nodes,
 /// or a hidden nodes.
-enum SymbolType {
-  Regular
-  Anonymous
-  Supertype
-  Auxiliary
+pub enum SymbolType {
+  Regular = 0
+  Anonymous = 1
+  Supertype = 2
+  Auxiliary = 3
 }
 
 ///|
@@ -178,16 +178,6 @@ fn SymbolType::of_int(value : UInt) -> SymbolType {
     2 => SymbolType::Supertype
     3 => SymbolType::Auxiliary
     value => abort("Invalid SymbolType: \{value}")
-  }
-}
-
-///|
-fn SymbolType::to_int(self : SymbolType) -> UInt {
-  match self {
-    SymbolType::Regular => 0
-    SymbolType::Anonymous => 1
-    SymbolType::Supertype => 2
-    SymbolType::Auxiliary => 3
   }
 }
 
