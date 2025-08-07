@@ -1,5 +1,5 @@
 ///|
-type Point FixedArray[UInt]
+struct Point(FixedArray[UInt])
 
 ///|
 pub impl Show for Point with output(self : Point, logger : &@builtin.Logger) -> Unit {

@@ -56,7 +56,7 @@ pub fn Language::state_count(self : Language) -> Int {
 }
 
 ///|
-type Symbol UInt derive(Eq)
+struct Symbol(UInt) derive(Eq)
 
 ///|
 /// Get the numerical id for the given node type string.
@@ -84,7 +84,7 @@ pub fn Language::symbol_for_name(
 }
 
 ///|
-type FieldId UInt16
+struct FieldId(UInt16)
 
 ///|
 extern "js" fn ts_language_field_count(language : Language) -> Int =
@@ -344,7 +344,7 @@ pub fn Language::metadata(self : Language) -> LanguageMetadata {
 }
 
 ///|
-type StateId UInt16
+struct StateId(UInt16)
 
 ///|
 extern "js" fn ts_language_next_state(

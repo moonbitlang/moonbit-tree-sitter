@@ -460,7 +460,7 @@ fn LogType::of_uint(value : UInt) -> LogType {
 }
 
 ///|
-type Logger (UInt, Bytes) -> Unit
+struct Logger((UInt, Bytes) -> Unit)
 
 ///|
 fn Logger::new(log : (LogType, @string.View) -> Unit) -> Logger {

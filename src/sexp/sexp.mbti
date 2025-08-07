@@ -1,3 +1,4 @@
+// Generated using `moon info`, DON'T EDIT IT
 package "tonyfettes/tree_sitter/sexp"
 
 import(
@@ -9,7 +10,19 @@ fn parse(@string.StringView) -> Array[Sexp] raise SexpError
 
 fn print(Array[Sexp]) -> String
 
-fn print_to(ArrayView[Sexp], &Logger, indent~ : Int = ..) -> Unit
+fn print_to(ArrayView[Sexp], &Logger, indent? : Int) -> Unit
+
+// Errors
+pub suberror SexpError {
+  UnrecognizedCharacter(@string.StringView)
+  UnterminatedString(@string.StringView)
+  UnterminatedList(@string.StringView)
+  ExtraContent(ArrayView[Sexp])
+  InvalidPairKey(@string.StringView)
+  InvalidQuantifier(Char)
+  InvalidCommand(@string.StringView)
+}
+impl Show for SexpError
 
 // Types and methods
 pub enum Atom {
@@ -49,23 +62,12 @@ pub enum Sexp {
   Atom(Atom)
   List(Array[Sexp], delimiter~ : Delimiter, mut quantifier~ : Quantifier)
 }
-fn Sexp::list(Array[Self], delimiter~ : Delimiter = .., quantifier~ : Quantifier = ..) -> Self
+fn Sexp::list(Array[Self], delimiter? : Delimiter, quantifier? : Quantifier) -> Self
 fn Sexp::parse(@string.StringView) -> Self raise SexpError
-fn Sexp::print_to(Self, &Logger, indent~ : Int = ..) -> Unit
+fn Sexp::print_to(Self, &Logger, indent? : Int) -> Unit
 impl Eq for Sexp
 impl Show for Sexp
 impl ToJson for Sexp
-
-pub suberror SexpError {
-  UnrecognizedCharacter(@string.StringView)
-  UnterminatedString(@string.StringView)
-  UnterminatedList(@string.StringView)
-  ExtraContent(ArrayView[Sexp])
-  InvalidPairKey(@string.StringView)
-  InvalidQuantifier(Char)
-  InvalidCommand(@string.StringView)
-}
-impl Show for SexpError
 
 // Type aliases
 

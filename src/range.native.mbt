@@ -1,5 +1,5 @@
 ///|
-type Range FixedArray[UInt]
+struct Range(FixedArray[UInt])
 
 ///|
 pub impl Show for Range with output(self : Range, logger : &@builtin.Logger) -> Unit {

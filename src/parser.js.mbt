@@ -181,7 +181,7 @@ pub enum LogType {
 }
 
 ///|
-type Logger (String, Bool) -> Unit
+struct Logger((String, Bool) -> Unit)
 
 ///|
 fn Logger::new(log : (LogType, @string.View) -> Unit) -> Logger {

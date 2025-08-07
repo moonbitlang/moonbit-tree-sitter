@@ -1,5 +1,5 @@
 ///|
-priv type TSNode Bytes
+priv struct TSNode(Bytes)
 
 ///|
 struct Node {

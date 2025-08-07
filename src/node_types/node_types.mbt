@@ -107,7 +107,7 @@ pub impl ToJson for NodeType with to_json(self : NodeType) -> Json {
 }
 
 ///|
-pub type NodeTypes Array[NodeType] derive(@json.FromJson, ToJson, Show)
+pub struct NodeTypes(Array[NodeType]) derive(@json.FromJson, ToJson, Show)
 
 ///|
 pub fn NodeTypes::from_json(

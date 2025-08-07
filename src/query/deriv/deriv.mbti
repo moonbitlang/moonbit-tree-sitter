@@ -1,3 +1,4 @@
+// Generated using `moon info`, DON'T EDIT IT
 package "tonyfettes/tree_sitter/query/deriv"
 
 import(
@@ -5,6 +6,8 @@ import(
 )
 
 // Values
+
+// Errors
 
 // Types and methods
 type Expr

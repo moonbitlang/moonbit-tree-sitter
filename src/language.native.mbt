@@ -1,5 +1,5 @@
 ///|
-pub(all) type Language @tree_sitter_language.Language
+pub(all) struct Language(@tree_sitter_language.Language)
 
 ///|
 extern "c" fn ts_language_copy(language : Language) -> Language = "moonbit_ts_language_copy"
@@ -39,7 +39,7 @@ pub fn Language::state_count(self : Language) -> Int {
 }
 
 ///|
-type Symbol UInt
+struct Symbol(UInt)
 
 ///|
 /// Get the numerical id for the given node type string.
@@ -65,7 +65,7 @@ pub fn Language::symbol_for_name(
 }
 
 ///|
-type FieldId UInt16
+struct FieldId(UInt16)
 
 ///|
 extern "c" fn ts_language_field_count(language : Language) -> Int = "moonbit_ts_language_field_count"
@@ -240,7 +240,7 @@ pub fn Language::abi_version(self : Language) -> Int {
 /// of the language. This version information should be used to signal if a given parser might
 /// be incompatible with existing queries when upgrading between major versions, or minor versions
 /// if it's in zerover.
-type LanguageMetadata Bytes
+struct LanguageMetadata(Bytes)
 
 ///|
 pub fn LanguageMetadata::major_version(self : LanguageMetadata) -> Byte {
@@ -271,7 +271,7 @@ pub fn Language::metadata(self : Language) -> LanguageMetadata {
 }
 
 ///|
-type StateId UInt16
+struct StateId(UInt16)
 
 ///|
 extern "c" fn ts_language_next_state(
