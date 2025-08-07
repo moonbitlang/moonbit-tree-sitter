@@ -1,4 +1,8 @@
 {
+  "targets": {
+    "query_test.mbt": ["native"],
+    "query.mbt": ["native"]
+  },
   "import": [
     "tonyfettes/tree_sitter/sexp",
     "tonyfettes/tree_sitter"

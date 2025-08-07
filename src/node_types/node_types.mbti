@@ -1,3 +1,4 @@
+// Generated using `moon info`, DON'T EDIT IT
 package "tonyfettes/tree_sitter/node_types"
 
 import(
@@ -5,6 +6,8 @@ import(
 )
 
 // Values
+
+// Errors
 
 // Types and methods
 pub struct ChildType {
@@ -31,7 +34,7 @@ pub enum NodeTypePayload {
 }
 impl Show for NodeTypePayload
 
-pub type NodeTypes Array[NodeType]
+pub struct NodeTypes(Array[NodeType])
 fn NodeTypes::from_json(Json) -> Self raise @json.JsonDecodeError
 fn NodeTypes::inner(Self) -> Array[NodeType]
 impl Show for NodeTypes

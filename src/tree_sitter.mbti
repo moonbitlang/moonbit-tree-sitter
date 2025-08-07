@@ -1,3 +1,4 @@
+// Generated using `moon info`, DON'T EDIT IT
 package "tonyfettes/tree_sitter"
 
 import(
@@ -15,6 +16,20 @@ const MIN_COMPATIBLE_LANGUAGE_VERSION : Int = 13
 
 fn parser(Language) -> Parser raise LanguageError
 
+// Errors
+type LanguageError
+impl Show for LanguageError
+impl ToJson for LanguageError
+
+pub suberror ParseError {
+  MissingLanguage
+  Cancelled
+}
+impl Show for ParseError
+
+type QueryError
+impl Show for QueryError
+
 // Types and methods
 type DecodeResult
 fn DecodeResult::new(code_point~ : Char, bytes_read~ : Int) -> Self
@@ -22,7 +37,7 @@ fn DecodeResult::new(code_point~ : Char, bytes_read~ : Int) -> Self
 type FieldId
 
 type Input[DecodeFunction]
-fn[DecodeFunction : DecodeFunction] Input::new((Int, Point) -> @bytes.View, DecodeFunction) -> Self[DecodeFunction]
+fn[DecodeFunction] Input::new((Int, Point) -> @bytes.View, DecodeFunction) -> Self[DecodeFunction]
 
 type InputEdit
 fn InputEdit::new(start_byte~ : Int, old_end_byte~ : Int, new_end_byte~ : Int, start_point~ : Point, old_end_point~ : Point, new_end_point~ : Point) -> Self
@@ -30,7 +45,7 @@ fn InputEdit::new(start_byte~ : Int, old_end_byte~ : Int, new_end_byte~ : Int, s
 type InputEncoding
 fn InputEncoding::custom() -> Self
 
-pub(all) type Language @tree_sitter_language.Language
+pub(all) struct Language(@tree_sitter_language.Language)
 fn Language::abi_version(Self) -> Int
 fn Language::copy(Self) -> Self
 fn Language::delete(Self) -> Unit
@@ -51,10 +66,6 @@ fn Language::symbol_type(Self, Symbol) -> SymbolType
 #deprecated
 fn Language::version(Self) -> Int
 
-type LanguageError
-impl Show for LanguageError
-impl ToJson for LanguageError
-
 type LanguageMetadata
 fn LanguageMetadata::major_version(Self) -> Byte
 fn LanguageMetadata::minor_version(Self) -> Byte
@@ -66,6 +77,7 @@ pub enum LogType {
 }
 
 type Logger
+fn Logger::new((LogType, @string.StringView) -> Unit) -> Self
 
 type LookaheadIterator
 fn LookaheadIterator::current_symbol(Self) -> Symbol
@@ -133,13 +145,6 @@ impl Eq for Node
 impl Hash for Node
 impl Show for Node
 impl ToJson for Node
-
-pub suberror ParseError {
-  MissingLanguage
-  Cancelled
-}
-impl Show for ParseError
-impl ToJson for ParseError
 
 type ParseOptions
 fn ParseOptions::new((ParseState) -> Bool) -> Self
@@ -225,10 +230,6 @@ pub struct QueryCursorState {
   current_byte_offset : Int
 }
 
-type QueryError
-impl Show for QueryError
-impl ToJson for QueryError
-
 type QueryMatch
 fn QueryMatch::captures(Self) -> Iter[QueryCapture]
 fn QueryMatch::id(Self) -> Int
@@ -255,7 +256,12 @@ type StateId
 
 type Symbol
 
-type SymbolType
+pub enum SymbolType {
+  Regular
+  Anonymous
+  Supertype
+  Auxiliary
+}
 
 type Tree
 fn Tree::copy(Self) -> Self

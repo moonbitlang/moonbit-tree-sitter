@@ -1,3 +1,4 @@
+// Generated using `moon info`, DON'T EDIT IT
 package "tonyfettes/tree_sitter/grammar"
 
 import(
@@ -5,6 +6,10 @@ import(
 )
 
 // Values
+
+// Errors
+type GrammarParseError
+impl Show for GrammarParseError
 
 // Types and methods
 pub struct Grammar {
@@ -24,9 +29,6 @@ fn Grammar::from_json(Json) -> Self raise GrammarParseError
 impl Show for Grammar
 impl ToJson for Grammar
 impl @json.FromJson for Grammar
-
-type GrammarParseError
-impl Show for GrammarParseError
 
 type PrecType
 impl Eq for PrecType

@@ -4,7 +4,7 @@ pub enum Quantifier {
   ZeroOrMore
   One
   OneOrMore
-} derive(Eq, ToJson)
+} derive(Eq)
 
 ///|
 pub fn Quantifier::from_char(char : Char) -> Quantifier raise SexpError {

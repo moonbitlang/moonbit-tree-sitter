@@ -19,7 +19,7 @@ pub fn[DecodeFunction] Input::new(
 }
 
 ///|
-type InputEdit FixedArray[UInt]
+struct InputEdit(FixedArray[UInt])
 
 ///|
 fn ts_input_edit_new(

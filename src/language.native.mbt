@@ -1,5 +1,5 @@
 ///|
-pub(all) type Language @tree_sitter_language.Language
+pub(all) struct Language(@tree_sitter_language.Language)
 
 ///|
 extern "c" fn ts_language_copy(language : Language) -> Language = "moonbit_ts_language_copy"
@@ -39,7 +39,7 @@ pub fn Language::state_count(self : Language) -> Int {
 }
 
 ///|
-type Symbol UInt
+struct Symbol(UInt)
 
 ///|
 /// Get the numerical id for the given node type string.
@@ -65,7 +65,7 @@ pub fn Language::symbol_for_name(
 }
 
 ///|
-type FieldId UInt16
+struct FieldId(UInt16)
 
 ///|
 extern "c" fn ts_language_field_count(language : Language) -> Int = "moonbit_ts_language_field_count"
@@ -163,11 +163,11 @@ pub fn Language::symbol_name(self : Language, symbol : Symbol) -> String? {
 ///|
 /// Check whether the given node type id belongs to named nodes, anonymous nodes,
 /// or a hidden nodes.
-enum SymbolType {
-  Regular
-  Anonymous
-  Supertype
-  Auxiliary
+pub enum SymbolType {
+  Regular = 0
+  Anonymous = 1
+  Supertype = 2
+  Auxiliary = 3
 }
 
 ///|
@@ -178,16 +178,6 @@ fn SymbolType::of_int(value : UInt) -> SymbolType {
     2 => SymbolType::Supertype
     3 => SymbolType::Auxiliary
     value => abort("Invalid SymbolType: \{value}")
-  }
-}
-
-///|
-fn SymbolType::to_int(self : SymbolType) -> UInt {
-  match self {
-    SymbolType::Regular => 0
-    SymbolType::Anonymous => 1
-    SymbolType::Supertype => 2
-    SymbolType::Auxiliary => 3
   }
 }
 
@@ -240,7 +230,7 @@ pub fn Language::abi_version(self : Language) -> Int {
 /// of the language. This version information should be used to signal if a given parser might
 /// be incompatible with existing queries when upgrading between major versions, or minor versions
 /// if it's in zerover.
-type LanguageMetadata Bytes
+struct LanguageMetadata(Bytes)
 
 ///|
 pub fn LanguageMetadata::major_version(self : LanguageMetadata) -> Byte {
@@ -271,7 +261,7 @@ pub fn Language::metadata(self : Language) -> LanguageMetadata {
 }
 
 ///|
-type StateId UInt16
+struct StateId(UInt16)
 
 ///|
 extern "c" fn ts_language_next_state(

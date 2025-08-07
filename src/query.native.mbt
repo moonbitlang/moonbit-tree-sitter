@@ -12,19 +12,7 @@ suberror QueryError {
   Capture(UInt)
   Structure(UInt)
   Language(UInt)
-} derive(Show, ToJson)
-
-///|
-fn QueryError::offset(self : QueryError) -> UInt {
-  match self {
-    QueryError::Syntax(offset) => offset
-    QueryError::NodeType(offset) => offset
-    QueryError::Field(offset) => offset
-    QueryError::Capture(offset) => offset
-    QueryError::Structure(offset) => offset
-    QueryError::Language(offset) => offset
-  }
-}
+} derive(Show)
 
 ///|
 fn QueryError::from(offset : UInt, type_ : UInt) -> QueryError {
