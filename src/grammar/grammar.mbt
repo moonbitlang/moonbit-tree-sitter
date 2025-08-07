@@ -255,11 +255,115 @@ pub struct Grammar {
   inline : Array[RuleName]
   conflicts : Array[Array[RuleName]]
   word : RuleName?
-} derive (
-  @json.FromJson(fields(schema(rename="$schema"), reserved(default={}))),
-  Show,
-  ToJson(fields(schema(rename="$schema"))),
-)
+} derive(Show)
+
+///|
+pub impl @json.FromJson for Grammar with from_json(
+  json : Json,
+  json_path : @json.JsonPath,
+) -> Grammar raise @json.JsonDecodeError {
+  match json {
+    Object(
+      {
+        "$schema": String(schema),
+        "name": String(name),
+        "rules": Object(rules_json),
+        "extras": Array(extras_json),
+        "supertypes": Array(supertypes_json),
+        "reserved": Object(reserved_json),
+        "precedences": Array(precedences),
+        "externals": Array(externals),
+        "inline": Array(inline),
+        "conflicts": Array(conflicts),
+        ..
+      } as json
+    ) => {
+      let word = match json.get("word") {
+        None => None
+        Some(Null) => None
+        Some(String(name)) =>
+          Some(RuleName::from_json(name.to_json(), json_path.add_key("word")))
+        _ => {
+          let message = "Grammar::from_json: expected string or null for \"word\""
+          raise @json.JsonDecodeError((json_path.add_key("word"), message))
+        }
+      }
+      Grammar::{
+        schema,
+        name,
+        rules: {
+          let rules = {}
+          for name, rule_json in rules_json {
+            rules[name] = Rule::from_json(
+              rule_json,
+              json_path.add_key("rules").add_key(name),
+            )
+          }
+          rules
+        },
+        extras: extras_json.map(rule_json => Rule::from_json(
+          rule_json,
+          json_path.add_key("extras"),
+        )),
+        supertypes: supertypes_json.map(rule_name_json => RuleName::from_json(
+          rule_name_json,
+          json_path.add_key("supertypes"),
+        )),
+        reserved: {
+          let reserved = {}
+          for name, rule_json in reserved_json {
+            reserved[name] = Rule::from_json(
+              rule_json,
+              json_path.add_key("reserved").add_key(name),
+            )
+          }
+          reserved
+        },
+        precedences: precedences.map(rules_json => @json.from_json(
+          rules_json,
+          path=json_path.add_key("precedences"),
+        )),
+        externals: externals.map(rule_json => @json.from_json(
+          rule_json,
+          path=json_path.add_key("externals"),
+        )),
+        inline: inline.map(rule_name_json => @json.from_json(
+          rule_name_json,
+          path=json_path.add_key("inline"),
+        )),
+        conflicts: conflicts.map(rule_names_json => @json.from_json(
+          rule_names_json,
+          path=json_path.add_key("conflicts"),
+        )),
+        word,
+      }
+    }
+    _ => {
+      let message = "Grammar::from_json: expected object with required fields"
+      raise @json.JsonDecodeError((json_path, message))
+    }
+  }
+}
+
+///|
+pub impl ToJson for Grammar with to_json(self : Grammar) -> Json {
+  {
+    "$schema": self.schema.to_json(),
+    "name": self.name.to_json(),
+    "rules": self.rules.to_json(),
+    "extras": self.extras.to_json(),
+    "supertypes": self.supertypes.to_json(),
+    "reserved": self.reserved.to_json(),
+    "precedences": self.precedences.to_json(),
+    "externals": self.externals.to_json(),
+    "inline": self.inline.to_json(),
+    "conflicts": self.conflicts.to_json(),
+    "word": match self.word {
+      None => Null
+      Some(word) => word.to_json()
+    },
+  }
+}
 
 ///|
 suberror GrammarParseError {

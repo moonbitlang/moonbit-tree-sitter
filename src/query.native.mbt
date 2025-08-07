@@ -12,7 +12,7 @@ suberror QueryError {
   Capture(UInt)
   Structure(UInt)
   Language(UInt)
-} derive(Show, ToJson)
+} derive(Show)
 
 ///|
 fn QueryError::offset(self : QueryError) -> UInt {

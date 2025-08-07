@@ -284,7 +284,7 @@ enum Expr {
   And(Expr, Expr)
   Repeat(Expr)
   Capture(Expr, String, id~ : Int?)
-} derive(Eq, ToJson)
+} derive(Eq, ToJson(style="flat"))
 
 ///|
 impl Show for Expr with output(self : Expr, logger : &Logger) -> Unit {

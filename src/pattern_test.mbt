@@ -1,5 +1,5 @@
 ///|
-type Range (Int, Int) derive(Eq, Hash, ToJson)
+struct Range(Int,Int) derive(Eq, Hash, ToJson)
 
 ///|
 struct Environment {
@@ -98,7 +98,7 @@ fn pattern_query(
       match context.variable {
         None => context.variable = Some((offset, StringBuilder::new()))
         Some((start, name)) => {
-          env.add_var(name.to_string(), (start, offset))
+          env.add_var(name.to_string(), Range(start, offset))
           context.variable = Some((offset, StringBuilder::new()))
         }
       }
@@ -117,13 +117,13 @@ fn pattern_query(
             continue (offset + 1, pattern)
           } else {
             context.replaced.write_char(char)
-            env.add_var(name.to_string(), (start, offset))
+            env.add_var(name.to_string(), Range(start, offset))
             continue (offset + 1, pattern)
           }
       }
     (offset, []) =>
       if context.variable is Some((start, name)) {
-        env.add_var(name.to_string(), (start, offset))
+        env.add_var(name.to_string(), Range(start, offset))
       }
   }
   guard context.start is Some(pattern_start) && context.end is Some(pattern_end) else {
@@ -175,7 +175,7 @@ fn pattern_query(
     if not(node.is_named()) {
       if node.type_() == "_" {
         for range, name in env.ranges {
-          if node.start_byte() == range.inner().0 {
+          if node.start_byte() == range.0 {
             let mut exists = false
             for old_name in capture_name {
               if old_name == name {

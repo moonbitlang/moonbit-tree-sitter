@@ -385,7 +385,7 @@ pub fn Parser::parse_bytes(
 pub suberror ParseError {
   MissingLanguage
   Cancelled
-} derive(Show, ToJson)
+} derive(Show)
 
 ///|
 fn raise_parse_error(self : Parser, tree : TSTree?) -> TSTree raise ParseError {
