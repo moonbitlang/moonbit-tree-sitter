@@ -198,7 +198,6 @@ extern "js" fn ts_parser_set_logger(
   #|}
 
 ///|
-///g
 /// Set the logger that a parser should use during parsing.
 ///
 /// The parser does not take ownership over the logger payload. If a logger was
