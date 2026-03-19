@@ -70,11 +70,8 @@ extern "js" fn ts_language_symbol_for_name_(
 
 ///|
 /// Get the numerical id for the given node type string.
-pub fn Language::symbol_for_name(
-  self : Language,
-  name : @string.View,
-) -> Symbol? {
-  let name_bytes = @encoding.encode(encoding=UTF8, name)
+pub fn Language::symbol_for_name(self : Language, name : StringView) -> Symbol? {
+  let name_bytes = @utf8.encode(name)
   let symbol = ts_language_symbol_for_name_(self, name_bytes)
   if symbol == 0 {
     return None
@@ -123,7 +120,7 @@ extern "js" fn ts_language_field_name_for_id(
 pub fn Language::field_name_for_id(
   self : Language,
   id : FieldId,
-) -> @string.View? {
+) -> StringView? {
   if Nullable::to_option(ts_language_field_name_for_id(self, id))
     is Some(string) {
     Some(string)
@@ -143,7 +140,7 @@ extern "js" fn ts_language_field_id_for_name(
 
 ///|
 /// Get the numerical id for the given field name string.
-pub fn Language::field_id_for_name(self : Language, name : @string.View) -> Int {
+pub fn Language::field_id_for_name(self : Language, name : StringView) -> Int {
   ts_language_field_id_for_name(self, name.to_string()) |> uint_to_int()
 }
 
@@ -184,7 +181,7 @@ extern "js" fn ts_language_symbol_name(
 
 ///|
 /// Get a node type string for the given numerical id.
-pub fn Language::symbol_name(self : Language, symbol : Symbol) -> @string.View? {
+pub fn Language::symbol_name(self : Language, symbol : Symbol) -> StringView? {
   if Nullable::to_option(ts_language_symbol_name(self, symbol)) is Some(name) {
     Some(name)
   } else {
@@ -355,7 +352,7 @@ extern "js" fn ts_language_name(language : Language) -> String =
 
 ///|
 /// Get the name of this language. This returns `None` in older parsers.
-pub fn Language::name(self : Language) -> @string.View? {
+pub fn Language::name(self : Language) -> StringView? {
   if Nullable::to_option(ts_language_name(self)) is Some(name) {
     Some(name)
   } else {

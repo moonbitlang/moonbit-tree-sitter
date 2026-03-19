@@ -92,7 +92,7 @@ extern "js" fn ts_lookahead_iterator_current_symbol_name(
 /// Get the current symbol type of the lookahead iterator as a string.
 pub fn LookaheadIterator::current_symbol_name(
   self : LookaheadIterator,
-) -> @string.View? {
+) -> StringView? {
   let bytes = Nullable::to_option(
     ts_lookahead_iterator_current_symbol_name(self),
   )
@@ -104,37 +104,30 @@ pub fn LookaheadIterator::current_symbol_name(
 }
 
 ///|
-/// true <=> IterContinue
-/// false <=> IterEnd
-extern "js" fn ts_lookahead_iterator_symbol_names(
+extern "js" fn ts_lookahead_iterator_collect_symbol_names(
   iterator : LookaheadIterator,
-  f : (String) -> Bool,
-) -> Bool =
-  #|(self, f) => {
+) -> Array[String] =
+  #|(self) => {
+  #|  const names = [];
   #|  for (const name of self) {
-  #|    if (!f(name)) {
-  #|      return false;
-  #|    } else {
-  #|      continue;
-  #|    }
+  #|    names.push(name);
   #|  }
-  #|  return true;
+  #|  return names;
   #|}
 
 ///|
 pub fn LookaheadIterator::symbol_names(
   self : LookaheadIterator,
 ) -> Iter[String] {
-  Iter::new(fn(yield_) {
-    if ts_lookahead_iterator_symbol_names(self, fn(name) {
-        match yield_(name) {
-          IterContinue => true
-          IterEnd => false
-        }
-      }) {
-      IterContinue
+  let names = ts_lookahead_iterator_collect_symbol_names(self)
+  let mut i = 0
+  Iter::new(fn() {
+    if i >= names.length() {
+      None
     } else {
-      IterEnd
+      let name = names[i]
+      i += 1
+      Some(name)
     }
   })
 }

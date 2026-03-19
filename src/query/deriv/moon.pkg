@@ -1,0 +1,14 @@
+import {
+  "moonbitlang/core/bench",
+  "moonbitlang/core/json",
+  "tonyfettes/tree_sitter",
+}
+
+import {
+  "tonyfettes/tree_sitter_moonbit",
+} for "test"
+
+options(
+  "supported-targets": "+native",
+  targets: { "deriv_test.mbt": [ "native" ] },
+)

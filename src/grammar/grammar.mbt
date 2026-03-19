@@ -301,14 +301,12 @@ pub impl @json.FromJson for Grammar with from_json(
           }
           rules
         },
-        extras: extras_json.map(rule_json => Rule::from_json(
-          rule_json,
-          json_path.add_key("extras"),
-        )),
-        supertypes: supertypes_json.map(rule_name_json => RuleName::from_json(
-          rule_name_json,
-          json_path.add_key("supertypes"),
-        )),
+        extras: extras_json.map(rule_json => {
+          Rule::from_json(rule_json, json_path.add_key("extras"))
+        }),
+        supertypes: supertypes_json.map(rule_name_json => {
+          RuleName::from_json(rule_name_json, json_path.add_key("supertypes"))
+        }),
         reserved: {
           let reserved = {}
           for name, rule_json in reserved_json {
@@ -319,22 +317,18 @@ pub impl @json.FromJson for Grammar with from_json(
           }
           reserved
         },
-        precedences: precedences.map(rules_json => @json.from_json(
-          rules_json,
-          path=json_path.add_key("precedences"),
-        )),
-        externals: externals.map(rule_json => @json.from_json(
-          rule_json,
-          path=json_path.add_key("externals"),
-        )),
-        inline: inline.map(rule_name_json => @json.from_json(
-          rule_name_json,
-          path=json_path.add_key("inline"),
-        )),
-        conflicts: conflicts.map(rule_names_json => @json.from_json(
-          rule_names_json,
-          path=json_path.add_key("conflicts"),
-        )),
+        precedences: precedences.map(rules_json => {
+          @json.from_json(rules_json, path=json_path.add_key("precedences"))
+        }),
+        externals: externals.map(rule_json => {
+          @json.from_json(rule_json, path=json_path.add_key("externals"))
+        }),
+        inline: inline.map(rule_name_json => {
+          @json.from_json(rule_name_json, path=json_path.add_key("inline"))
+        }),
+        conflicts: conflicts.map(rule_names_json => {
+          @json.from_json(rule_names_json, path=json_path.add_key("conflicts"))
+        }),
         word,
       }
     }
@@ -359,7 +353,7 @@ pub impl ToJson for Grammar with to_json(self : Grammar) -> Json {
     "inline": self.inline.to_json(),
     "conflicts": self.conflicts.to_json(),
     "word": match self.word {
-      None => Null
+      None => Json::null()
       Some(word) => word.to_json()
     },
   }

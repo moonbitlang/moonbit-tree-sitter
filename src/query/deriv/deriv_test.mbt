@@ -34,7 +34,7 @@ test {
       ),
     ),
   )
-  @json.inspect(expr.matches([root_node].iter()), content=[
+  json_inspect(expr.matches([root_node].iter()), content=[
     {
       "value": [
         {
@@ -82,7 +82,7 @@ test {
       ),
     ),
   )
-  @json.inspect(expr.matches([root_node].iter()), content=[
+  json_inspect(expr.matches([root_node].iter()), content=[
     {
       "value": [
         {
@@ -187,7 +187,7 @@ test "bench" (b : @bench.T) {
     function_matcher,
   )
   let expr = Node::and_(Node::type_("structure"), Node::child(function_context))
-  @json.inspect(expr.matches(root_node), content=[
+  json_inspect(expr.matches(root_node), content=[
     {
       "comment": [
         {
@@ -228,7 +228,7 @@ test "bench" (b : @bench.T) {
       #|   (comment) @comment)))
     ),
   )
-  @json.inspect(query.matches(root_node).collect(), content=[
+  json_inspect(query.matches(root_node).collect(), content=[
     {
       "id": 0,
       "pattern_index": 0,

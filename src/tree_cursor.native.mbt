@@ -5,7 +5,7 @@ priv type TSTreeCursor
 struct TreeCursor {
   cursor : TSTreeCursor
   tree : TSTree
-  text : @string.View
+  text : StringView
 }
 
 ///|
@@ -71,7 +71,7 @@ pub fn TreeCursor::current_node(self : TreeCursor) -> Node {
 #borrow(cursor)
 extern "c" fn ts_tree_cursor_current_field_name(
   cursor : TSTreeCursor,
-) -> @native.ConstPtr[Byte] = "moonbit_ts_tree_cursor_current_field_name"
+) -> @c.Pointer[Byte] = "moonbit_ts_tree_cursor_current_field_name"
 
 ///|
 /// Get the field name of the tree cursor's current node.

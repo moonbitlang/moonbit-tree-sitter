@@ -73,8 +73,18 @@ class Project:
             content = self.relocate(source, content)
         if condition is not None:
             content = self.condition(condition, content)
-        print(f"COPY {self.source / source} -> {self.target / target}")
-        (self.target / target).write_text(content, encoding="utf-8")
+        target_path = self.target / target
+        if target_path.exists():
+            try:
+                existing = target_path.read_text(encoding="utf-8")
+            except OSError:
+                existing = None
+            if existing == content:
+                print(f"SKIP {self.source / source} -> {target_path} (unchanged)")
+                self.copied.add(Path(target))
+                return
+        print(f"COPY {self.source / source} -> {target_path}")
+        target_path.write_text(content, encoding="utf-8")
         self.copied.add(Path(target))
 
 

@@ -1,12 +1,12 @@
 ///|
 struct Input[DecodeFunction] {
-  read : (UInt, Point) -> @bytes.View
+  read : (UInt, Point) -> BytesView
   decode : DecodeFunction
 }
 
 ///|
 pub fn[DecodeFunction] Input::new(
-  read : (Int, Point) -> @bytes.View,
+  read : (Int, Point) -> BytesView,
   decode : DecodeFunction,
 ) -> Input[DecodeFunction] {
   {
@@ -77,7 +77,7 @@ pub fn DecodeResult::new(code_point~ : Char, bytes_read~ : Int) -> DecodeResult 
 /// If the input is invalid, return `None`.
 pub(open) trait DecodeFunction {
   encoding(Self) -> InputEncoding = _
-  decode(@bytes.View) -> DecodeResult?
+  decode(BytesView) -> DecodeResult?
 }
 
 ///|
@@ -87,7 +87,7 @@ impl DecodeFunction with encoding(self) -> InputEncoding {
 }
 
 ///|
-enum InputEncoding {
+pub(all) enum InputEncoding {
   UTF8
   UTF16LE
   UTF16BE
@@ -100,17 +100,12 @@ pub fn InputEncoding::custom() -> InputEncoding {
 }
 
 ///|
-pub impl DecodeFunction for @encoding.Encoding with encoding(self) -> InputEncoding {
-  match self {
-    @encoding.UTF8 => UTF8
-    @encoding.UTF16LE => UTF16LE
-    @encoding.UTF16BE => UTF16BE
-  }
+pub impl DecodeFunction for InputEncoding with encoding(self) -> InputEncoding {
+  self
 }
 
 ///|
-pub impl DecodeFunction for @encoding.Encoding with decode(bytes) -> DecodeResult? {
-  ignore(bytes)
+pub impl DecodeFunction for InputEncoding with decode(_bytes) -> DecodeResult? {
   None
 }
 

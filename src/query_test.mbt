@@ -55,7 +55,7 @@ test "query" {
       captures[capture.name()] = capture.node().text()
     }
   }
-  @json.inspect(captures, content={
+  json_inspect(captures, content={
     "forExpression": "for i = 0; i < 10; i = i + 1 {\n    println(\"Hello, world!\")\n  }",
   })
 }

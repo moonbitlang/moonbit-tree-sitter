@@ -1,2 +1,2 @@
 ///|
-pub typealias @grammar.Grammar
+pub using @grammar {type Grammar}

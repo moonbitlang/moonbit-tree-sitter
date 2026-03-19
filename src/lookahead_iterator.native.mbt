@@ -87,7 +87,7 @@ pub extern "c" fn LookaheadIterator::current_symbol(
 #borrow(iterator)
 extern "c" fn ts_lookahead_iterator_current_symbol_name(
   iterator : LookaheadIterator,
-) -> @native.ConstPtr[Byte] = "moonbit_ts_lookahead_iterator_current_symbol_name"
+) -> @c.Pointer[Byte] = "moonbit_ts_lookahead_iterator_current_symbol_name"
 
 ///|
 /// Get the current symbol type of the lookahead iterator as a string.

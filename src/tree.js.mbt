@@ -53,7 +53,8 @@ extern "js" fn ts_tree_root_node(tree : Tree) -> Node =
   #|  return tree.rootNode;
   #|}
 
-///| Get the root node of the syntax tree.
+///|
+/// Get the root node of the syntax tree.
 pub fn Tree::root_node(self : Tree) -> Node {
   ts_tree_root_node(self)
 }
@@ -151,7 +152,7 @@ pub fn Tree::get_changed_ranges(self : Tree, other : Tree) -> Array[Range] {
 ///|
 pub fn Tree::query(
   self : Tree,
-  query : @string.View,
+  query : StringView,
 ) -> QueryCursor raise QueryError {
   self.root_node().query(query)
 }

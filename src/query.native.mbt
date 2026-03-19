@@ -44,10 +44,10 @@ extern "c" fn ts_query_new(
 /// If a pattern is invalid, this raises a `QueryError`.
 pub fn Query::new(
   language : Language,
-  source : @string.View,
+  source : StringView,
 ) -> Query raise QueryError {
   let error = FixedArray::make(2, 0U)
-  let source = @encoding.encode(encoding=UTF8, source)
+  let source = @utf8.encode(source)
   let query = ts_query_new(language, source, error)
   if error[1] == 0 {
     query
@@ -170,7 +170,7 @@ pub impl ToJson for QueryPredicateStep with to_json(self) -> Json {
 }
 
 ///|
-pub typealias Array[QueryPredicateStep] as QueryPredicate
+pub type QueryPredicate = Array[QueryPredicateStep]
 
 ///|
 /// Get all of the predicates for the given pattern in the query.
@@ -267,7 +267,7 @@ extern "c" fn ts_query_capture_name_for_id(
   query : Query,
   capture_id : UInt,
   length : FixedArray[UInt],
-) -> @native.ConstPtr[Byte] = "moonbit_ts_query_capture_name_for_id"
+) -> @c.Pointer[Byte] = "moonbit_ts_query_capture_name_for_id"
 
 ///|
 /// Get the name of one of the query's captures. Each capture is associated with a
@@ -337,7 +337,7 @@ pub fn Query::string_value_for_id(self : Query, string_id : Int) -> String? {
   let string_id = int_to_uint(string_id)
   let value = ts_query_string_value_for_id(self, string_id).to()
   guard value is Some(value) else { return None }
-  Some(@encoding.decode_lossy(value, encoding=UTF8))
+  Some(@utf8.decode_lossy(value))
 }
 
 ///|
@@ -350,8 +350,8 @@ extern "c" fn ts_query_disable_capture(query : Query, name : Bytes) = "moonbit_t
 /// This prevents the capture from being returned in matches, and also avoids
 /// any resource usage associated with recording the capture. Currently, there
 /// is no way to undo this.
-pub fn Query::disable_capture(self : Query, name : @string.View) -> Unit {
-  let name = @encoding.encode(encoding=UTF8, name)
+pub fn Query::disable_capture(self : Query, name : StringView) -> Unit {
+  let name = @utf8.encode(name)
   ts_query_disable_capture(self, name)
 }
 

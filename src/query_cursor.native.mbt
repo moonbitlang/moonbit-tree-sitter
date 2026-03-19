@@ -6,7 +6,7 @@ struct QueryCursor {
   cursor : TSQueryCursor
   mut query : Query
   mut tree : TSTree
-  mut text : @string.View
+  mut text : StringView
 }
 
 ///|
@@ -353,16 +353,7 @@ pub fn QueryCursor::next_match(self : QueryCursor) -> QueryMatch? {
 
 ///|
 pub fn QueryCursor::matches(self : QueryCursor) -> Iter[QueryMatch] {
-  Iter::new(fn(yield_) {
-    while self.next_match() is Some(match_) {
-      match yield_(match_) {
-        IterContinue => continue
-        IterEnd => break IterEnd
-      }
-    } else {
-      IterContinue
-    }
-  })
+  Iter::new(fn() { self.next_match() })
 }
 
 ///|
@@ -418,16 +409,7 @@ pub fn QueryCursor::next_capture(self : QueryCursor) -> QueryCapture? {
 
 ///|
 pub fn QueryCursor::captures(self : QueryCursor) -> Iter[QueryCapture] {
-  Iter::new(fn(yield_) {
-    while self.next_capture() is Some(capture) {
-      match yield_(capture) {
-        IterContinue => continue
-        IterEnd => break IterEnd
-      }
-    } else {
-      IterContinue
-    }
-  })
+  Iter::new(fn() { self.next_capture() })
 }
 
 ///|

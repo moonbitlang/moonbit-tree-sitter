@@ -1,0 +1,17 @@
+import {
+  "moonbitlang/core/json",
+  "moonbitlang/core/queue",
+  "moonbitlang/core/string",
+  "tonyfettes/tree_sitter/sexp",
+  "tonyfettes/tree_sitter",
+}
+
+import {
+  "tonyfettes/tree_sitter_json",
+  "tonyfettes/tree_sitter_moonbit",
+} for "test"
+
+options(
+  "supported-targets": "+native",
+  targets: { "query.mbt": [ "native" ], "query_test.mbt": [ "native" ] },
+)

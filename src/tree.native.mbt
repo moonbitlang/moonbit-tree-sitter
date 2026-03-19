@@ -4,7 +4,7 @@ priv type TSTree
 ///|
 struct Tree {
   tree : TSTree
-  text : @string.View
+  text : StringView
 }
 
 ///|
@@ -50,7 +50,8 @@ pub fn Tree::copy(self : Tree) -> Tree {
 #borrow(tree)
 extern "c" fn ts_tree_root_node(tree : TSTree) -> TSNode = "moonbit_ts_tree_root_node"
 
-///| Get the root node of the syntax tree.
+///|
+/// Get the root node of the syntax tree.
 pub fn Tree::root_node(self : Tree) -> Node {
   Node::{ node: ts_tree_root_node(self.tree), tree: self.tree, text: self.text }
 }
@@ -164,7 +165,7 @@ pub fn Tree::walk(self : Tree) -> TreeCursor {
 ///|
 pub fn Tree::query(
   self : Tree,
-  source : @string.View,
+  source : StringView,
 ) -> QueryCursor raise QueryError {
   self.root_node().query(source)
 }

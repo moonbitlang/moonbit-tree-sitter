@@ -15,7 +15,7 @@ extern "js" fn ts_node_type(node : Node) -> String =
 
 ///|
 /// Get the node's type as a string.
-pub fn Node::type_(self : Node) -> @string.View {
+pub fn Node::type_(self : Node) -> StringView {
   ts_node_type(self)
 }
 
@@ -39,7 +39,7 @@ extern "js" fn ts_node_grammar_type(node : Node) -> String =
 
 ///|
 /// Get the node's type as it appears in the grammar ignoring aliases as a string.
-pub fn Node::grammar_type(self : Node) -> @string.View {
+pub fn Node::grammar_type(self : Node) -> StringView {
   ts_node_grammar_type(self)
 }
 
@@ -101,15 +101,13 @@ extern "js" fn ts_node_string(node : Node) -> String =
 
 ///|
 /// Get an S-expression representing the node as a string.
-pub fn Node::string(self : Node) -> @string.View {
+pub fn Node::string(self : Node) -> StringView {
   ts_node_string(self)
 }
 
 ///|
 pub impl Show for Node with output(self : Node, logger : &@builtin.Logger) -> Unit {
-  try
-    self.string() |> @sexp.parse() |> @sexp.print_to(logger)
-  catch {
+  try self.string() |> @sexp.parse() |> @sexp.print_to(logger) catch {
     _ => logger.write_string(self.string().to_string())
   }
 }
@@ -314,15 +312,16 @@ pub fn Node::child(self : Node, index : Int) -> Node? {
 ///|
 /// Get all children of the node.
 pub fn Node::children(self : Node) -> Iter[Node] {
-  Iter::new(fn(yield_) {
-    for i in 0U..<ts_node_child_count(self) {
+  let count = ts_node_child_count(self)
+  let mut i = 0U
+  Iter::new(fn() {
+    if i >= count {
+      None
+    } else {
       let child = ts_node_child(self, i)
-      match yield_(child) {
-        IterEnd => return IterEnd
-        IterContinue => continue
-      }
+      i += 1
+      Some(child)
     }
-    IterContinue
   })
 }
 
@@ -341,7 +340,7 @@ extern "js" fn ts_node_field_name_for_child(
 pub fn Node::field_name_for_child(
   self : Node,
   child_index : Int,
-) -> @string.View? {
+) -> StringView? {
   let child_index = int_to_uint(child_index)
   let field_name = Nullable::to_option(
     ts_node_field_name_for_child(self, child_index),
@@ -368,7 +367,7 @@ extern "js" fn ts_node_field_name_for_named_child(
 pub fn Node::field_name_for_named_child(
   self : Node,
   child_index : Int,
-) -> @string.View? {
+) -> StringView? {
   let child_index = int_to_uint(child_index)
   let field_name = Nullable::to_option(
     ts_node_field_name_for_named_child(self, child_index),
@@ -429,15 +428,16 @@ pub fn Node::named_child_count(self : Node) -> Int {
 ///|
 /// Get all named children of the node.
 pub fn Node::named_children(self : Node) -> Iter[Node] {
-  Iter::new(fn(yield_) {
-    for i in 0U..<ts_node_named_child_count(self) {
+  let count = ts_node_named_child_count(self)
+  let mut i = 0U
+  Iter::new(fn() {
+    if i >= count {
+      None
+    } else {
       let child = ts_node_named_child(self, i)
-      match yield_(child) {
-        IterEnd => return IterEnd
-        IterContinue => continue
-      }
+      i += 1
+      Some(child)
     }
-    IterContinue
   })
 }
 
@@ -450,7 +450,7 @@ extern "js" fn ts_node_child_by_field_name(node : Node, name : String) -> Node =
 
 ///|
 /// Get the node's child with the given field name.
-pub fn Node::child_by_field_name(self : Node, name : @string.View) -> Node? {
+pub fn Node::child_by_field_name(self : Node, name : StringView) -> Node? {
   let child = ts_node_child_by_field_name(self, name.to_string())
   if ts_node_is_null(child) {
     None
@@ -774,7 +774,7 @@ extern "js" fn ts_node_text(node : Node) -> String =
   #|}
 
 ///|
-pub fn Node::text(self : Node) -> @string.View {
+pub fn Node::text(self : Node) -> StringView {
   ts_node_text(self)
 }
 
@@ -797,7 +797,7 @@ pub fn Node::next_symbol_names(self : Node) -> Iter[String] {
 ///|
 pub fn Node::query(
   self : Node,
-  source : @string.View,
+  source : StringView,
 ) -> QueryCursor raise QueryError {
   let query = Query::new(self.language(), source)
   let query_cursor = QueryCursor::new()

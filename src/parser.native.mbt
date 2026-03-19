@@ -129,12 +129,12 @@ pub fn Parser::set_included_ranges(
 ) -> Bool {
   let flatten_ranges = FixedArray::make(ranges.length() * 6, 0U)
   for i, range in ranges {
-    flatten_ranges[i * 6] = range.inner()[0]
-    flatten_ranges[i * 6 + 1] = range.inner()[1]
-    flatten_ranges[i * 6 + 2] = range.inner()[2]
-    flatten_ranges[i * 6 + 3] = range.inner()[3]
-    flatten_ranges[i * 6 + 4] = range.inner()[4]
-    flatten_ranges[i * 6 + 5] = range.inner()[5]
+    flatten_ranges[i * 6] = range.0[0]
+    flatten_ranges[i * 6 + 1] = range.0[1]
+    flatten_ranges[i * 6 + 2] = range.0[2]
+    flatten_ranges[i * 6 + 3] = range.0[3]
+    flatten_ranges[i * 6 + 4] = range.0[4]
+    flatten_ranges[i * 6 + 5] = range.0[5]
   }
   return ts_parser_set_included_ranges(self, flatten_ranges)
 }
@@ -165,7 +165,7 @@ extern "c" fn ts_parser_parse(
   input : (UInt, Point, FixedArray[UInt]) -> Bytes,
   encoding : InputEncoding,
   decode : @c.Nullable[
-    FuncRef[(@native.ConstPtr[Byte], UInt, @native.Ptr[Int]) -> Int],
+    FuncRef[(@c.Pointer[Byte], UInt, @c.Pointer[Int]) -> Int],
   ],
 ) -> TSTree = "moonbit_ts_parser_parse"
 
@@ -198,7 +198,7 @@ extern "c" fn ts_parser_parse_with_options(
   input : (UInt, Point, FixedArray[UInt]) -> Bytes,
   encoding : UInt,
   decode : @c.Nullable[
-    FuncRef[(@native.ConstPtr[Byte], UInt, @native.Ptr[Int]) -> Int],
+    FuncRef[(@c.Pointer[Byte], UInt, @c.Pointer[Int]) -> Int],
   ],
   progress_callback : (UInt, Bool) -> Bool,
 ) -> TSTree = "moonbit_ts_parser_parse_with_options"
@@ -250,18 +250,18 @@ pub fn[Encoding : DecodeFunction] Parser::parse(
 ) -> Tree raise ParseError {
   let encoding = input.decode.encoding()
   let decode : @c.Nullable[
-    FuncRef[(@native.ConstPtr[Byte], UInt, @native.Ptr[Int]) -> Int],
+    FuncRef[(@c.Pointer[Byte], UInt, @c.Pointer[Int]) -> Int],
   ] = match encoding {
     Custom =>
       @c.Nullable::some(fn(bytes, length, code_point) {
         let buffer = @buffer.new()
         for i in 0..<length.reinterpret_as_int() {
-          buffer.write_byte(bytes.add(i.to_int64()).get())
+          buffer.write_byte(bytes[i])
         }
         let bytes = buffer.contents()
         match Encoding::decode(bytes[:]) {
           Some(result) => {
-            code_point.set(result.code_point.to_int())
+            code_point.store(result.code_point.to_int())
             result.bytes_read
           }
           None => -1
@@ -269,7 +269,7 @@ pub fn[Encoding : DecodeFunction] Parser::parse(
       })
     _ => @c.Nullable::none()
   }
-  let mut stage : @bytes.View = []
+  let mut stage : BytesView = []
   let text = StringBuilder::new()
   let mut chunk = None
   let read : (UInt, Point, FixedArray[UInt]) -> Bytes = fn(
@@ -354,7 +354,7 @@ pub fn Parser::parse_bytes(
   self : Parser,
   old_tree? : Tree,
   bytes : Bytes,
-  encoding~ : @encoding.Encoding,
+  encoding~ : InputEncoding,
 ) -> Tree raise ParseError {
   let old_ts_tree = match old_tree {
     None => ts_tree_null()
@@ -364,12 +364,15 @@ pub fn Parser::parse_bytes(
     self,
     old_ts_tree,
     bytes,
-    DecodeFunction::encoding(encoding).to_uint(),
+    encoding.to_uint(),
   ).to_option()
-  {
-    tree: self.raise_parse_error(tree),
-    text: @encoding.decode_lossy(bytes, encoding~),
+  let text : StringView = match encoding {
+    UTF8 => @utf8.decode_lossy(bytes)
+    UTF16LE => @utf16.decode_lossy(bytes, endianness=Little)
+    UTF16BE => @utf16.decode_lossy(bytes, endianness=Big)
+    Custom => @utf8.decode_lossy(bytes)
   }
+  { tree: self.raise_parse_error(tree), text }
 }
 
 ///|
@@ -379,7 +382,10 @@ pub suberror ParseError {
 } derive(Show)
 
 ///|
-fn raise_parse_error(self : Parser, tree : TSTree?) -> TSTree raise ParseError {
+fn Parser::raise_parse_error(
+  self : Parser,
+  tree : TSTree?,
+) -> TSTree raise ParseError {
   match tree {
     None =>
       match self.language() {
@@ -397,17 +403,13 @@ fn raise_parse_error(self : Parser, tree : TSTree?) -> TSTree raise ParseError {
 pub fn Parser::parse_string(
   self : Parser,
   old_tree? : Tree,
-  string : @string.View,
+  string : StringView,
 ) -> Tree raise ParseError {
   let old_ts_tree = match old_tree {
     None => ts_tree_null()
     Some(tree) => tree.tree
   }
-  let tree = ts_parser_parse_bytes(
-    self,
-    old_ts_tree,
-    @encoding.encode(encoding=UTF8, string),
-  ).to_option()
+  let tree = ts_parser_parse_bytes(self, old_ts_tree, @utf8.encode(string)).to_option()
   { tree: self.raise_parse_error(tree), text: string }
 }
 
@@ -446,12 +448,9 @@ fn LogType::of_uint(value : UInt) -> LogType {
 struct Logger((UInt, Bytes) -> Unit)
 
 ///|
-pub fn Logger::new(log : (LogType, @string.View) -> Unit) -> Logger {
+pub fn Logger::new(log : (LogType, StringView) -> Unit) -> Logger {
   fn(log_type, message) {
-    log(
-      LogType::of_uint(log_type),
-      @encoding.decode_lossy(encoding=UTF8, message),
-    )
+    log(LogType::of_uint(log_type), @utf8.decode_lossy(message))
   }
 }
 

@@ -42,7 +42,7 @@ test "Query::new" {
   let query = @query.Query::new(language, query)
   let cursor = @query.QueryCursor::new(query)
   cursor.exec(tree.root_node())
-  @json.inspect(cursor.captures().to_array(), content=[
+  json_inspect(cursor.captures().to_array(), content=[
     [
       "key",
       {
@@ -187,7 +187,7 @@ test "query/return" {
   let query = @query.Query::new(language, query)
   let cursor = @query.QueryCursor::new(query)
   cursor.exec(tree.root_node())
-  @json.inspect(cursor.captures().to_array(), content=[
+  json_inspect(cursor.captures().to_array(), content=[
     [
       "return",
       {
