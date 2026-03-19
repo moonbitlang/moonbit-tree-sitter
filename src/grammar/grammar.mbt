@@ -353,7 +353,7 @@ pub impl ToJson for Grammar with to_json(self : Grammar) -> Json {
     "inline": self.inline.to_json(),
     "conflicts": self.conflicts.to_json(),
     "word": match self.word {
-      None => Null
+      None => Json::null()
       Some(word) => word.to_json()
     },
   }
