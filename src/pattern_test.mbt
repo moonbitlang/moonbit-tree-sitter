@@ -1,5 +1,5 @@
 ///|
-struct Range(Int,Int) derive(Eq, Hash, ToJson)
+struct Range(Int, Int) derive(Eq, Hash, ToJson)
 
 ///|
 struct Environment {
@@ -36,7 +36,7 @@ suberror PatternError {
 fn pattern_query(
   parser : @tree_sitter.Parser,
   env : Environment,
-  pattern : @string.View,
+  pattern : StringView,
 ) -> Query raise {
   struct Context {
     replaced : StringBuilder
@@ -136,7 +136,7 @@ fn pattern_query(
   fn generate_pattern(
     node : @tree_sitter.Node,
     stripping : Bool?,
-  ) -> @string.View {
+  ) -> StringView {
     if node.start_byte() <= pattern_start || node.end_byte() >= pattern_end {
       let child_patterns = []
       for child in node.children() {
@@ -278,5 +278,5 @@ test "pattern" {
       ranges.push((text, start, end))
     }
   }
-  @json.inspect(ranges, content=[["1 == 1", 15, 21]])
+  json_inspect(ranges, content=[["1 == 1", 15, 21]])
 }

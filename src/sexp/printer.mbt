@@ -2,7 +2,7 @@
 pub fn print_to(
   list : ArrayView[Sexp],
   logger : &Logger,
-  indent~ : Int = 0,
+  indent? : Int = 0,
 ) -> Unit {
   loop list {
     [] => ()
@@ -62,7 +62,7 @@ pub fn print(list : Array[Sexp]) -> String {
 }
 
 ///|
-pub fn Sexp::print_to(self : Sexp, logger : &Logger, indent~ : Int = 0) -> Unit {
+pub fn Sexp::print_to(self : Sexp, logger : &Logger, indent? : Int = 0) -> Unit {
   match self {
     Atom(atom) => logger.write_object(atom)
     List(list, delimiter~, quantifier~) => {

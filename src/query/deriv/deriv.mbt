@@ -145,10 +145,10 @@ test {
   let d = Node::type_("d")
   let e = Node::type_("e")
   let f = Node::type_("f")
-  @json.inspect(a.and_(b.or_(c)), content={
+  json_inspect(a.and_(b.or_(c)), content={
     "or": [{ "and": ["a", "b"] }, { "and": ["a", "c"] }],
   })
-  @json.inspect(a.or_(b).and_(c.or_(d)), content={
+  json_inspect(a.or_(b).and_(c.or_(d)), content={
     "or": [
       { "and": ["a", "c"] },
       {
@@ -159,24 +159,24 @@ test {
       },
     ],
   })
-  @json.inspect(a.and_(b).not(), content={
+  json_inspect(a.and_(b).not(), content={
     "or": [{ "not": "a" }, { "not": "b" }],
   })
-  @json.inspect(a.or_(b).not().and_(c), content={
+  json_inspect(a.or_(b).not().and_(c), content={
     "and": [{ "not": "a" }, { "and": [{ "not": "b" }, "c"] }],
   })
-  @json.inspect(a.and_(b).or_(a.not().and_(c)), content={
+  json_inspect(a.and_(b).or_(a.not().and_(c)), content={
     "or": [{ "and": ["a", "b"] }, { "and": [{ "not": "a" }, "c"] }],
   })
-  @json.inspect(a.and_(b.or_(b.not())), content="a")
-  @json.inspect(a.or_(b.and_(b.not())), content="a")
-  @json.inspect(a.and_(b).or_(a.and_(b.not())), content={
+  json_inspect(a.and_(b.or_(b.not())), content="a")
+  json_inspect(a.or_(b.and_(b.not())), content="a")
+  json_inspect(a.and_(b).or_(a.and_(b.not())), content={
     "or": [{ "and": ["a", "b"] }, { "and": ["a", { "not": "b" }] }],
   })
-  @json.inspect(a.not().or_(b.and_(c)).not(), content={
+  json_inspect(a.not().or_(b.and_(c)).not(), content={
     "or": [{ "and": ["a", { "not": "b" }] }, { "and": ["a", { "not": "c" }] }],
   })
-  @json.inspect(a.or_(b).and_(c.or_(d)).and_(e.or_(f)), content={
+  json_inspect(a.or_(b).and_(c.or_(d)).and_(e.or_(f)), content={
     "or": [
       { "and": ["a", { "and": ["c", "e"] }] },
       {
@@ -215,7 +215,7 @@ test {
 }
 
 ///|
-fn merge(
+fn Map::merge(
   self : Map[String, Array[Match]],
   other : Map[String, Array[Match]],
 ) -> Unit {
@@ -284,7 +284,7 @@ enum Expr {
   And(Expr, Expr)
   Repeat(Expr)
   Capture(Expr, String, id~ : Int?)
-} derive(Eq, ToJson(style="flat"))
+} derive(Eq, ToJson)
 
 ///|
 impl Show for Expr with output(self : Expr, logger : &Logger) -> Unit {

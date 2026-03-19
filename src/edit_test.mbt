@@ -1,8 +1,8 @@
 ///|
 struct Edit {
-  name : @string.View
-  search : @string.View
-  replace : @string.View
+  name : StringView
+  search : StringView
+  replace : StringView
 } derive(Show, ToJson)
 
 ///|
@@ -105,7 +105,7 @@ test "parse_rules" {
     #|    for $binderDefinition in $rangeLower..<($rangeUpper) $forBody
     #|
   let rules = parse_rules(@encoding.encode(encoding=UTF8, rules))
-  @json.inspect(rules, content=[
+  json_inspect(rules, content=[
     {
       "name": "suggested-for-in",
       "search": (

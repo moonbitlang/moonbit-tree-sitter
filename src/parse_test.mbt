@@ -150,7 +150,7 @@ test "markdown" {
 struct UTF32BE {}
 
 ///|
-impl @tree_sitter.DecodeFunction for UTF32BE with decode(bytes : @bytes.View) -> @tree_sitter.DecodeResult? {
+impl @tree_sitter.DecodeFunction for UTF32BE with decode(bytes : BytesView) -> @tree_sitter.DecodeResult? {
   match bytes {
     [a, b, c, d, .. _bytes] => {
       let bytes : Bytes = [a, b, c, d]

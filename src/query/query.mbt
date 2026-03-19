@@ -13,7 +13,7 @@ suberror ParseError {
 ///|
 pub fn Query::new(
   language : @tree_sitter.Language,
-  query : @string.View,
+  query : StringView,
 ) -> Query raise ParseError {
   enum State {
     Search(StringBuilder)
@@ -171,7 +171,7 @@ pub fn QueryCursor::captures(
           IterContinue => continue
         }
       }
-    } else {
+    } nobreak {
       IterContinue
     }
   })

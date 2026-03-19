@@ -1,12 +1,12 @@
 ///|
 struct Input[DecodeFunction] {
-  read : (UInt, Point) -> @bytes.View
+  read : (UInt, Point) -> BytesView
   decode : DecodeFunction
 }
 
 ///|
 pub fn[DecodeFunction] Input::new(
-  read : (Int, Point) -> @bytes.View,
+  read : (Int, Point) -> BytesView,
   decode : DecodeFunction,
 ) -> Input[DecodeFunction] {
   {
@@ -77,7 +77,7 @@ pub fn DecodeResult::new(code_point~ : Char, bytes_read~ : Int) -> DecodeResult 
 /// If the input is invalid, return `None`.
 pub(open) trait DecodeFunction {
   encoding(Self) -> InputEncoding = _
-  decode(@bytes.View) -> DecodeResult?
+  decode(BytesView) -> DecodeResult?
 }
 
 ///|

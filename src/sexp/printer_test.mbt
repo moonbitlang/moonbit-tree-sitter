@@ -70,7 +70,7 @@ test "comment" {
     #|   c ; comment
     #|   d e f)
   let sexp = @sexp.parse(sexp)
-  @json.inspect(sexp, content=[
+  json_inspect(sexp, content=[
     "; comment a",
     "a",
     "b",
@@ -121,7 +121,7 @@ test "newline" {
     #|
     #|  c)
   let sexp = @sexp.parse(sexp)
-  @json.inspect(sexp, content=["a", ["b", "c"]])
+  json_inspect(sexp, content=["a", ["b", "c"]])
   inspect(
     @sexp.print(sexp),
     content=(

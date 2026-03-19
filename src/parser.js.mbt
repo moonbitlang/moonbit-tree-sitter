@@ -112,7 +112,10 @@ pub suberror ParseError {
 } derive(Show)
 
 ///|
-fn raise_parse_error(self : Parser, tree : Tree?) -> Tree raise ParseError {
+fn Parser::raise_parse_error(
+  self : Parser,
+  tree : Tree?,
+) -> Tree raise ParseError {
   match tree {
     None =>
       match self.language() {
@@ -140,7 +143,7 @@ extern "js" fn ts_parser_parse_string(
 pub fn Parser::parse_string(
   self : Parser,
   old_tree? : Tree,
-  string : @string.View,
+  string : StringView,
 ) -> Tree raise ParseError {
   let old_ts_tree = match old_tree {
     None => ts_tree_null()
@@ -178,7 +181,7 @@ pub enum LogType {
 struct Logger((String, Bool) -> Unit)
 
 ///|
-pub fn Logger::new(log : (LogType, @string.View) -> Unit) -> Logger {
+pub fn Logger::new(log : (LogType, StringView) -> Unit) -> Logger {
   fn(message, isLex) {
     let logType = if isLex { LogType::Lex } else { LogType::Parse }
     log(logType, message)
@@ -194,7 +197,8 @@ extern "js" fn ts_parser_set_logger(
   #|  return parser.setLogger(logger);
   #|}
 
-///|g
+///|
+///g
 /// Set the logger that a parser should use during parsing.
 ///
 /// The parser does not take ownership over the logger payload. If a logger was

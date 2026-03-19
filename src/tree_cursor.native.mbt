@@ -5,7 +5,7 @@ priv type TSTreeCursor
 struct TreeCursor {
   cursor : TSTreeCursor
   tree : TSTree
-  text : @string.View
+  text : StringView
 }
 
 ///|

@@ -114,8 +114,8 @@ pub enum Sexp {
 ///|
 pub fn Sexp::list(
   list : Array[Sexp],
-  delimiter~ : Delimiter = Parenthesis,
-  quantifier~ : Quantifier = One,
+  delimiter? : Delimiter = Parenthesis,
+  quantifier? : Quantifier = One,
 ) -> Sexp {
   Sexp::List(list, delimiter~, quantifier~)
 }

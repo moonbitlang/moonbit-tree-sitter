@@ -6,7 +6,7 @@ struct QueryCursor {
   cursor : TSQueryCursor
   mut query : Query
   mut tree : TSTree
-  mut text : @string.View
+  mut text : StringView
 }
 
 ///|
@@ -359,7 +359,7 @@ pub fn QueryCursor::matches(self : QueryCursor) -> Iter[QueryMatch] {
         IterContinue => continue
         IterEnd => break IterEnd
       }
-    } else {
+    } nobreak {
       IterContinue
     }
   })
@@ -424,7 +424,7 @@ pub fn QueryCursor::captures(self : QueryCursor) -> Iter[QueryCapture] {
         IterContinue => continue
         IterEnd => break IterEnd
       }
-    } else {
+    } nobreak {
       IterContinue
     }
   })

@@ -269,7 +269,7 @@ pub fn[Encoding : DecodeFunction] Parser::parse(
       })
     _ => @c.Nullable::none()
   }
-  let mut stage : @bytes.View = []
+  let mut stage : BytesView = []
   let text = StringBuilder::new()
   let mut chunk = None
   let read : (UInt, Point, FixedArray[UInt]) -> Bytes = fn(
@@ -379,7 +379,10 @@ pub suberror ParseError {
 } derive(Show)
 
 ///|
-fn raise_parse_error(self : Parser, tree : TSTree?) -> TSTree raise ParseError {
+fn Parser::raise_parse_error(
+  self : Parser,
+  tree : TSTree?,
+) -> TSTree raise ParseError {
   match tree {
     None =>
       match self.language() {
@@ -397,7 +400,7 @@ fn raise_parse_error(self : Parser, tree : TSTree?) -> TSTree raise ParseError {
 pub fn Parser::parse_string(
   self : Parser,
   old_tree? : Tree,
-  string : @string.View,
+  string : StringView,
 ) -> Tree raise ParseError {
   let old_ts_tree = match old_tree {
     None => ts_tree_null()
@@ -446,7 +449,7 @@ fn LogType::of_uint(value : UInt) -> LogType {
 struct Logger((UInt, Bytes) -> Unit)
 
 ///|
-pub fn Logger::new(log : (LogType, @string.View) -> Unit) -> Logger {
+pub fn Logger::new(log : (LogType, StringView) -> Unit) -> Logger {
   fn(log_type, message) {
     log(
       LogType::of_uint(log_type),

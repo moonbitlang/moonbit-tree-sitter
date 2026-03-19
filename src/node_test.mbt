@@ -130,7 +130,7 @@ test "Node::children" {
       children.push(child.type_())
     }
   }
-  @json.inspect(children, content=[
+  json_inspect(children, content=[
     "number", "number", "number", "number", "number",
   ])
 }

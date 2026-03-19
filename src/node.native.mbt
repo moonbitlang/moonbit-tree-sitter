@@ -5,7 +5,7 @@ priv struct TSNode(Bytes)
 struct Node {
   node : TSNode
   tree : TSTree
-  text : @string.View
+  text : StringView
 }
 
 ///|
@@ -438,7 +438,7 @@ extern "c" fn ts_node_child_by_field_name(
 
 ///|
 /// Get the node's child with the given field name.
-pub fn Node::child_by_field_name(self : Node, name : @string.View) -> Node? {
+pub fn Node::child_by_field_name(self : Node, name : StringView) -> Node? {
   let name_bytes = @encoding.encode(encoding=UTF8, name)
   let child = ts_node_child_by_field_name(self.node, self.tree, name_bytes)
   if ts_node_is_null(child, self.tree) {
@@ -775,7 +775,7 @@ pub fn Node::walk(self : Node) -> TreeCursor {
 ///|
 pub fn Node::query(
   self : Node,
-  source : @string.View,
+  source : StringView,
 ) -> QueryCursor raise QueryError {
   let query = Query::new(self.language(), source)
   let query_cursor = QueryCursor::new()
@@ -784,7 +784,7 @@ pub fn Node::query(
 }
 
 ///|
-pub fn Node::text(self : Node) -> @string.View {
+pub fn Node::text(self : Node) -> StringView {
   let start = self.start_byte()
   let end = self.end_byte()
   let text = self.text.view(start_offset=start, end_offset=end)
@@ -802,7 +802,7 @@ pub fn Node::symbols(self : Node) -> Iter[Symbol] {
         IterEnd => break IterEnd
         IterContinue => continue
       }
-    } else {
+    } nobreak {
       IterContinue
     }
   })
@@ -818,7 +818,7 @@ pub fn Node::symbol_names(self : Node) -> Iter[String] {
         IterContinue => continue
         IterEnd => break IterEnd
       }
-    } else {
+    } nobreak {
       IterContinue
     }
   })
@@ -838,7 +838,7 @@ pub fn Node::next_symbols(self : Node) -> Iter[Symbol] {
         IterEnd => break IterEnd
         IterContinue => continue
       }
-    } else {
+    } nobreak {
       IterContinue
     }
   })
@@ -854,7 +854,7 @@ pub fn Node::next_symbol_names(self : Node) -> Iter[String] {
         IterContinue => continue
         IterEnd => break IterEnd
       }
-    } else {
+    } nobreak {
       IterContinue
     }
   })

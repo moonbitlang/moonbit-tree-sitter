@@ -44,7 +44,7 @@ extern "c" fn ts_query_new(
 /// If a pattern is invalid, this raises a `QueryError`.
 pub fn Query::new(
   language : Language,
-  source : @string.View,
+  source : StringView,
 ) -> Query raise QueryError {
   let error = FixedArray::make(2, 0U)
   let source = @encoding.encode(encoding=UTF8, source)
@@ -170,7 +170,7 @@ pub impl ToJson for QueryPredicateStep with to_json(self) -> Json {
 }
 
 ///|
-pub typealias Array[QueryPredicateStep] as QueryPredicate
+pub type QueryPredicate = Array[QueryPredicateStep]
 
 ///|
 /// Get all of the predicates for the given pattern in the query.
@@ -350,7 +350,7 @@ extern "c" fn ts_query_disable_capture(query : Query, name : Bytes) = "moonbit_t
 /// This prevents the capture from being returned in matches, and also avoids
 /// any resource usage associated with recording the capture. Currently, there
 /// is no way to undo this.
-pub fn Query::disable_capture(self : Query, name : @string.View) -> Unit {
+pub fn Query::disable_capture(self : Query, name : StringView) -> Unit {
   let name = @encoding.encode(encoding=UTF8, name)
   ts_query_disable_capture(self, name)
 }

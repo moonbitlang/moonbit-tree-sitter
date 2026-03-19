@@ -92,7 +92,7 @@ extern "js" fn ts_lookahead_iterator_current_symbol_name(
 /// Get the current symbol type of the lookahead iterator as a string.
 pub fn LookaheadIterator::current_symbol_name(
   self : LookaheadIterator,
-) -> @string.View? {
+) -> StringView? {
   let bytes = Nullable::to_option(
     ts_lookahead_iterator_current_symbol_name(self),
   )

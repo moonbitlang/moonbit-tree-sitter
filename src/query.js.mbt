@@ -64,7 +64,7 @@ extern "js" fn ts_query_new(
 /// If a pattern is invalid, this raises a `QueryError`.
 pub fn Query::new(
   language : Language,
-  source : @string.View,
+  source : StringView,
 ) -> Query raise QueryError {
   let error = FixedArray::make(2, 0U)
   let query = ts_query_new(ts, language, source.to_string(), error)
@@ -236,7 +236,7 @@ extern "js" fn ts_query_predicates_for_pattern(
   #|}
 
 ///|
-typealias Array[QueryPredicateStep] as QueryPredicate
+type QueryPredicate = Array[QueryPredicateStep]
 
 ///|
 pub fn Query::predicates_for_pattern(
@@ -330,10 +330,7 @@ extern "js" fn ts_query_capture_name_for_id(
 ///|
 /// Get the name of one of the query's captures. Each capture is associated with a
 /// numeric id based on the order that it appeared in the query's source.
-pub fn Query::capture_name_for_id(
-  self : Query,
-  capture_id : Int,
-) -> @string.View {
+pub fn Query::capture_name_for_id(self : Query, capture_id : Int) -> StringView {
   let capture_id = int_to_uint(capture_id)
   ts_query_capture_name_for_id(self, capture_id)
 }
@@ -396,7 +393,7 @@ extern "js" fn ts_query_disable_capture(query : Query, name : String) =
 /// This prevents the capture from being returned in matches, and also avoids
 /// any resource usage associated with recording the capture. Currently, there
 /// is no way to undo this.
-pub fn Query::disable_capture(self : Query, name : @string.View) -> Unit {
+pub fn Query::disable_capture(self : Query, name : StringView) -> Unit {
   ts_query_disable_capture(self, name.to_string())
 }
 

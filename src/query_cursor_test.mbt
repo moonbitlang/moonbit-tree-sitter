@@ -129,7 +129,7 @@ test "query cursor with predicates" {
     matches.push(captures)
     predicates.push(matched.predicates())
   }
-  @json.inspect(matches, content=[
+  json_inspect(matches, content=[
     {
       "if_block": "if x < y {\n    println(\"x is less than y\")\n  }",
       "left": "x",
@@ -141,7 +141,7 @@ test "query cursor with predicates" {
       "right": "z",
     },
   ])
-  @json.inspect(predicates, content=[
+  json_inspect(predicates, content=[
     [["\"eq?\"", "@left", "\"x\""]],
     [["\"eq?\"", "@left", "\"x\""]],
   ])

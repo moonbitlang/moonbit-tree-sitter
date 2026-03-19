@@ -1,24 +1,24 @@
 ///|
 pub suberror SexpError {
-  UnrecognizedCharacter(@string.View)
-  UnterminatedString(@string.View)
-  UnterminatedList(@string.View)
-  ExtraContent(@array.View[Sexp])
-  InvalidPairKey(@string.View)
+  UnrecognizedCharacter(StringView)
+  UnterminatedString(StringView)
+  UnterminatedList(StringView)
+  ExtraContent(ArrayView[Sexp])
+  InvalidPairKey(StringView)
   InvalidQuantifier(Char)
-  InvalidCommand(@string.View)
+  InvalidCommand(StringView)
 } derive(Show)
 
 ///|
 fn parse_list(
-  source : @string.View,
+  source : StringView,
   sexp : Array[Sexp],
-) -> @string.View raise SexpError {
+) -> StringView raise SexpError {
   fn parse_string(
-    source : @string.View,
+    source : StringView,
     string : StringBuilder,
     quote : Char,
-  ) -> @string.View raise SexpError {
+  ) -> StringView raise SexpError {
     loop source {
       ['\\', '\\', .. source] => {
         string.write_char('\\')
@@ -37,10 +37,7 @@ fn parse_list(
     }
   }
 
-  fn parse_symbol(
-    source : @string.View,
-    symbol : StringBuilder,
-  ) -> @string.View {
+  fn parse_symbol(source : StringView, symbol : StringBuilder) -> StringView {
     loop source {
       ['a'..<'z' | 'A'..<'Z' | '0'..<'9' | '_' as char, .. source] => {
         symbol.write_char(char)
@@ -50,10 +47,7 @@ fn parse_list(
     }
   }
 
-  fn parse_comment(
-    source : @string.View,
-    comment : StringBuilder,
-  ) -> @string.View {
+  fn parse_comment(source : StringView, comment : StringBuilder) -> StringView {
     loop source {
       ['\n', ..] as source => return source
       [char, .. source] => {
@@ -171,7 +165,7 @@ fn parse_list(
 }
 
 ///|
-pub fn Sexp::parse(source : @string.View) -> Sexp raise SexpError {
+pub fn Sexp::parse(source : StringView) -> Sexp raise SexpError {
   let list = []
   let source = parse_list(source, list)
   if source is [_, ..] {
@@ -185,7 +179,7 @@ pub fn Sexp::parse(source : @string.View) -> Sexp raise SexpError {
 }
 
 ///|
-pub fn parse(source : @string.View) -> Array[Sexp] raise SexpError {
+pub fn parse(source : StringView) -> Array[Sexp] raise SexpError {
   let list = []
   let source = parse_list(source, list)
   match source {

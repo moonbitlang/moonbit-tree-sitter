@@ -1,6 +1,6 @@
 ///|
 test "parse" {
-  @json.inspect(
+  json_inspect(
     @sexp.parse(
       (
         #|(structure
@@ -29,7 +29,7 @@ test "parse" {
 
 ///|
 test "[]" {
-  @json.inspect(
+  json_inspect(
     @sexp.parse(
       (
         #|[
@@ -44,7 +44,7 @@ test "[]" {
 
 ///|
 test "capture" {
-  @json.inspect(
+  json_inspect(
     @sexp.parse(
       (
         #|(capture) @a
@@ -56,7 +56,7 @@ test "capture" {
 
 ///|
 test "void" {
-  @json.inspect(
+  json_inspect(
     @sexp.parse(
       (
         #|
@@ -68,7 +68,7 @@ test "void" {
 
 ///|
 test "unit" {
-  @json.inspect(
+  json_inspect(
     @sexp.parse(
       (
         #|()
@@ -80,7 +80,7 @@ test "unit" {
 
 ///|
 test "pair" {
-  @json.inspect(
+  json_inspect(
     @sexp.parse(
       (
         #|(key: value)
@@ -92,7 +92,7 @@ test "pair" {
 
 ///|
 test "pair with multiple values" {
-  @json.inspect(
+  json_inspect(
     @sexp.parse(
       (
         #|(key: value1 value2)
@@ -104,7 +104,7 @@ test "pair with multiple values" {
 
 ///|
 test "comment" {
-  @json.inspect(
+  json_inspect(
     @sexp.parse(
       (
         #|; comment
@@ -116,7 +116,7 @@ test "comment" {
 
 ///|
 test "newline" {
-  @json.inspect(
+  json_inspect(
     @sexp.parse(
       (
         #|
