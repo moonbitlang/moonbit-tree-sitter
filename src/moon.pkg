@@ -27,7 +27,7 @@ options(
       "output": "tree-sitter#lib#src#lib.c",
     },
   ],
-  "supported-targets": [ "native" ],
+  "supported-targets": "+native",
   targets: {
     "edit_test.mbt": [ "native" ],
     "init.js.mbt": [ "js" ],

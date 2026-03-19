@@ -165,6 +165,16 @@ enum SymbolType {
 }
 
 ///|
+pub fn SymbolType::to_int(self : SymbolType) -> UInt {
+  match self {
+    SymbolType::Regular => 0
+    SymbolType::Anonymous => 1
+    SymbolType::Supertype => 2
+    SymbolType::Auxiliary => 3
+  }
+}
+
+///|
 fn SymbolType::of_int(value : UInt) -> SymbolType {
   match value {
     0 => SymbolType::Regular
@@ -172,16 +182,6 @@ fn SymbolType::of_int(value : UInt) -> SymbolType {
     2 => SymbolType::Supertype
     3 => SymbolType::Auxiliary
     value => abort("Invalid SymbolType: \{value}")
-  }
-}
-
-///|
-fn SymbolType::to_int(self : SymbolType) -> UInt {
-  match self {
-    SymbolType::Regular => 0
-    SymbolType::Anonymous => 1
-    SymbolType::Supertype => 2
-    SymbolType::Auxiliary => 3
   }
 }
 

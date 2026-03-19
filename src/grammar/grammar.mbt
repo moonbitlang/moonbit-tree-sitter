@@ -255,11 +255,45 @@ pub struct Grammar {
   inline : Array[RuleName]
   conflicts : Array[Array[RuleName]]
   word : RuleName?
-} derive (
-  @json.FromJson(fields(schema(rename="$schema"), reserved(default={}))),
-  Show,
-  ToJson(fields(schema(rename="$schema"))),
-)
+} derive(Show, ToJson(fields(schema(rename="$schema"))))
+
+///|
+impl @json.FromJson for Grammar with from_json(json, path) {
+  guard json is Object(obj) else {
+    raise @json.JsonDecodeError((path, "expected object"))
+  }
+  fn get(obj : Map[String, Json], key : String) -> Json {
+    obj.get(key).unwrap_or(Json::null())
+  }
+  {
+    schema: @json.from_json(get(obj, "$schema"), path=path.add_key("$schema")),
+    name: @json.from_json(get(obj, "name"), path=path.add_key("name")),
+    rules: @json.from_json(get(obj, "rules"), path=path.add_key("rules")),
+    extras: @json.from_json(get(obj, "extras"), path=path.add_key("extras")),
+    supertypes: @json.from_json(
+      get(obj, "supertypes"),
+      path=path.add_key("supertypes"),
+    ),
+    reserved: match obj.get("reserved") {
+      Some(v) => @json.from_json(v, path=path.add_key("reserved"))
+      None => {}
+    },
+    precedences: @json.from_json(
+      get(obj, "precedences"),
+      path=path.add_key("precedences"),
+    ),
+    externals: @json.from_json(
+      get(obj, "externals"),
+      path=path.add_key("externals"),
+    ),
+    inline: @json.from_json(get(obj, "inline"), path=path.add_key("inline")),
+    conflicts: @json.from_json(
+      get(obj, "conflicts"),
+      path=path.add_key("conflicts"),
+    ),
+    word: @json.from_json(get(obj, "word"), path=path.add_key("word")),
+  }
+}
 
 ///|
 suberror GrammarParseError {

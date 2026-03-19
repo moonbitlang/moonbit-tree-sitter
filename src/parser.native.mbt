@@ -439,15 +439,7 @@ pub enum LogType {
 }
 
 ///|
-fn LogType::to_uint(self : LogType) -> UInt {
-  match self {
-    Parse => 0
-    Lex => 1
-  }
-}
-
-///|
-fn LogType::of_uint(value : UInt) -> LogType {
+pub fn LogType::of_uint(value : UInt) -> LogType {
   match value {
     0 => Parse
     1 => Lex
@@ -457,13 +449,6 @@ fn LogType::of_uint(value : UInt) -> LogType {
 
 ///|
 struct Logger((UInt, Bytes) -> Unit)
-
-///|
-fn Logger::new(log : (LogType, StringView) -> Unit) -> Logger {
-  fn(log_type, message) {
-    log(LogType::of_uint(log_type), @encoding/utf8.decode_lossy(message))
-  }
-}
 
 ///|
 #borrow(parser)
