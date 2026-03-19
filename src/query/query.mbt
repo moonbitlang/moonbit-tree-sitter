@@ -163,16 +163,20 @@ pub fn QueryCursor::exec(self : QueryCursor, node : @tree_sitter.Node) -> Unit {
 pub fn QueryCursor::captures(
   self : QueryCursor,
 ) -> Iter2[String, @tree_sitter.Node] {
-  Iter2::new(fn(yield_) {
-    captures~: for name, nodes in self.captures {
-      for node in nodes {
-        match yield_(name, node) {
-          IterEnd => break captures~ IterEnd
-          IterContinue => continue
-        }
-      }
-    } nobreak {
-      IterContinue
+  let pairs : Array[(String, @tree_sitter.Node)] = []
+  for name, nodes in self.captures {
+    for node in nodes {
+      pairs.push((name, node))
+    }
+  }
+  let mut i = 0
+  Iter2::new(fn() {
+    if i >= pairs.length() {
+      None
+    } else {
+      let (name, node) = pairs[i]
+      i += 1
+      Some((name, node))
     }
   })
 }

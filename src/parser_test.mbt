@@ -13,7 +13,9 @@ test "parser creation and basic parsing" {
   inspect(root.type_(), content="document")
 
   // Make sure the tree structure is correct
-  let object_node = root.child(0).or_error(Failure("No object node"))
+  let object_node = root
+    .child(0)
+    .unwrap_or_error(Failure::Failure("No object node"))
   inspect(object_node.type_(), content="object")
 
   // Count named children

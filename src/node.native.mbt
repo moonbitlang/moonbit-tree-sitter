@@ -10,10 +10,7 @@ struct Node {
 
 ///|
 #borrow(node, tree)
-extern "c" fn ts_node_type(
-  node : TSNode,
-  tree : TSTree,
-) -> @native.ConstPtr[Byte] = "moonbit_ts_node_type"
+extern "c" fn ts_node_type(node : TSNode, tree : TSTree) -> @c.Pointer[Byte] = "moonbit_ts_node_type"
 
 ///|
 /// Get the node's type as a string.
@@ -46,7 +43,7 @@ pub fn Node::language(self : Node) -> Language {
 extern "c" fn ts_node_grammar_type(
   node : TSNode,
   tree : TSTree,
-) -> @native.ConstPtr[Byte] = "moonbit_ts_node_grammar_type"
+) -> @c.Pointer[Byte] = "moonbit_ts_node_grammar_type"
 
 ///|
 /// Get the node's type as it appears in the grammar ignoring aliases as a string.
@@ -123,10 +120,7 @@ pub fn Node::range(self : Node) -> Range {
 ///|
 /// Get an S-expression representing the node as a string.
 pub fn Node::string(self : Node) -> String {
-  return @encoding.decode_lossy(
-    encoding=UTF8,
-    ts_node_string(self.node, self.tree),
-  )
+  return @utf8.decode_lossy(ts_node_string(self.node, self.tree))
 }
 
 ///|
@@ -311,15 +305,16 @@ pub fn Node::child(self : Node, index : Int) -> Node? {
 ///|
 /// Get all children of the node.
 pub fn Node::children(self : Node) -> Iter[Node] {
-  Iter::new(fn(yield_) {
-    for i in 0U..<ts_node_child_count(self.node, self.tree) {
+  let count = ts_node_child_count(self.node, self.tree)
+  let mut i = 0U
+  Iter::new(fn() {
+    if i >= count {
+      None
+    } else {
       let child = ts_node_child(self.node, self.tree, i)
-      match yield_({ ..self, node: child }) {
-        IterEnd => return IterEnd
-        IterContinue => continue
-      }
+      i += 1
+      Some({ ..self, node: child })
     }
-    IterContinue
   })
 }
 
@@ -329,7 +324,7 @@ extern "c" fn ts_node_field_name_for_child(
   node : TSNode,
   tree : TSTree,
   child_index : UInt,
-) -> @native.ConstPtr[Byte] = "moonbit_ts_node_field_name_for_child"
+) -> @c.Pointer[Byte] = "moonbit_ts_node_field_name_for_child"
 
 ///|
 /// Get the field name for node's child at the given index, where zero represents
@@ -350,7 +345,7 @@ extern "c" fn ts_node_field_name_for_named_child(
   node : TSNode,
   tree : TSTree,
   child_index : UInt,
-) -> @native.ConstPtr[Byte] = "moonbit_ts_node_field_name_for_named_child"
+) -> @c.Pointer[Byte] = "moonbit_ts_node_field_name_for_named_child"
 
 ///|
 /// Get the field name for node's named child at the given index, where zero
@@ -415,15 +410,16 @@ pub fn Node::named_child_count(self : Node) -> Int {
 ///|
 /// Get all named children of the node.
 pub fn Node::named_children(self : Node) -> Iter[Node] {
-  Iter::new(fn(yield_) {
-    for i in 0U..<ts_node_named_child_count(self.node, self.tree) {
+  let count = ts_node_named_child_count(self.node, self.tree)
+  let mut i = 0U
+  Iter::new(fn() {
+    if i >= count {
+      None
+    } else {
       let child = ts_node_named_child(self.node, self.tree, i)
-      match yield_({ ..self, node: child }) {
-        IterEnd => return IterEnd
-        IterContinue => continue
-      }
+      i += 1
+      Some({ ..self, node: child })
     }
-    IterContinue
   })
 }
 
@@ -439,7 +435,7 @@ extern "c" fn ts_node_child_by_field_name(
 ///|
 /// Get the node's child with the given field name.
 pub fn Node::child_by_field_name(self : Node, name : StringView) -> Node? {
-  let name_bytes = @encoding.encode(encoding=UTF8, name)
+  let name_bytes = @utf8.encode(name)
   let child = ts_node_child_by_field_name(self.node, self.tree, name_bytes)
   if ts_node_is_null(child, self.tree) {
     None
@@ -741,7 +737,7 @@ pub fn Node::eq(self : Node, other : Node) -> Bool {
 }
 
 ///|
-pub impl Eq for Node with op_equal(self, other) -> Bool {
+pub impl Eq for Node with equal(self, other) -> Bool {
   ts_node_eq(self.node, self.tree, other.node, other.tree)
 }
 
@@ -758,7 +754,7 @@ pub impl ToJson for Node with to_json(self : Node) -> Json {
 }
 
 ///|
-#borrow(self)
+#borrow(self, tree)
 extern "c" fn Node::id_as_uint64(self : TSNode, tree : TSTree) -> UInt64 = "moonbit_ts_node_id_as_uint64"
 
 ///|
@@ -795,15 +791,11 @@ pub fn Node::text(self : Node) -> StringView {
 pub fn Node::symbols(self : Node) -> Iter[Symbol] {
   let iterator = LookaheadIterator::new(self.language(), self.parse_state())
   guard iterator is Some(iterator) else { Iter::empty() }
-  Iter::new(fn(yield_) {
-    while iterator.next() {
-      let symbol = iterator.current_symbol()
-      match yield_(symbol) {
-        IterEnd => break IterEnd
-        IterContinue => continue
-      }
-    } nobreak {
-      IterContinue
+  Iter::new(fn() {
+    if iterator.next() {
+      Some(iterator.current_symbol())
+    } else {
+      None
     }
   })
 }
@@ -811,17 +803,7 @@ pub fn Node::symbols(self : Node) -> Iter[Symbol] {
 ///|
 pub fn Node::symbol_names(self : Node) -> Iter[String] {
   let language = self.language()
-  Iter::new(fn(yield_) {
-    for symbol in self.symbols() {
-      guard language.symbol_name(symbol) is Some(name) else { continue }
-      match yield_(name) {
-        IterContinue => continue
-        IterEnd => break IterEnd
-      }
-    } nobreak {
-      IterContinue
-    }
-  })
+  self.symbols().filter_map(fn(symbol) { language.symbol_name(symbol) })
 }
 
 ///|
@@ -831,15 +813,11 @@ pub fn Node::next_symbols(self : Node) -> Iter[Symbol] {
     self.next_parse_state(),
   )
   guard iterator is Some(iterator) else { Iter::empty() }
-  Iter::new(fn(yield_) {
-    while iterator.next() {
-      let symbol = iterator.current_symbol()
-      match yield_(symbol) {
-        IterEnd => break IterEnd
-        IterContinue => continue
-      }
-    } nobreak {
-      IterContinue
+  Iter::new(fn() {
+    if iterator.next() {
+      Some(iterator.current_symbol())
+    } else {
+      None
     }
   })
 }
@@ -847,15 +825,5 @@ pub fn Node::next_symbols(self : Node) -> Iter[Symbol] {
 ///|
 pub fn Node::next_symbol_names(self : Node) -> Iter[String] {
   let language = self.language()
-  Iter::new(fn(yield_) {
-    for symbol in self.next_symbols() {
-      guard language.symbol_name(symbol) is Some(name) else { continue }
-      match yield_(name) {
-        IterContinue => continue
-        IterEnd => break IterEnd
-      }
-    } nobreak {
-      IterContinue
-    }
-  })
+  self.next_symbols().filter_map(fn(symbol) { language.symbol_name(symbol) })
 }

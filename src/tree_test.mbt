@@ -28,8 +28,12 @@ test "Tree::copy" {
   inspect(copy_root.type_(), content="document")
 
   // Check child nodes
-  let root_child = root.child(0).or_error(Failure("No child found"))
-  let copy_root_child = copy_root.child(0).or_error(Failure("No child found"))
+  let root_child = root
+    .child(0)
+    .unwrap_or_error(Failure::Failure("No child found"))
+  let copy_root_child = copy_root
+    .child(0)
+    .unwrap_or_error(Failure::Failure("No child found"))
   inspect(root_child.type_(), content="object")
   inspect(copy_root_child.type_(), content="object")
 }
@@ -92,8 +96,12 @@ test "tree with offset" {
   // The content and structure should be the same
   inspect(offset_root.child_count(), content="1")
   inspect(normal_root.child_count(), content="1")
-  let offset_child = offset_root.child(0).or_error(Failure("No child"))
-  let normal_child = normal_root.child(0).or_error(Failure("No child"))
+  let offset_child = offset_root
+    .child(0)
+    .unwrap_or_error(Failure::Failure("No child"))
+  let normal_child = normal_root
+    .child(0)
+    .unwrap_or_error(Failure::Failure("No child"))
   inspect(offset_child.type_(), content="object")
   inspect(normal_child.type_(), content="object")
 }
@@ -110,7 +118,9 @@ test "tree edit operations" {
 
   // Get original node content
   let root_node = original_tree.root_node()
-  let object_node = root_node.child(0).or_error(Failure("No object node"))
+  let object_node = root_node
+    .child(0)
+    .unwrap_or_error(Failure::Failure("No object node"))
   let original_node_count = object_node.named_child_count()
   inspect(original_node_count, content="1")
 
@@ -138,7 +148,7 @@ test "tree edit operations" {
   let new_root = new_tree.root_node()
   let new_object = new_root
     .child(0)
-    .or_error(Failure("No object node in new tree"))
+    .unwrap_or_error(Failure::Failure("No object node in new tree"))
   let new_node_count = new_object.named_child_count()
   inspect(new_node_count, content="2")
 

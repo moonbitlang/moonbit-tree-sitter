@@ -1,4 +1,5 @@
 import {
+  "moonbitlang/core/bench",
   "moonbitlang/core/json",
   "tonyfettes/tree_sitter",
 }

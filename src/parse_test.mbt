@@ -25,7 +25,9 @@ test "json" {
       #|   value: (number))))
     ),
   )
-  let root_node_first_child = root_node.child(0).or_error(Failure("None"))
+  let root_node_first_child = root_node
+    .child(0)
+    .unwrap_or_error(Failure::Failure("None"))
   inspect(
     root_node_first_child,
     content=(
@@ -69,8 +71,8 @@ test "moonbit" {
     let comment_node = match_
       .captures()
       .filter(fn(x) { x.name() == "comment" })
-      .peek()
-      .or_error(Failure("No comment found"))
+      .next()
+      .unwrap_or_error(Failure::Failure("No comment found"))
       .node()
     let start_byte = comment_node.start_byte()
     let end_byte = comment_node.end_byte()
@@ -152,14 +154,12 @@ struct UTF32BE {}
 ///|
 impl @tree_sitter.DecodeFunction for UTF32BE with decode(bytes : BytesView) -> @tree_sitter.DecodeResult? {
   match bytes {
-    [a, b, c, d, .. _bytes] => {
-      let bytes : Bytes = [a, b, c, d]
-      match bytes[:].to_int_be().to_char() {
+    [u32be(code_point), .. _bytes] =>
+      match code_point.reinterpret_as_int().to_char() {
         Some(code_point) =>
           Some(@tree_sitter.DecodeResult::new(code_point~, bytes_read=4))
         None => None
       }
-    }
     [.. _bytes] => None
   }
 }

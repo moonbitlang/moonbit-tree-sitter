@@ -39,17 +39,17 @@ pub fn Range::new(
 
 ///|
 pub fn Range::start_point(self : Range) -> Point {
-  ts_point_new(self.inner()[0], self.inner()[1])
+  ts_point_new(self.0[0], self.0[1])
 }
 
 ///|
 pub fn Range::end_point(self : Range) -> Point {
-  ts_point_new(self.inner()[2], self.inner()[3])
+  ts_point_new(self.0[2], self.0[3])
 }
 
 ///|
 fn ts_range_start_byte(point : Range) -> UInt {
-  point.inner()[4]
+  point.0[4]
 }
 
 ///|
@@ -59,7 +59,7 @@ pub fn Range::start_byte(self : Range) -> Int {
 
 ///|
 fn ts_range_end_byte(point : Range) -> UInt {
-  point.inner()[5]
+  point.0[5]
 }
 
 ///|

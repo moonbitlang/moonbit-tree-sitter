@@ -1,5 +1,6 @@
 import {
   "moonbitlang/core/json",
+  "moonbitlang/core/queue",
   "moonbitlang/core/string",
   "tonyfettes/tree_sitter/sexp",
   "tonyfettes/tree_sitter",

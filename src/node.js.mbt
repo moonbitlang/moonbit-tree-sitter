@@ -312,15 +312,16 @@ pub fn Node::child(self : Node, index : Int) -> Node? {
 ///|
 /// Get all children of the node.
 pub fn Node::children(self : Node) -> Iter[Node] {
-  Iter::new(fn(yield_) {
-    for i in 0U..<ts_node_child_count(self) {
+  let count = ts_node_child_count(self)
+  let mut i = 0U
+  Iter::new(fn() {
+    if i >= count {
+      None
+    } else {
       let child = ts_node_child(self, i)
-      match yield_(child) {
-        IterEnd => return IterEnd
-        IterContinue => continue
-      }
+      i += 1
+      Some(child)
     }
-    IterContinue
   })
 }
 
@@ -427,15 +428,16 @@ pub fn Node::named_child_count(self : Node) -> Int {
 ///|
 /// Get all named children of the node.
 pub fn Node::named_children(self : Node) -> Iter[Node] {
-  Iter::new(fn(yield_) {
-    for i in 0U..<ts_node_named_child_count(self) {
+  let count = ts_node_named_child_count(self)
+  let mut i = 0U
+  Iter::new(fn() {
+    if i >= count {
+      None
+    } else {
       let child = ts_node_named_child(self, i)
-      match yield_(child) {
-        IterEnd => return IterEnd
-        IterContinue => continue
-      }
+      i += 1
+      Some(child)
     }
-    IterContinue
   })
 }
 

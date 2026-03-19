@@ -1,13 +1,17 @@
 import {
+  "moonbitlang/core/builtin",
+  "moonbitlang/core/int",
   "moonbitlang/core/json",
   "moonbitlang/core/string",
-  "tonyfettes/encoding",
+  "moonbitlang/core/encoding/utf8" @utf8,
+  "moonbitlang/core/encoding/utf16" @utf16,
+  "moonbitlang/core/buffer",
+  "moonbitlang/core/cmp",
   "tonyfettes/c",
   "tonyfettes/tree_sitter/grammar",
   "tonyfettes/tree_sitter/node_types",
   "tonyfettes/tree_sitter_language",
   "tonyfettes/tree_sitter/sexp",
-  "illusory0x0/native",
 }
 
 import {

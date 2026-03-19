@@ -2,10 +2,6 @@ import {
   "moonbitlang/core/json",
 }
 
-import {
-  "tonyfettes/tree_sitter",
-} for "test"
-
 options(
   "supported-targets": "+native",
 )

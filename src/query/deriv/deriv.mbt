@@ -215,7 +215,7 @@ test {
 }
 
 ///|
-fn Map::merge(
+fn Map::merge_matches(
   self : Map[String, Array[Match]],
   other : Map[String, Array[Match]],
 ) -> Unit {
@@ -255,7 +255,7 @@ pub fn Node::matches(
       Type(t) => if node.type_() == t { true } else { false }
       Child(e) =>
         if e.matches(node.children()) is Some(matched) {
-          group.merge(matched.group)
+          group.merge_matches(matched.group)
           true
         } else {
           false
@@ -454,7 +454,7 @@ fn State::deriv(self : State, expr : Expr, node : @tree_sitter.Node) -> Expr {
     Never => Never
     Node(n) =>
       if n.matches(node) is Some(group) {
-        self.group[self.index()].merge(group)
+        self.group[self.index()].merge_matches(group)
         Empty
       } else {
         Never
@@ -563,7 +563,7 @@ pub fn Expr::matches(self : Expr, nodes : Iter[@tree_sitter.Node]) -> Match? {
       }
       let group : Map[String, Array[Match]] = Map::new()
       for i in start..<end {
-        group.merge(state.group[i])
+        group.merge_matches(state.group[i])
       }
       captures.push({ value: state.nodes[start:end], group })
     }
@@ -579,7 +579,7 @@ pub fn Expr::matches(self : Expr, nodes : Iter[@tree_sitter.Node]) -> Match? {
       }
     }
     if count == 0 {
-      matched.merge(g)
+      matched.merge_matches(g)
     }
   }
   Some({ value: state.nodes, group: matched })

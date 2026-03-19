@@ -9,7 +9,7 @@ struct Edit {
 fn parse_rules(source : Bytes) -> Array[Edit] raise {
   let yaml = @tree_sitter_yaml.language()
   let parser = @tree_sitter.parser(yaml)
-  let source_tree = parser.parse_bytes(source, encoding=@encoding.UTF8)
+  let source_tree = parser.parse_bytes(source, encoding=UTF8)
   let source_root = source_tree.root_node()
   let query_source =
     #|(block_mapping_pair
@@ -33,7 +33,7 @@ fn parse_rules(source : Bytes) -> Array[Edit] raise {
     for capture in matched.captures() {
       let node = capture.node()
       let bytes = source[node.start_byte():node.end_byte()]
-      let text = @encoding.decode(encoding=UTF8, [..bytes])
+      let text = @utf8.decode([..bytes])
       captures_nodes[capture.name().to_string()] = node
       captures_texts[capture.name().to_string()] = text
     }
@@ -43,21 +43,21 @@ fn parse_rules(source : Bytes) -> Array[Edit] raise {
     guard captures_texts.get("search") is Some(search) else {
       fail("Error: missing search")
     }
-    let search = match search.trim_space() {
+    let search = match search.trim() {
       ['|', '\n', .. search] => search
       search => search
     }
     guard captures_texts.get("replace") is Some(replace) else {
       fail("Error: missing replace")
     }
-    let replace = match replace.trim_space() {
+    let replace = match replace.trim() {
       ['|', '\n', .. replace] => replace
       replace => replace
     }
     edits.push(Edit::{
       name,
-      search: search.trim_space().to_string(),
-      replace: replace.trim_space().to_string(),
+      search: search.trim().to_string(),
+      replace: replace.trim().to_string(),
     })
   }
   return edits
@@ -104,7 +104,7 @@ test "parse_rules" {
     #|  replace: |
     #|    for $binderDefinition in $rangeLower..<($rangeUpper) $forBody
     #|
-  let rules = parse_rules(@encoding.encode(encoding=UTF8, rules))
+  let rules = parse_rules(@utf8.encode(rules))
   json_inspect(rules, content=[
     {
       "name": "suggested-for-in",

@@ -25,8 +25,8 @@ test "query cursor basics" {
     let variable_name_node = matched
       .captures()
       .filter(fn(c) { c.name() == "variable_name" })
-      .peek()
-      .or_error(Failure("No variable name found"))
+      .next()
+      .unwrap_or_error(Failure::Failure("No variable name found"))
       .node()
 
     // We'll just use the name, not the value for this test

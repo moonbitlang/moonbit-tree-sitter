@@ -71,7 +71,7 @@ extern "js" fn ts_language_symbol_for_name_(
 ///|
 /// Get the numerical id for the given node type string.
 pub fn Language::symbol_for_name(self : Language, name : StringView) -> Symbol? {
-  let name_bytes = @encoding.encode(encoding=UTF8, name)
+  let name_bytes = @utf8.encode(name)
   let symbol = ts_language_symbol_for_name_(self, name_bytes)
   if symbol == 0 {
     return None
