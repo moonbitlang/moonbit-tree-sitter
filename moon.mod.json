@@ -14,5 +14,6 @@
   "license": "Apache-2.0",
   "keywords": [],
   "description": "A MoonBit binding to the tree-sitter parsing library",
-  "source": "src"
+  "source": "src",
+  "preferred-target": "native"
 }
