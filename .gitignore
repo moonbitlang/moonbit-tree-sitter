@@ -1,5 +1,12 @@
+# MoonBit
+_build/
+target
 target/
 .mooncakes/
 /publish/
+
+# Node.js
 node_modules/
+
+# Grammars
 src/grammars/*/

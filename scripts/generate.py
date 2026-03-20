@@ -103,7 +103,7 @@ class Grammar:
             "name": f"tonyfettes/tree_sitter_{self.name}",
             "version": version,
             "deps": {
-                "tonyfettes/tree_sitter_language": "0.1.2",
+                "tonyfettes/tree_sitter_language": "0.1.3",
             },
             "repository": self.metadata.repository,
             "license": "Apache-2.0",
