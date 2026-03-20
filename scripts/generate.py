@@ -284,13 +284,13 @@ def generate_binding(project: Path, bindings: Path):
         tree_sitter_dict = json.loads(tree_sitter_path.read_text())
         metadata_dict = tree_sitter_dict["metadata"]
         metadata_links_dict = metadata_dict["links"]
-        submodule_commit = git_grammar_commit(project)
+        grammar_commit = git_grammar_commit(project)
         metadata = Metadata(
             version=metadata_dict["version"],
             license=metadata_dict["license"],
             description=metadata_dict["description"],
             repository=metadata_links_dict["repository"],
-            commit=submodule_commit,
+            commit=grammar_commit,
         )
         grammars = tree_sitter_dict["grammars"]
         for grammar_dict in grammars:
