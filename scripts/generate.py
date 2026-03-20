@@ -207,33 +207,38 @@ pub extern "c" fn language() -> @tree_sitter_language.Language = "{function_name
         self.generate_moon_pkg_json_to(destination / "moon.pkg.json")
 
 
-def git_submodule_url(path: Path) -> str:
+def _load_grammars_lock() -> dict:
+    lock_path = Path("grammars.lock.json")
+    if lock_path.exists():
+        return json.loads(lock_path.read_text())
+    return {}
+
+
+def git_grammar_url(path: Path) -> str:
+    name = path.name
+    lock = _load_grammars_lock()
+    if name in lock:
+        return lock[name]["url"]
+    raise ValueError(f"Could not find URL for {name} in grammars.lock.json")
+
+
+def git_grammar_commit(path: Path) -> str:
+    name = path.name
+    lock = _load_grammars_lock()
+    if name in lock:
+        return lock[name]["rev"]
+    # Fallback: read HEAD from the cloned repo
     try:
-        url = subprocess.run(
-            ["git", "config", f"submodule.{path}.url"],
+        result = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            cwd=path,
             capture_output=True,
             check=True,
             text=True,
         )
-        url = url.stdout.strip()
-    except subprocess.CalledProcessError:
-        raise ValueError(f"Could not find submodule URL for {path}")
-    return url
-
-
-def git_submodule_commit(path: Path) -> str:
-    try:
-        commit = subprocess.run(
-            ["git", "submodule", "status", path],
-            capture_output=True,
-            check=True,
-            text=True,
-        )
-        commit = commit.stdout.strip().split(" ")[0]
+        return result.stdout.strip()
     except Exception as e:
         raise ValueError(f"Could not get commit hash for {path}: {e}")
-
-    return commit
 
 
 def git_clean(path: Path):
@@ -279,7 +284,7 @@ def generate_binding(project: Path, bindings: Path):
         tree_sitter_dict = json.loads(tree_sitter_path.read_text())
         metadata_dict = tree_sitter_dict["metadata"]
         metadata_links_dict = metadata_dict["links"]
-        submodule_commit = git_submodule_commit(project)
+        submodule_commit = git_grammar_commit(project)
         metadata = Metadata(
             version=metadata_dict["version"],
             license=metadata_dict["license"],
