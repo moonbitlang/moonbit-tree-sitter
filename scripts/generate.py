@@ -94,7 +94,8 @@ class Grammar:
         return list(self.path.glob("*.wasm"))[0]
 
     def generate_gitignore_to(self, destination: Path):
-        content = "\n".join(self.files) + "\n"
+        content = "# MoonBit\n_build/\n.mooncakes/\ntarget\n\n# tree-sitter\n"
+        content += "\n".join(self.files) + "\n"
         destination.write_text(content)
 
     def generate_moon_mod_json_to(self, destination: Path, version: str, wasm: str):
@@ -102,22 +103,27 @@ class Grammar:
             "name": f"tonyfettes/tree_sitter_{self.name}",
             "version": version,
             "deps": {
-                "tonyfettes/tree_sitter_language": "0.1.1",
+                "tonyfettes/tree_sitter_language": "0.1.2",
             },
             "repository": self.metadata.repository,
             "license": "Apache-2.0",
-            "include": self.files + ["binding.mbt", "moon.pkg.json", wasm],
+            "include": self.files + ["binding.mbt", "moon.pkg", wasm],
+            "preferred-target": "native",
         }
         destination.write_text(json.dumps(moon_mod_json, indent=2) + "\n")
 
-    def generate_moon_pkg_json_to(self, destination: Path):
-        moon_pkg_json = {
-            "import": ["tonyfettes/tree_sitter_language"],
-            "targets": {"binding.mbt": ["native"]},
-            "native_stub": self.stubs,
-            "support-targets": ["native"],
-        }
-        destination.write_text(json.dumps(moon_pkg_json, indent=2) + "\n")
+    def generate_moon_pkg_to(self, destination: Path):
+        content = """import {
+  "tonyfettes/tree_sitter_language",
+}
+
+options(
+  native_stub: [ "parser.c" ],
+  "supported-targets": "+native",
+  targets: { "binding.mbt": [ "native" ] },
+)
+"""
+        destination.write_text(content)
 
     def generate_binding_native_mbt_to(self, parser: Path, destination: Path):
         logger.info(f"Parsing function name from {parser}")
@@ -204,7 +210,7 @@ pub extern "c" fn language() -> @tree_sitter_language.Language = "{function_name
         self.generate_moon_mod_json_to(
             destination / "moon.mod.json", version, wasm=wasm_path.name
         )
-        self.generate_moon_pkg_json_to(destination / "moon.pkg.json")
+        self.generate_moon_pkg_to(destination / "moon.pkg")
 
 
 def _load_grammars_lock() -> dict:
