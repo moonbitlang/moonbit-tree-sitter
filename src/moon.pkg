@@ -61,6 +61,7 @@ options(
     "query_test.mbt": [ "native" ],
     "range.js.mbt": [ "js" ],
     "range.native.mbt": [ "native" ],
+    "range_test.mbt": [ "native" ],
     "tree.js.mbt": [ "js" ],
     "tree.native.mbt": [ "native" ],
     "tree_cursor.native.mbt": [ "native" ],
