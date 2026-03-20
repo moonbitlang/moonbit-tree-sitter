@@ -328,15 +328,14 @@ pub fn Query::capture_quantifier_for_id(
 extern "c" fn ts_query_string_value_for_id(
   query : Query,
   string_id : UInt,
-) -> @c.Nullable[Bytes] = "moonbit_ts_query_string_value_for_id"
+) -> Bytes = "moonbit_ts_query_string_value_for_id"
 
 ///|
 /// Get the value of one of the query's string literals. Each string is associated with a
 /// numeric id based on the order that it appeared in the query's source.
 pub fn Query::string_value_for_id(self : Query, string_id : Int) -> String? {
   let string_id = int_to_uint(string_id)
-  let value = ts_query_string_value_for_id(self, string_id).to()
-  guard value is Some(value) else { return None }
+  let value = ts_query_string_value_for_id(self, string_id)
   Some(@utf8.decode_lossy(value))
 }
 

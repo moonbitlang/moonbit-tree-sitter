@@ -383,7 +383,7 @@ extern "c" fn ts_query_cursor_next_capture(
   query : Query,
   tree : TSTree,
   match_id : FixedArray[UInt],
-) -> @c.Nullable[TSQueryMatch] = "moonbit_ts_query_cursor_next_capture"
+) -> TSQueryMatch = "moonbit_ts_query_cursor_next_capture"
 
 ///|
 /// Advance to the next capture of the currently running query.
@@ -397,7 +397,7 @@ pub fn QueryCursor::next_capture(self : QueryCursor) -> QueryCapture? {
     self.query,
     self.tree,
     match_id,
-  ).to()
+  ).to_option()
   guard ts_match is Some(ts_match) else { return None }
   let match_id = match_id[0]
   let node = ts_query_match_captures_get_node(ts_match, match_id)

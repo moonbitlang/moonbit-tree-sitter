@@ -26,6 +26,18 @@
 #define moonbit_ts_ignore(...) ((void)(__VA_ARGS__))
 
 MOONBIT_FFI_EXPORT
+void *
+moonbit_c_null(void) {
+  return NULL;
+}
+
+MOONBIT_FFI_EXPORT
+int32_t
+moonbit_c_is_null(void *ptr) {
+  return ptr == NULL;
+}
+
+MOONBIT_FFI_EXPORT
 const TSLanguage *
 moonbit_ts_language_copy(const TSLanguage *self) {
   return ts_language_copy(self);

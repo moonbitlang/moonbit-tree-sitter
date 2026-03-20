@@ -19,12 +19,21 @@ pub fn parser(language : Language) -> Parser raise LanguageError {
 
 ///|
 #borrow(parser)
-extern "c" fn ts_parser_language(parser : Parser) -> @c.Nullable[Language] = "moonbit_ts_parser_language"
+extern "c" fn ts_parser_language(parser : Parser) -> Language = "moonbit_ts_parser_language"
+
+///|
+#borrow(language)
+extern "c" fn ts_language_is_null(language : Language) -> Bool = "moonbit_c_is_null"
 
 ///|
 /// Get the parser's current language.
 pub fn Parser::language(self : Parser) -> Language? {
-  ts_parser_language(self).to()
+  let language = ts_parser_language(self)
+  if ts_language_is_null(language) {
+    None
+  } else {
+    Some(language)
+  }
 }
 
 ///|
@@ -164,9 +173,7 @@ extern "c" fn ts_parser_parse(
   old_tree : TSTree,
   input : (UInt, Point, FixedArray[UInt]) -> Bytes,
   encoding : InputEncoding,
-  decode : @c.Nullable[
-    FuncRef[(@c.Pointer[Byte], UInt, @c.Pointer[Int]) -> Int],
-  ],
+  decode : FuncRef[(@c.Pointer[Byte], UInt, @c.Pointer[Int]) -> Int],
 ) -> TSTree = "moonbit_ts_parser_parse"
 
 ///|
@@ -197,9 +204,7 @@ extern "c" fn ts_parser_parse_with_options(
   old_tree : TSTree,
   input : (UInt, Point, FixedArray[UInt]) -> Bytes,
   encoding : UInt,
-  decode : @c.Nullable[
-    FuncRef[(@c.Pointer[Byte], UInt, @c.Pointer[Int]) -> Int],
-  ],
+  decode : FuncRef[(@c.Pointer[Byte], UInt, @c.Pointer[Int]) -> Int],
   progress_callback : (UInt, Bool) -> Bool,
 ) -> TSTree = "moonbit_ts_parser_parse_with_options"
 
@@ -249,11 +254,9 @@ pub fn[Encoding : DecodeFunction] Parser::parse(
   options? : ParseOptions,
 ) -> Tree raise ParseError {
   let encoding = input.decode.encoding()
-  let decode : @c.Nullable[
-    FuncRef[(@c.Pointer[Byte], UInt, @c.Pointer[Int]) -> Int],
-  ] = match encoding {
+  let decode : FuncRef[(@c.Pointer[Byte], UInt, @c.Pointer[Int]) -> Int] = match encoding {
     Custom =>
-      @c.Nullable::some(fn(bytes, length, code_point) {
+      fn(bytes, length, code_point) {
         let buffer = @buffer.new()
         for i in 0..<length.reinterpret_as_int() {
           buffer.write_byte(bytes[i])
@@ -266,8 +269,8 @@ pub fn[Encoding : DecodeFunction] Parser::parse(
           }
           None => -1
         }
-      })
-    _ => @c.Nullable::none()
+      }
+    _ => fn(_bytes, _length, _code_point) { 0 }
   }
   let mut stage : BytesView = []
   let text = StringBuilder::new()
