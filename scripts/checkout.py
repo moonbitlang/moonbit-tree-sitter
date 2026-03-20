@@ -61,6 +61,7 @@ def install(args):
         dest = GRAMMARS_DIR / name
         url = locked["url"]
         rev = locked["rev"]
+        branch = locked.get("branch")
 
         if dest.exists():
             try:
@@ -77,11 +78,17 @@ def install(args):
             except subprocess.CalledProcessError:
                 print(f"{name}: re-cloning")
                 shutil.rmtree(dest)
-                git("clone", url, str(dest))
+                clone_args = ["clone", url, str(dest)]
+                if branch:
+                    clone_args.extend(["-b", branch])
+                git(*clone_args)
                 git("checkout", rev, cwd=dest)
         else:
             print(f"{name}: cloning at {rev[:12]}")
-            git("clone", url, str(dest))
+            clone_args = ["clone", url, str(dest)]
+            if branch:
+                clone_args.extend(["-b", branch])
+            git(*clone_args)
             git("checkout", rev, cwd=dest)
 
 
