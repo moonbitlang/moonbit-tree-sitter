@@ -1,2 +1,3 @@
 ///|
-pub extern type Language
+#external
+pub type Language
