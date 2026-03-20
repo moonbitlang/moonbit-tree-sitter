@@ -107,7 +107,7 @@ class Grammar:
             },
             "repository": self.metadata.repository,
             "license": "Apache-2.0",
-            "include": self.files + ["binding.mbt", "moon.pkg.json", wasm],
+            "include": self.files + ["binding.mbt", "moon.pkg", wasm],
             "preferred-target": "native",
         }
         destination.write_text(json.dumps(moon_mod_json, indent=2) + "\n")
