@@ -26,6 +26,18 @@
 #define moonbit_ts_ignore(...) ((void)(__VA_ARGS__))
 
 MOONBIT_FFI_EXPORT
+void *
+moonbit_c_null(void) {
+  return NULL;
+}
+
+MOONBIT_FFI_EXPORT
+int32_t
+moonbit_c_is_null(void *ptr) {
+  return ptr == NULL;
+}
+
+MOONBIT_FFI_EXPORT
 const TSLanguage *
 moonbit_ts_language_copy(const TSLanguage *self) {
   return ts_language_copy(self);
@@ -1253,6 +1265,9 @@ moonbit_ts_query_string_value_for_id(MoonBitTSQuery *self, uint32_t index) {
   uint32_t length = 0;
   const char *string_value =
     ts_query_string_value_for_id(self->query, index, &length);
+  if (string_value == NULL) {
+    return NULL;
+  }
   moonbit_bytes_t bytes = moonbit_make_bytes_sz(length, 0);
   memcpy(bytes, string_value, length);
   return bytes;
