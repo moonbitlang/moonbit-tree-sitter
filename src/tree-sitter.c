@@ -1265,6 +1265,9 @@ moonbit_ts_query_string_value_for_id(MoonBitTSQuery *self, uint32_t index) {
   uint32_t length = 0;
   const char *string_value =
     ts_query_string_value_for_id(self->query, index, &length);
+  if (string_value == NULL) {
+    return NULL;
+  }
   moonbit_bytes_t bytes = moonbit_make_bytes_sz(length, 0);
   memcpy(bytes, string_value, length);
   return bytes;

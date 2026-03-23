@@ -331,12 +331,20 @@ extern "c" fn ts_query_string_value_for_id(
 ) -> Bytes = "moonbit_ts_query_string_value_for_id"
 
 ///|
+#borrow(bytes)
+extern "c" fn ts_bytes_is_null(bytes : Bytes) -> Bool = "moonbit_c_is_null"
+
+///|
 /// Get the value of one of the query's string literals. Each string is associated with a
 /// numeric id based on the order that it appeared in the query's source.
 pub fn Query::string_value_for_id(self : Query, string_id : Int) -> String? {
   let string_id = int_to_uint(string_id)
   let value = ts_query_string_value_for_id(self, string_id)
-  Some(@utf8.decode_lossy(value))
+  if ts_bytes_is_null(value) {
+    None
+  } else {
+    Some(@utf8.decode_lossy(value))
+  }
 }
 
 ///|
