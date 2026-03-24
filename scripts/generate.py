@@ -80,6 +80,11 @@ class Grammar:
         self.file_types = file_types
 
     def refresh_file_lists(self):
+        # NOTE: This only iterates top-level entries in src/ and does not
+        # filter with is_file(), so directories (e.g. tree_sitter/) are
+        # included in self.files. If a grammar ever has nested .c files
+        # (e.g. src/subdir/*.c), this will need a recursive walk and an
+        # is_file() check. All current grammars use a flat src/ layout.
         self.stubs = []
         self.files = []
         src_path = self.path / "src"
