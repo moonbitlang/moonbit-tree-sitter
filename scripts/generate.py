@@ -98,7 +98,9 @@ class Grammar:
                 "tonyfettes/tree_sitter_language": "0.1.3",
             },
             "repository": self.metadata.repository,
-            "license": "Apache-2.0",
+            "license": self.metadata.license,
+            "description": self.metadata.description,
+            "keywords": ["tree-sitter", self.name],
             "include": self.files + ["binding.mbt", "moon.pkg", wasm],
             "preferred-target": "native",
         }
