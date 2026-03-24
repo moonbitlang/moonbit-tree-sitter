@@ -79,10 +79,22 @@ class Grammar:
         self.external_files = external_files
         self.file_types = file_types
 
+    def refresh_file_lists(self):
+        self.stubs = []
+        self.files = []
+        src_path = self.path / "src"
+        for file in src_path.iterdir():
+            if file.suffix == ".c":
+                self.stubs.append(str(file.relative_to(src_path)))
+            self.files.append(str(file.relative_to(src_path)))
+        self.stubs.sort()
+        self.files.sort()
+
     def tree_sitter_generate(self):
         subprocess.run(
             ["tree-sitter", "generate"], cwd=self.path, check=True, capture_output=True
         )
+        self.refresh_file_lists()
 
     def tree_sitter_build_wasm(self):
         subprocess.run(
