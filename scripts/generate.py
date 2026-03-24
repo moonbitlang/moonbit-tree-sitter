@@ -64,7 +64,7 @@ class Grammar:
         external_files: list[Path] = [],
         file_types: list[str] = [],
     ):
-        self.name = name
+        self.name = name.replace("-", "_")
         self.path = path
         self.metadata = metadata
         self.stubs = []
@@ -79,10 +79,27 @@ class Grammar:
         self.external_files = external_files
         self.file_types = file_types
 
+    def refresh_file_lists(self):
+        # NOTE: This only iterates top-level entries in src/ and does not
+        # filter with is_file(), so directories (e.g. tree_sitter/) are
+        # included in self.files. If a grammar ever has nested .c files
+        # (e.g. src/subdir/*.c), this will need a recursive walk and an
+        # is_file() check. All current grammars use a flat src/ layout.
+        self.stubs = []
+        self.files = []
+        src_path = self.path / "src"
+        for file in src_path.iterdir():
+            if file.suffix == ".c":
+                self.stubs.append(str(file.relative_to(src_path)))
+            self.files.append(str(file.relative_to(src_path)))
+        self.stubs.sort()
+        self.files.sort()
+
     def tree_sitter_generate(self):
         subprocess.run(
             ["tree-sitter", "generate"], cwd=self.path, check=True, capture_output=True
         )
+        self.refresh_file_lists()
 
     def tree_sitter_build_wasm(self):
         subprocess.run(
@@ -287,10 +304,14 @@ def generate_binding(project: Path, bindings: Path):
         metadata_dict = tree_sitter_dict["metadata"]
         metadata_links_dict = metadata_dict["links"]
         grammar_commit = git_grammar_commit(project)
+        description = metadata_dict.get("description", "")
+        if not description and (project / "package.json").exists():
+            pkg = json.loads((project / "package.json").read_text())
+            description = pkg.get("description", "")
         metadata = Metadata(
             version=metadata_dict["version"],
             license=metadata_dict["license"],
-            description=metadata_dict["description"],
+            description=description,
             repository=metadata_links_dict["repository"],
             commit=grammar_commit,
         )

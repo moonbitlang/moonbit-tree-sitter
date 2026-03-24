@@ -1,0 +1,20 @@
+{
+  "name": "tonyfettes/tree_sitter_bash",
+  "version": "0.1.24",
+  "deps": {
+    "tonyfettes/tree_sitter_language": "0.1.3"
+  },
+  "repository": "https://github.com/tree-sitter/tree-sitter-bash",
+  "license": "Apache-2.0",
+  "include": [
+    "grammar.json",
+    "node-types.json",
+    "parser.c",
+    "scanner.c",
+    "tree_sitter",
+    "binding.mbt",
+    "moon.pkg",
+    "tree-sitter-bash.wasm"
+  ],
+  "preferred-target": "native"
+}

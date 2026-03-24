@@ -19,6 +19,13 @@ import {
   "tonyfettes/tree_sitter_moonbit",
   "tonyfettes/tree_sitter_markdown",
   "tonyfettes/tree_sitter_yaml",
+  "tonyfettes/tree_sitter_bash",
+  "tonyfettes/tree_sitter_c_sharp",
+  "tonyfettes/tree_sitter_kotlin",
+  "tonyfettes/tree_sitter_lua",
+  "tonyfettes/tree_sitter_toml",
+  "tonyfettes/tree_sitter_sql",
+  "tonyfettes/tree_sitter_zig",
 } for "test"
 
 options(
@@ -67,5 +74,12 @@ options(
     "tree_cursor.native.mbt": [ "native" ],
     "tree_cursor_test.mbt": [ "native" ],
     "tree_test.mbt": [ "native" ],
+    "bash_test.mbt": [ "native" ],
+    "c_sharp_test.mbt": [ "native" ],
+    "kotlin_test.mbt": [ "native" ],
+    "lua_test.mbt": [ "native" ],
+    "toml_test.mbt": [ "native" ],
+    "sql_test.mbt": [ "native" ],
+    "zig_test.mbt": [ "native" ],
   },
 )

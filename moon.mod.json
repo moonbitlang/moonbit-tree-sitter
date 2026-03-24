@@ -7,6 +7,13 @@
     "tonyfettes/tree_sitter_json": "0.1.24",
     "tonyfettes/tree_sitter_markdown": "0.1.24",
     "tonyfettes/tree_sitter_yaml": "0.1.24",
+    "tonyfettes/tree_sitter_bash": { "path": "src/languages/tree_sitter_bash" },
+    "tonyfettes/tree_sitter_c_sharp": { "path": "src/languages/tree_sitter_c_sharp" },
+    "tonyfettes/tree_sitter_kotlin": { "path": "src/languages/tree_sitter_kotlin" },
+    "tonyfettes/tree_sitter_lua": { "path": "src/languages/tree_sitter_lua" },
+    "tonyfettes/tree_sitter_toml": { "path": "src/languages/tree_sitter_toml" },
+    "tonyfettes/tree_sitter_sql": { "path": "src/languages/tree_sitter_sql" },
+    "tonyfettes/tree_sitter_zig": { "path": "src/languages/tree_sitter_zig" },
     "tonyfettes/c": "0.7.4"
   },
   "readme": "README.md",

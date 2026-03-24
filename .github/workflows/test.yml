@@ -50,12 +50,6 @@ jobs:
         if: ${{ matrix.os == 'windows-latest' }}
         uses: ilammy/msvc-dev-cmd@v1
 
-      - name: Download artifacts
-        uses: actions/download-artifact@v4
-        with:
-          merge-multiple: true
-          path: src/languages
-
       - name: Run tests
         run: |
           python3 scripts/test.py
