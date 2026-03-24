@@ -21,7 +21,7 @@ if MOON_HOME is None:
     MOON_HOME = Path.home() / ".moon"
 else:
     MOON_HOME = Path(MOON_HOME)
-VERSION = "0.1.16"
+VERSION = "0.1.24"
 
 
 class Metadata:
@@ -113,14 +113,15 @@ class Grammar:
         destination.write_text(json.dumps(moon_mod_json, indent=2) + "\n")
 
     def generate_moon_pkg_to(self, destination: Path):
-        content = """import {
+        native_stub_list = ", ".join(f'"{stub}"' for stub in self.stubs)
+        content = f"""import {{
   "tonyfettes/tree_sitter_language",
-}
+}}
 
 options(
-  native_stub: [ "parser.c" ],
+  native_stub: [ {native_stub_list} ],
   "supported-targets": "+native",
-  targets: { "binding.mbt": [ "native" ] },
+  targets: {{ "binding.mbt": [ "native" ] }},
 )
 """
         destination.write_text(content)
@@ -181,12 +182,7 @@ pub extern "c" fn language() -> @tree_sitter_language.Language = "{function_name
 
     def generate_binding_to(self, destination: Path):
         self.tree_sitter_generate()
-        version: str = VERSION
         if destination.exists():
-            if (destination / "moon.mod.json").exists():
-                moon_mod_json = json.loads((destination / "moon.mod.json").read_text())
-                if "version" in moon_mod_json:
-                    version = moon_mod_json["version"]
             shutil.rmtree(destination)
         shutil.copytree(self.path / "src", destination)
         relocations = {}
@@ -208,7 +204,7 @@ pub extern "c" fn language() -> @tree_sitter_language.Language = "{function_name
         )
         self.generate_gitignore_to(destination / ".gitignore")
         self.generate_moon_mod_json_to(
-            destination / "moon.mod.json", version, wasm=wasm_path.name
+            destination / "moon.mod.json", VERSION, wasm=wasm_path.name
         )
         self.generate_moon_pkg_to(destination / "moon.pkg")
 
@@ -345,6 +341,26 @@ def generate_binding(project: Path, bindings: Path):
         git_clean(project)
 
 
+def publish_languages(bindings: Path):
+    for lang_dir in sorted(bindings.iterdir()):
+        if not lang_dir.is_dir():
+            continue
+        if not (lang_dir / "moon.mod.json").exists():
+            continue
+        logger.info(f"Publishing {lang_dir.name}")
+        try:
+            subprocess.run(
+                ["moon", "publish"],
+                cwd=lang_dir,
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+            logger.info(f"Published {lang_dir.name}")
+        except subprocess.CalledProcessError as e:
+            logger.error(f"Failed to publish {lang_dir.name}: {e.stderr}")
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Generate bindings for tree-sitter grammars"
@@ -362,7 +378,14 @@ def main():
         default=os.cpu_count(),
         help="Number of worker threads to use (default: number of CPU cores)",
     )
+    parser.add_argument(
+        "--publish",
+        action="store_true",
+        help="Publish generated language packages after generation",
+    )
     args = parser.parse_args()
+
+    bindings = Path("src", "languages")
 
     # Create a thread pool executor
     with concurrent.futures.ThreadPoolExecutor(max_workers=args.workers) as executor:
@@ -370,7 +393,7 @@ def main():
         if args.path:
             # Process each path provided
             for p in args.path:
-                future = executor.submit(generate_binding, p, Path("src", "languages"))
+                future = executor.submit(generate_binding, p, bindings)
                 futures.append((p, future))
         else:
             # Multiple grammars case (default behavior when no path is specified)
@@ -380,7 +403,7 @@ def main():
 
                 # Submit each grammar to the thread pool
                 future = executor.submit(
-                    generate_binding, path_item, Path("src", "languages")
+                    generate_binding, path_item, bindings
                 )
                 futures.append((path_item, future))
 
@@ -390,6 +413,9 @@ def main():
                 future.result()
             except Exception as e:
                 logger.error(f"Error generating binding for {path_item}: {e}")
+
+    if args.publish:
+        publish_languages(bindings)
 
 
 if __name__ == "__main__":

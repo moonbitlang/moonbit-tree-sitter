@@ -142,7 +142,7 @@ test "query/return" {
       #|     (atomic_expression
       #|      (literal
       #|       (boolean_literal)))
-      #|     (simple_pattern
+      #|     (atomic_pattern
       #|      (literal
       #|       (boolean_literal))))
       #|    (guard_else_expression
