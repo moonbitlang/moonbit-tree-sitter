@@ -1,64 +1,88 @@
 {
+  "tree-sitter-bash": {
+    "url": "https://github.com/tree-sitter/tree-sitter-bash",
+    "rev": "a06c2e4415e9bc0346c6b86d401879ffb44058f7"
+  },
   "tree-sitter-c": {
     "url": "https://github.com/tree-sitter/tree-sitter-c",
-    "rev": "7fa1be1b694b6e763686793d97da01f36a0e5c12"
+    "rev": "ae19b676b13bdcc13b7665397e6d9b14975473dd"
+  },
+  "tree-sitter-c-sharp": {
+    "url": "https://github.com/tree-sitter/tree-sitter-c-sharp",
+    "rev": "88366631d598ce6595ec655ce1591b315cffb14c"
   },
   "tree-sitter-cpp": {
     "url": "https://github.com/tree-sitter/tree-sitter-cpp",
-    "rev": "56455f4245baf4ea4e0881c5169de69d7edd5ae7"
+    "rev": "8b5b49eb196bec7040441bee33b2c9a4838d6967"
   },
   "tree-sitter-css": {
     "url": "https://github.com/tree-sitter/tree-sitter-css",
-    "rev": "6e327db434fec0ee90f006697782e43ec855adf5"
+    "rev": "dda5cfc5722c429eaba1c910ca32c2c0c5bb1a3f"
   },
   "tree-sitter-go": {
     "url": "https://github.com/tree-sitter/tree-sitter-go",
-    "rev": "5e73f476efafe5c768eda19bbe877f188ded6144"
+    "rev": "2346a3ab1bb3857b48b29d779a1ef9799a248cd7"
   },
   "tree-sitter-html": {
     "url": "https://github.com/tree-sitter/tree-sitter-html",
-    "rev": "cbb91a0ff3621245e890d1c50cc811bffb77a26b"
+    "rev": "73a3947324f6efddf9e17c0ea58d454843590cc0"
   },
   "tree-sitter-java": {
     "url": "https://github.com/tree-sitter/tree-sitter-java",
-    "rev": "a7db5227ec40fcfe94489559d8c9bc7c8181e25a"
+    "rev": "e10607b45ff745f5f876bfa3e94fbcc6b44bdc11"
   },
   "tree-sitter-javascript": {
     "url": "https://github.com/tree-sitter/tree-sitter-javascript",
-    "rev": "6fbef40512dcd9f0a61ce03a4c9ae7597b36ab5c"
+    "rev": "58404d8cf191d69f2674a8fd507bd5776f46cb11"
   },
   "tree-sitter-json": {
     "url": "https://github.com/tree-sitter/tree-sitter-json",
-    "rev": "46aa487b3ade14b7b05ef92507fdaa3915a662a3"
+    "rev": "001c28d7a29832b06b0e831ec77845553c89b56d"
+  },
+  "tree-sitter-kotlin": {
+    "url": "https://github.com/fwcd/tree-sitter-kotlin",
+    "rev": "802fd920c153b02b9d266369a3ef061622f2bbf0"
+  },
+  "tree-sitter-lua": {
+    "url": "https://github.com/tree-sitter-grammars/tree-sitter-lua",
+    "rev": "10fe0054734eec83049514ea2e718b2a56acd0c9"
   },
   "tree-sitter-markdown": {
     "url": "https://github.com/tree-sitter-grammars/tree-sitter-markdown",
-    "rev": "9dca2b6834df9be17bed2ec0fc05c215fa10acf3"
+    "rev": "f969cd3ae3f9fbd4e43205431d0ae286014c05b5"
   },
   "tree-sitter-moonbit": {
     "url": "https://github.com/moonbitlang/tree-sitter-moonbit",
-    "rev": "6b58b2c3916435eb654f9bf7ddfc4a4572789fb9"
+    "rev": "fb3634fbcedcc73d2a7b0cb7768d9d9c5367049e"
   },
   "tree-sitter-ocaml": {
     "url": "https://github.com/tree-sitter/tree-sitter-ocaml",
-    "rev": "3ef7c00b29e41e3a0c1d18e82ea37c64d72b93fc"
+    "rev": "28a93319a67a93780bbd484e6ed5b12dcbe7eddb"
   },
   "tree-sitter-python": {
     "url": "https://github.com/tree-sitter/tree-sitter-python",
-    "rev": "710796b8b877a970297106e5bbc8e2afa47f86ec"
+    "rev": "26855eabccb19c6abf499fbc5b8dc7cc9ab8bc64"
   },
   "tree-sitter-query": {
     "url": "https://github.com/tree-sitter-grammars/tree-sitter-query",
-    "rev": "8a43889f89fd0667289936341bff3a77bafade17"
+    "rev": "fc5409c6820dd5e02b0b0a309d3da2bfcde2db17"
   },
   "tree-sitter-rust": {
     "url": "https://github.com/tree-sitter/tree-sitter-rust",
-    "rev": "3691201b01cacb2f96ffca4c632c4e938bfacd88"
+    "rev": "8a1ccae7aaccdc11b04dbd803453e3e9cfd9159b"
+  },
+  "tree-sitter-sql": {
+    "url": "https://github.com/DerekStride/tree-sitter-sql",
+    "rev": "c2e1e08db1ea20dc23bdb8d228a81a8756e9c450"
   },
   "tree-sitter-swift": {
     "url": "https://github.com/tonyfettes/tree-sitter-swift",
-    "branch": "regenerate",
-    "rev": "d64a733eee0f55dcc9790491e0d534e8a559c20a"
+    "rev": "8ce42be4f22575e474c899ca8b901fc9226f6073",
+    "branch": "regenerate"
+  },
+  "tree-sitter-toml": {
+    "url": "https://github.com/tree-sitter-grammars/tree-sitter-toml",
+    "rev": "64b56832c2cffe41758f28e05c756a3a98d16f41"
   },
   "tree-sitter-typescript": {
     "url": "https://github.com/tree-sitter/tree-sitter-typescript",
@@ -66,6 +90,10 @@
   },
   "tree-sitter-yaml": {
     "url": "https://github.com/tree-sitter-grammars/tree-sitter-yaml",
-    "rev": "3431ec21da1dde751bab55520963cf3a4f1121f3"
+    "rev": "4463985dfccc640f3d6991e3396a2047610cf5f8"
+  },
+  "tree-sitter-zig": {
+    "url": "https://github.com/tree-sitter-grammars/tree-sitter-zig",
+    "rev": "6479aa13f32f701c383083d8b28360ebd682fb7d"
   }
 }

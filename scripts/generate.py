@@ -287,10 +287,14 @@ def generate_binding(project: Path, bindings: Path):
         metadata_dict = tree_sitter_dict["metadata"]
         metadata_links_dict = metadata_dict["links"]
         grammar_commit = git_grammar_commit(project)
+        description = metadata_dict.get("description", "")
+        if not description and (project / "package.json").exists():
+            pkg = json.loads((project / "package.json").read_text())
+            description = pkg.get("description", "")
         metadata = Metadata(
             version=metadata_dict["version"],
             license=metadata_dict["license"],
-            description=metadata_dict["description"],
+            description=description,
             repository=metadata_links_dict["repository"],
             commit=grammar_commit,
         )
