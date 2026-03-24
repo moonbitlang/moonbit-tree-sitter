@@ -13,9 +13,7 @@ test "query cursor basics" {
   // Create a query to find all variable declarations
   let query_source =
     #|(let_expression
-    #| (pattern
-    #|  (simple_pattern
-    #|   (lowercase_identifier) @variable_name))
+    #| ((lowercase_identifier) @variable_name)
     #| (_) @variable_value)
   let query_cursor = tree.query(query_source)
 
