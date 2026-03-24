@@ -69,37 +69,13 @@ class Grammar:
         self.metadata = metadata
         self.stubs = []
         self.files = []
-        src_path = path / "src"
-        for file in src_path.iterdir():
-            if file.suffix == ".c":
-                self.stubs.append(str(file.relative_to(src_path)))
-            self.files.append(str(file.relative_to(src_path)))
-        self.stubs.sort()
-        self.files.sort()
         self.external_files = external_files
         self.file_types = file_types
-
-    def refresh_file_lists(self):
-        # NOTE: This only iterates top-level entries in src/ and does not
-        # filter with is_file(), so directories (e.g. tree_sitter/) are
-        # included in self.files. If a grammar ever has nested .c files
-        # (e.g. src/subdir/*.c), this will need a recursive walk and an
-        # is_file() check. All current grammars use a flat src/ layout.
-        self.stubs = []
-        self.files = []
-        src_path = self.path / "src"
-        for file in src_path.iterdir():
-            if file.suffix == ".c":
-                self.stubs.append(str(file.relative_to(src_path)))
-            self.files.append(str(file.relative_to(src_path)))
-        self.stubs.sort()
-        self.files.sort()
 
     def tree_sitter_generate(self):
         subprocess.run(
             ["tree-sitter", "generate"], cwd=self.path, check=True, capture_output=True
         )
-        self.refresh_file_lists()
 
     def tree_sitter_build_wasm(self):
         subprocess.run(
@@ -214,6 +190,15 @@ pub extern "c" fn language() -> @tree_sitter_language.Language = "{function_name
             self.perform_c_include_to(
                 destination, file.relative_to(destination), relocations
             )
+        # Scan destination to collect stubs and files after all copying is done
+        self.stubs = []
+        self.files = []
+        for file in destination.iterdir():
+            if file.suffix == ".c":
+                self.stubs.append(file.name)
+            self.files.append(file.name)
+        self.stubs.sort()
+        self.files.sort()
         wasm_path = self.tree_sitter_build_wasm()
         shutil.copyfile(wasm_path, destination / wasm_path.name)
         self.generate_binding_native_mbt_to(

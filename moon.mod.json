@@ -14,6 +14,8 @@
     "tonyfettes/tree_sitter_toml": { "path": "src/languages/tree_sitter_toml" },
     "tonyfettes/tree_sitter_sql": { "path": "src/languages/tree_sitter_sql" },
     "tonyfettes/tree_sitter_zig": { "path": "src/languages/tree_sitter_zig" },
+    "tonyfettes/tree_sitter_ocaml": { "path": "src/languages/tree_sitter_ocaml" },
+    "tonyfettes/tree_sitter_typescript": { "path": "src/languages/tree_sitter_typescript" },
     "tonyfettes/c": "0.7.4"
   },
   "readme": "README.md",
