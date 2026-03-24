@@ -56,6 +56,19 @@ jobs:
           merge-multiple: true
           path: src/languages
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install tree-sitter CLI
+        run: npm install -g tree-sitter-cli
+
+      - name: Generate language bindings
+        run: |
+          python3 scripts/checkout.py install
+          python3 scripts/generate.py
+
       - name: Run tests
         run: |
           python3 scripts/test.py
