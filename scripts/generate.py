@@ -64,7 +64,7 @@ class Grammar:
         external_files: list[Path] = [],
         file_types: list[str] = [],
     ):
-        self.name = name
+        self.name = name.replace("-", "_")
         self.path = path
         self.metadata = metadata
         self.stubs = []

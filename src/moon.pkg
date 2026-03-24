@@ -20,7 +20,7 @@ import {
   "tonyfettes/tree_sitter_markdown",
   "tonyfettes/tree_sitter_yaml",
   "tonyfettes/tree_sitter_bash",
-  "tonyfettes/tree_sitter_c-sharp" @tree_sitter_c_sharp,
+  "tonyfettes/tree_sitter_c_sharp",
   "tonyfettes/tree_sitter_kotlin",
   "tonyfettes/tree_sitter_lua",
   "tonyfettes/tree_sitter_toml",
