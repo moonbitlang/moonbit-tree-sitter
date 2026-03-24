@@ -1,0 +1,17 @@
+{
+  "name": "tonyfettes/tree_sitter_sql",
+  "version": "0.1.24",
+  "deps": {
+    "tonyfettes/tree_sitter_language": "0.1.3"
+  },
+  "repository": "git+https://github.com/derekstride/tree-sitter-sql.git",
+  "license": "Apache-2.0",
+  "include": [
+    "parser.c",
+    "scanner.c",
+    "binding.mbt",
+    "moon.pkg",
+    "tree-sitter-sql.wasm"
+  ],
+  "preferred-target": "native"
+}

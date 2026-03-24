@@ -1,2 +1,4 @@
-*
-!.gitignore
+# MoonBit build artifacts
+_build/
+.mooncakes/
+target/
