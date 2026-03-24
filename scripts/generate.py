@@ -300,12 +300,21 @@ def generate_binding(project: Path, bindings: Path):
             commit=grammar_commit,
         )
         grammars = tree_sitter_dict["grammars"]
+        seen_paths: set[Path] = set()
         for grammar_dict in grammars:
             grammar_name = grammar_dict["name"]
             grammar_path = Path(".")
             if "path" in grammar_dict:
                 grammar_path = grammar_dict["path"]
             grammar_path: Path = project / grammar_path
+            resolved = grammar_path.resolve()
+            if resolved in seen_paths:
+                logger.info(
+                    f"Skipping grammar {grammar_name}: "
+                    f"path {grammar_path} already used by another grammar"
+                )
+                continue
+            seen_paths.add(resolved)
             grammar_external_files = []
             for external_file in (
                 grammar_dict["external-files"]
