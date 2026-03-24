@@ -1,5 +1,4 @@
 options(
-  "support-targets": "+native",
+  "supported-targets": "+native",
   targets: { "language.native.mbt": [ "native" ] },
 )
-
