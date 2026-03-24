@@ -1,4 +1,4 @@
 # MoonBit
 _build/
 .mooncakes/
-target/
+target

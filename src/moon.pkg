@@ -26,6 +26,8 @@ import {
   "tonyfettes/tree_sitter_toml",
   "tonyfettes/tree_sitter_sql",
   "tonyfettes/tree_sitter_zig",
+  "tonyfettes/tree_sitter_ocaml",
+  "tonyfettes/tree_sitter_typescript",
 } for "test"
 
 options(
@@ -53,6 +55,7 @@ options(
     "node.js.mbt": [ "js" ],
     "node.native.mbt": [ "native" ],
     "node_test.mbt": [ "native" ],
+    "ocaml_test.mbt": [ "native" ],
     "parse_test.mbt": [ "native" ],
     "parser.js.mbt": [ "js" ],
     "parser.native.mbt": [ "native" ],
@@ -81,5 +84,6 @@ options(
     "toml_test.mbt": [ "native" ],
     "sql_test.mbt": [ "native" ],
     "zig_test.mbt": [ "native" ],
+    "typescript_test.mbt": [ "native" ],
   },
 )

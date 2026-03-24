@@ -1,0 +1,21 @@
+{
+  "name": "tonyfettes/tree_sitter_ocaml_type",
+  "version": "0.1.24",
+  "deps": {
+    "tonyfettes/tree_sitter_language": "0.1.3"
+  },
+  "repository": "https://github.com/tree-sitter/tree-sitter-ocaml",
+  "license": "Apache-2.0",
+  "include": [
+    "grammar.json",
+    "node-types.json",
+    "parser.c",
+    "scanner.c",
+    "scanner.h",
+    "tree_sitter",
+    "binding.mbt",
+    "moon.pkg",
+    "tree-sitter-ocaml_type.wasm"
+  ],
+  "preferred-target": "native"
+}
