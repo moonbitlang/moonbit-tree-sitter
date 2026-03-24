@@ -113,14 +113,15 @@ class Grammar:
         destination.write_text(json.dumps(moon_mod_json, indent=2) + "\n")
 
     def generate_moon_pkg_to(self, destination: Path):
-        content = """import {
+        native_stub_list = ", ".join(f'"{stub}"' for stub in self.stubs)
+        content = f"""import {{
   "tonyfettes/tree_sitter_language",
-}
+}}
 
 options(
-  native_stub: [ "parser.c" ],
+  native_stub: [ {native_stub_list} ],
   "supported-targets": "+native",
-  targets: { "binding.mbt": [ "native" ] },
+  targets: {{ "binding.mbt": [ "native" ] }},
 )
 """
         destination.write_text(content)
