@@ -3,10 +3,3 @@ _build/
 .mooncakes/
 target
 
-# tree-sitter
-grammar.json
-node-types.json
-parser.c
-scanner.c
-scanner.h
-tree_sitter

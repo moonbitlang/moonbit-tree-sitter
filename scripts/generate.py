@@ -87,8 +87,7 @@ class Grammar:
         return list(self.path.glob("*.wasm"))[0]
 
     def generate_gitignore_to(self, destination: Path):
-        content = "# MoonBit\n_build/\n.mooncakes/\ntarget\n\n# tree-sitter\n"
-        content += "\n".join(self.files) + "\n"
+        content = "# MoonBit\n_build/\n.mooncakes/\ntarget\n"
         destination.write_text(content)
 
     def generate_moon_mod_json_to(self, destination: Path, version: str, wasm: str):
