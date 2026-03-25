@@ -1,11 +1,16 @@
 {
   "name": "tonyfettes/tree_sitter_bash",
-  "version": "0.1.24",
+  "version": "0.1.25",
   "deps": {
     "tonyfettes/tree_sitter_language": "0.1.3"
   },
   "repository": "https://github.com/tree-sitter/tree-sitter-bash",
-  "license": "Apache-2.0",
+  "license": "MIT",
+  "description": "Bash grammar for tree-sitter",
+  "keywords": [
+    "tree-sitter",
+    "bash"
+  ],
   "include": [
     "grammar.json",
     "node-types.json",

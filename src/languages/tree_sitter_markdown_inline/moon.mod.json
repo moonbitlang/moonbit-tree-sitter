@@ -1,11 +1,16 @@
 {
   "name": "tonyfettes/tree_sitter_markdown_inline",
-  "version": "0.1.24",
+  "version": "0.1.25",
   "deps": {
     "tonyfettes/tree_sitter_language": "0.1.3"
   },
   "repository": "https://github.com/tree-sitter-grammars/tree-sitter-markdown",
-  "license": "Apache-2.0",
+  "license": "MIT",
+  "description": "Markdown grammar for tree-sitter",
+  "keywords": [
+    "tree-sitter",
+    "markdown_inline"
+  ],
   "include": [
     "common.js",
     "grammar.json",

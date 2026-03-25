@@ -21,7 +21,7 @@ if MOON_HOME is None:
     MOON_HOME = Path.home() / ".moon"
 else:
     MOON_HOME = Path(MOON_HOME)
-VERSION = "0.1.24"
+VERSION = "0.1.25"
 
 
 class Metadata:
@@ -338,7 +338,7 @@ def generate_binding(project: Path, bindings: Path):
                 ),
                 metadata=metadata,
             )
-            binding_root: Path = (bindings / f"tree_sitter_{grammar_name}").resolve()
+            binding_root: Path = (bindings / f"tree_sitter_{grammar_dict.name}").resolve()
             logger.info(f"Generating binding for {grammar_name}")
             grammar_dict.generate_binding_to(binding_root)
 

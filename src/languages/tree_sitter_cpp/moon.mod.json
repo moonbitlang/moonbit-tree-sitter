@@ -1,0 +1,25 @@
+{
+  "name": "tonyfettes/tree_sitter_cpp",
+  "version": "0.1.25",
+  "deps": {
+    "tonyfettes/tree_sitter_language": "0.1.3"
+  },
+  "repository": "https://github.com/tree-sitter/tree-sitter-cpp",
+  "license": "MIT",
+  "description": "C++ grammar for tree-sitter",
+  "keywords": [
+    "tree-sitter",
+    "cpp"
+  ],
+  "include": [
+    "grammar.json",
+    "node-types.json",
+    "parser.c",
+    "scanner.c",
+    "tree_sitter",
+    "binding.mbt",
+    "moon.pkg",
+    "tree-sitter-cpp.wasm"
+  ],
+  "preferred-target": "native"
+}
