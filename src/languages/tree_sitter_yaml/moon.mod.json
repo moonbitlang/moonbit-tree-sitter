@@ -1,0 +1,23 @@
+{
+  "name": "tonyfettes/tree_sitter_yaml",
+  "version": "0.1.24",
+  "deps": {
+    "tonyfettes/tree_sitter_language": "0.1.3"
+  },
+  "repository": "https://github.com/tree-sitter-grammars/tree-sitter-yaml",
+  "license": "Apache-2.0",
+  "include": [
+    "grammar.json",
+    "node-types.json",
+    "parser.c",
+    "scanner.c",
+    "schema.core.c",
+    "schema.json.c",
+    "schema.legacy.c",
+    "tree_sitter",
+    "binding.mbt",
+    "moon.pkg",
+    "tree-sitter-yaml.wasm"
+  ],
+  "preferred-target": "native"
+}
