@@ -1,0 +1,26 @@
+{
+  "name": "tonyfettes/tree_sitter_html",
+  "version": "0.1.26",
+  "deps": {
+    "tonyfettes/tree_sitter_language": "0.1.3"
+  },
+  "repository": "https://github.com/tree-sitter/tree-sitter-html",
+  "license": "MIT",
+  "description": "HTML grammar for tree-sitter",
+  "keywords": [
+    "tree-sitter",
+    "html"
+  ],
+  "include": [
+    "grammar.json",
+    "node-types.json",
+    "parser.c",
+    "scanner.c",
+    "tag.h",
+    "tree_sitter",
+    "binding.mbt",
+    "moon.pkg",
+    "tree-sitter-html.wasm"
+  ],
+  "preferred-target": "native"
+}

@@ -1,0 +1,25 @@
+{
+  "name": "tonyfettes/tree_sitter_swift",
+  "version": "0.1.26",
+  "deps": {
+    "tonyfettes/tree_sitter_language": "0.1.3"
+  },
+  "repository": "git+https://github.com/alex-pinkus/tree-sitter-swift.git",
+  "license": "MIT",
+  "description": "A tree-sitter grammar for the Swift programming language.",
+  "keywords": [
+    "tree-sitter",
+    "swift"
+  ],
+  "include": [
+    "grammar.json",
+    "node-types.json",
+    "parser.c",
+    "scanner.c",
+    "tree_sitter",
+    "binding.mbt",
+    "moon.pkg",
+    "tree-sitter-swift.wasm"
+  ],
+  "preferred-target": "native"
+}

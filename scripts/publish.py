@@ -137,7 +137,8 @@ def copy_source(src: Path, dst: Path):
                     shutil.copy(file, dst / file)
 
 
-def main():
+def prepare_main():
+    """Prepare the main module (tonyfettes/tree_sitter) for publishing."""
     publish_path = Path("publish")
     if publish_path.exists():
         shutil.rmtree("publish")
@@ -173,6 +174,70 @@ def main():
         p = publish_path / d
         if p.exists():
             shutil.rmtree(p)
+    return publish_path
+
+
+def publish_main():
+    """Prepare and publish the main module (tonyfettes/tree_sitter)."""
+    publish_path = prepare_main()
+    print("Publishing tonyfettes/tree_sitter")
+    subprocess.run(["moon", "publish"], cwd=publish_path, check=True)
+    print("Published tonyfettes/tree_sitter")
+
+
+def publish_language():
+    """Publish the language definition (tonyfettes/tree_sitter_language)."""
+    language_path = Path("src", "language")
+    print("Publishing tonyfettes/tree_sitter_language")
+    subprocess.run(["moon", "publish"], cwd=language_path, check=True)
+    print("Published tonyfettes/tree_sitter_language")
+
+
+def publish_languages():
+    """Publish all generated language bindings."""
+    languages_path = Path("src", "languages")
+    for lang_dir in sorted(languages_path.iterdir()):
+        if not lang_dir.is_dir():
+            continue
+        if not (lang_dir / "moon.mod.json").exists():
+            continue
+        print(f"Publishing {lang_dir.name}")
+        try:
+            subprocess.run(
+                ["moon", "publish"],
+                cwd=lang_dir,
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+            print(f"Published {lang_dir.name}")
+        except subprocess.CalledProcessError as e:
+            print(f"Failed to publish {lang_dir.name}: {e.stderr}")
+
+
+import argparse
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Publish tree-sitter MoonBit packages"
+    )
+    parser.add_argument(
+        "target",
+        nargs="*",
+        choices=["main", "language", "languages"],
+        default=["main", "language", "languages"],
+        help="What to publish (default: all)",
+    )
+    args = parser.parse_args()
+
+    targets = args.target
+    if "language" in targets:
+        publish_language()
+    if "languages" in targets:
+        publish_languages()
+    if "main" in targets:
+        publish_main()
 
 
 if __name__ == "__main__":

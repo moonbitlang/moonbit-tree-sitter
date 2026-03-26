@@ -21,7 +21,7 @@ if MOON_HOME is None:
     MOON_HOME = Path.home() / ".moon"
 else:
     MOON_HOME = Path(MOON_HOME)
-VERSION = "0.1.24"
+VERSION = "0.1.26"
 
 
 class Metadata:
@@ -98,7 +98,9 @@ class Grammar:
                 "tonyfettes/tree_sitter_language": "0.1.3",
             },
             "repository": self.metadata.repository,
-            "license": "Apache-2.0",
+            "license": self.metadata.license,
+            "description": self.metadata.description,
+            "keywords": ["tree-sitter", self.name],
             "include": self.files + ["binding.mbt", "moon.pkg", wasm],
             "preferred-target": "native",
         }
@@ -336,7 +338,7 @@ def generate_binding(project: Path, bindings: Path):
                 ),
                 metadata=metadata,
             )
-            binding_root: Path = (bindings / f"tree_sitter_{grammar_name}").resolve()
+            binding_root: Path = (bindings / f"tree_sitter_{grammar_dict.name}").resolve()
             logger.info(f"Generating binding for {grammar_name}")
             grammar_dict.generate_binding_to(binding_root)
 

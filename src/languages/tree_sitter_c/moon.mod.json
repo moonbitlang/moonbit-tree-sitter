@@ -1,0 +1,24 @@
+{
+  "name": "tonyfettes/tree_sitter_c",
+  "version": "0.1.26",
+  "deps": {
+    "tonyfettes/tree_sitter_language": "0.1.3"
+  },
+  "repository": "https://github.com/tree-sitter/tree-sitter-c",
+  "license": "MIT",
+  "description": "C grammar for tree-sitter",
+  "keywords": [
+    "tree-sitter",
+    "c"
+  ],
+  "include": [
+    "grammar.json",
+    "node-types.json",
+    "parser.c",
+    "tree_sitter",
+    "binding.mbt",
+    "moon.pkg",
+    "tree-sitter-c.wasm"
+  ],
+  "preferred-target": "native"
+}

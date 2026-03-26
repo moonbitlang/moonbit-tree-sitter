@@ -1,0 +1,24 @@
+{
+  "name": "tonyfettes/tree_sitter_java",
+  "version": "0.1.26",
+  "deps": {
+    "tonyfettes/tree_sitter_language": "0.1.3"
+  },
+  "repository": "https://github.com/tree-sitter/tree-sitter-java",
+  "license": "MIT",
+  "description": "Java grammar for tree-sitter",
+  "keywords": [
+    "tree-sitter",
+    "java"
+  ],
+  "include": [
+    "grammar.json",
+    "node-types.json",
+    "parser.c",
+    "tree_sitter",
+    "binding.mbt",
+    "moon.pkg",
+    "tree-sitter-java.wasm"
+  ],
+  "preferred-target": "native"
+}
