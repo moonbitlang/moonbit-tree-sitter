@@ -1,6 +1,6 @@
 {
   "name": "tonyfettes/tree_sitter",
-  "version": "0.4.4",
+  "version": "0.4.6",
   "deps": {
     "tonyfettes/tree_sitter_language": "0.1.3",
     "tonyfettes/tree_sitter_moonbit": { "path": "src/languages/tree_sitter_moonbit" },
@@ -21,7 +21,7 @@
   "readme": "README.md",
   "repository": "https://github.com/tonyfettes/moonbit-tree-sitter",
   "license": "Apache-2.0",
-  "keywords": [],
+  "keywords": ["tree-sitter", "parser", "syntax", "highlighting"],
   "description": "A MoonBit binding to the tree-sitter parsing library",
   "source": "src",
   "preferred-target": "native"
