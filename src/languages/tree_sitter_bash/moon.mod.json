@@ -1,6 +1,6 @@
 {
   "name": "tonyfettes/tree_sitter_bash",
-  "version": "0.1.25",
+  "version": "0.1.26",
   "deps": {
     "tonyfettes/tree_sitter_language": "0.1.3"
   },

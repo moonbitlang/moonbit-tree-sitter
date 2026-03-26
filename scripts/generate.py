@@ -21,7 +21,7 @@ if MOON_HOME is None:
     MOON_HOME = Path.home() / ".moon"
 else:
     MOON_HOME = Path(MOON_HOME)
-VERSION = "0.1.25"
+VERSION = "0.1.26"
 
 
 class Metadata:
