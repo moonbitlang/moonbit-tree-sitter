@@ -219,21 +219,34 @@ extern "js" fn TSQueryPredicate::operator(self : TSQueryPredicate) -> String =
   #|}
 
 ///|
-extern "js" fn TSQueryPredicate::operands(
+extern "js" fn TSQueryPredicate::operands_ffi(
   self : TSQueryPredicate,
-) -> Array[TSQueryPredicateStep] =
+) -> FixedArray[TSQueryPredicateStep] =
   #|(self) => {
   #|  return self.operands;
   #|}
 
+fn TSQueryPredicate::operands(
+  self : TSQueryPredicate,
+) -> Array[TSQueryPredicateStep] {
+  Array::from_fixed_array(TSQueryPredicate::operands_ffi(self))
+}
+
 ///|
-extern "js" fn ts_query_predicates_for_pattern(
+extern "js" fn ts_query_predicates_for_pattern_ffi(
   query : Query,
   pattern_index : Int,
-) -> Array[TSQueryPredicate] =
+) -> FixedArray[TSQueryPredicate] =
   #|(query, patternIndex) => {
   #|  return query.predicates[patternIndex];
   #|}
+
+fn ts_query_predicates_for_pattern(
+  query : Query,
+  pattern_index : Int,
+) -> Array[TSQueryPredicate] {
+  Array::from_fixed_array(ts_query_predicates_for_pattern_ffi(query, pattern_index))
+}
 
 ///|
 type QueryPredicate = Array[QueryPredicateStep]
@@ -413,13 +426,20 @@ pub fn Query::disable_pattern(self : Query, pattern_index : Int) -> Unit {
 }
 
 ///|
-extern "js" fn ts_query_matches(
+extern "js" fn ts_query_matches_ffi(
   query : Query,
   node : Node,
-) -> Array[TSQueryMatch] =
+) -> FixedArray[TSQueryMatch] =
   #|(query, node) => {
   #|  return query.matches(node);
   #|}
+
+fn ts_query_matches(
+  query : Query,
+  node : Node,
+) -> Array[TSQueryMatch] {
+  Array::from_fixed_array(ts_query_matches_ffi(query, node))
+}
 
 ///|
 pub fn Query::matches(self : Query, node : Node) -> Array[QueryMatch] {
@@ -433,10 +453,18 @@ pub fn Query::matches(self : Query, node : Node) -> Array[QueryMatch] {
 }
 
 ///|
-pub extern "js" fn Query::captures(
+pub extern "js" fn Query::captures_ffi(
   self : Query,
   node : Node,
-) -> Array[QueryCapture] =
+) -> FixedArray[QueryCapture] =
   #|(query, node) => {
   #|  return query.captures(node);
   #|}
+
+pub fn Query::captures(
+  self : Query,
+  node : Node,
+) -> Array[QueryCapture] {
+  Array::from_fixed_array(Query::captures_ffi(self, node))
+}
+

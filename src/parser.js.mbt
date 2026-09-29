@@ -94,10 +94,14 @@ pub const LANGUAGE_VERSION = 15
 pub const MIN_COMPATIBLE_LANGUAGE_VERSION = 13
 
 ///|
-extern "js" fn ts_parser_included_ranges(parser : Parser) -> Array[Range] =
+extern "js" fn ts_parser_included_ranges_ffi(parser : Parser) -> FixedArray[Range] =
   #|(parser) => {
   #|  return parser.getIncludedRanges();
   #|}
+
+fn ts_parser_included_ranges(parser : Parser) -> Array[Range] {
+  Array::from_fixed_array(ts_parser_included_ranges_ffi(parser))
+}
 
 ///|
 /// Get the ranges of text that the parser will include when parsing.
