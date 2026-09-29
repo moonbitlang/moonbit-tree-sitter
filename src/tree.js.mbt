@@ -93,10 +93,14 @@ pub fn Tree::language(self : Tree) -> Language {
 }
 
 ///|
-extern "js" fn ts_tree_included_ranges(tree : Tree) -> Array[Range] =
+extern "js" fn ts_tree_included_ranges_ffi(tree : Tree) -> FixedArray[Range] =
   #|(tree) => {
   #|  return tree.getIncludedRanges();
   #|}
+
+fn ts_tree_included_ranges(tree : Tree) -> Array[Range] {
+  Array::from_fixed_array(ts_tree_included_ranges_ffi(tree))
+}
 
 ///|
 /// Get the array of included ranges that was used to parse the syntax tree.
@@ -121,13 +125,20 @@ pub fn Tree::edit(self : Tree, edit : InputEdit) -> Unit {
 }
 
 ///|
-extern "js" fn ts_tree_get_changed_ranges(
+extern "js" fn ts_tree_get_changed_ranges_ffi(
   tree : Tree,
   other : Tree,
-) -> Array[Range] =
+) -> FixedArray[Range] =
   #|(tree, other) => {
   #|  return tree.getChangedRanges(other);
   #|}
+
+fn ts_tree_get_changed_ranges(
+  tree : Tree,
+  other : Tree,
+) -> Array[Range] {
+  Array::from_fixed_array(ts_tree_get_changed_ranges_ffi(tree, other))
+}
 
 ///|
 /// Compare an old edited syntax tree to a new syntax tree representing the same

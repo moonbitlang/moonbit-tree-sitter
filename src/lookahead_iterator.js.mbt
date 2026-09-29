@@ -104,9 +104,9 @@ pub fn LookaheadIterator::current_symbol_name(
 }
 
 ///|
-extern "js" fn ts_lookahead_iterator_collect_symbol_names(
+extern "js" fn ts_lookahead_iterator_collect_symbol_names_ffi(
   iterator : LookaheadIterator,
-) -> Array[String] =
+) -> FixedArray[String] =
   #|(self) => {
   #|  const names = [];
   #|  for (const name of self) {
@@ -114,6 +114,12 @@ extern "js" fn ts_lookahead_iterator_collect_symbol_names(
   #|  }
   #|  return names;
   #|}
+
+fn ts_lookahead_iterator_collect_symbol_names(
+  iterator : LookaheadIterator,
+) -> Array[String] {
+  Array::from_fixed_array(ts_lookahead_iterator_collect_symbol_names_ffi(iterator))
+}
 
 ///|
 pub fn LookaheadIterator::symbol_names(

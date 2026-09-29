@@ -23,12 +23,18 @@ pub extern "js" fn QueryCapture::node(self : QueryCapture) -> Node =
 priv type TSQueryMatch
 
 ///|
-extern "js" fn TSQueryMatch::captures(
+extern "js" fn TSQueryMatch::captures_ffi(
   self : TSQueryMatch,
-) -> Array[QueryCapture] =
+) -> FixedArray[QueryCapture] =
   #|(self) => {
   #|  return self.captures;
   #|}
+
+fn TSQueryMatch::captures(
+  self : TSQueryMatch,
+) -> Array[QueryCapture] {
+  Array::from_fixed_array(TSQueryMatch::captures_ffi(self))
+}
 
 ///|
 extern "js" fn TSQueryMatch::pattern_index(self : TSQueryMatch) -> Int =

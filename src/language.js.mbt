@@ -145,10 +145,14 @@ pub fn Language::field_id_for_name(self : Language, name : StringView) -> Int {
 }
 
 ///|
-extern "js" fn ts_language_supertypes(language : Language) -> Array[Symbol] =
+extern "js" fn ts_language_supertypes_ffi(language : Language) -> FixedArray[Symbol] =
   #|(language) => {
   #|  return language.supertypes;
   #|}
+
+fn ts_language_supertypes(language : Language) -> Array[Symbol] {
+  Array::from_fixed_array(ts_language_supertypes_ffi(language))
+}
 
 ///|
 /// Get a list of all supertype symbols for the language.
@@ -157,10 +161,14 @@ pub fn Language::supertypes(self : Language) -> Array[Symbol] {
 }
 
 ///|
-extern "js" fn ts_language_subtypes(language : Language) -> Array[Symbol] =
+extern "js" fn ts_language_subtypes_ffi(language : Language) -> FixedArray[Symbol] =
   #|(language) => {
   #|  return language.subtypes;
   #|}
+
+fn ts_language_subtypes(language : Language) -> Array[Symbol] {
+  Array::from_fixed_array(ts_language_subtypes_ffi(language))
+}
 
 ///|
 /// Get a list of all subtype symbol ids for a given supertype symbol.
