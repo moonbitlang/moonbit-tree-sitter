@@ -1,4 +1,5 @@
 ///|
+#derive(Debug)
 pub suberror SexpError {
   UnrecognizedCharacter(StringView)
   UnterminatedString(StringView)
@@ -7,7 +8,7 @@ pub suberror SexpError {
   InvalidPairKey(StringView)
   InvalidQuantifier(Char)
   InvalidCommand(StringView)
-} derive(Show)
+}
 
 ///|
 fn parse_list(
@@ -19,148 +20,156 @@ fn parse_list(
     string : StringBuilder,
     quote : Char,
   ) -> StringView raise SexpError {
-    loop source {
-      ['\\', '\\', .. source] => {
-        string.write_char('\\')
-        continue source
+    for loop_state = source {
+      break match loop_state {
+        ['\\', '\\', .. source] => {
+          string.write_char('\\')
+          continue source
+        }
+        ['\\', char, .. source] if char == quote => {
+          string.write_char(char)
+          continue source
+        }
+        [char, .. source] if char == quote => return source
+        [char, .. source] => {
+          string.write_char(char)
+          continue source
+        }
+        [.. source] => raise SexpError::UnterminatedString(source)
       }
-      ['\\', char, .. source] if char == quote => {
-        string.write_char(char)
-        continue source
-      }
-      [char, .. source] if char == quote => return source
-      [char, .. source] => {
-        string.write_char(char)
-        continue source
-      }
-      [.. source] => raise SexpError::UnterminatedString(source)
     }
   }
 
   fn parse_symbol(source : StringView, symbol : StringBuilder) -> StringView {
-    loop source {
-      ['a'..<'z' | 'A'..<'Z' | '0'..<'9' | '_' as char, .. source] => {
-        symbol.write_char(char)
-        continue source
+    for loop_state = source {
+      break match loop_state {
+        ['a'..<'z' | 'A'..<'Z' | '0'..<'9' | '_' as char, .. source] => {
+          symbol.write_char(char)
+          continue source
+        }
+        [.. source] => return source
       }
-      [.. source] => return source
     }
   }
 
   fn parse_comment(source : StringView, comment : StringBuilder) -> StringView {
-    loop source {
-      ['\n', ..] as source => return source
-      [char, .. source] => {
-        comment.write_char(char)
-        continue source
+    for loop_state = source {
+      break match loop_state {
+        ['\n', ..] as source => return source
+        [char, .. source] => {
+          comment.write_char(char)
+          continue source
+        }
+        [.. source] => return source
       }
-      [.. source] => return source
     }
   }
 
-  loop source {
-    [' ' | '\t' | '\n' | '\r', .. source] => continue source
-    ['\'' | '"' as quote, .. source] => {
-      let string = StringBuilder::new()
-      let source = parse_string(source, string, quote)
-      sexp.push(Atom(String(string.to_string())))
-      continue source
-    }
-    ['.', .. source] => {
-      sexp.push(Atom(Anchor))
-      continue source
-    }
-    ['(', .. source] => {
-      let list = []
-      let sexp_list = Sexp::List(list, delimiter=Parenthesis, quantifier=One)
-      guard sexp_list is (List(_, ..) as sexp_list)
-      sexp.push(sexp_list)
-      match parse_list(source, list) {
-        [')', '+' | '?' | '*' as quantifier, .. source] => {
-          sexp_list.quantifier = Quantifier::from_char(quantifier)
-          continue source
-        }
-        [')', .. source] => continue source
-        [.. source] => raise SexpError::UnterminatedList(source)
+  for loop_state = source {
+    break match loop_state {
+      [' ' | '\t' | '\n' | '\r', .. source] => continue source
+      ['\'' | '"' as quote, .. source] => {
+        let string = StringBuilder()
+        let source = parse_string(source, string, quote)
+        sexp.push(Atom(String(string.to_string())))
+        continue source
       }
-    }
-    ['[', .. source] => {
-      let list = []
-      let sexp_list = Sexp::List(list, delimiter=Bracket, quantifier=One)
-      guard sexp_list is (List(_, ..) as sexp_list)
-      sexp.push(sexp_list)
-      match parse_list(source, list) {
-        [']', '+' | '?' | '*' as quantifier, .. source] => {
-          sexp_list.quantifier = Quantifier::from_char(quantifier)
-          continue source
-        }
-        [']', .. source] => continue source
-        [.. source] => raise SexpError::UnterminatedList(source)
+      ['.', .. source] => {
+        sexp.push(Atom(Anchor))
+        continue source
       }
-    }
-    ['{', .. source] => {
-      let list = []
-      let sexp_list = Sexp::List(list, delimiter=Brace, quantifier=One)
-      guard sexp_list is (List(_, ..) as sexp_list)
-      sexp.push(sexp_list)
-      match parse_list(source, list) {
-        ['}', '+' | '?' | '*' as quantifier, .. source] => {
-          sexp_list.quantifier = Quantifier::from_char(quantifier)
-          continue source
-        }
-        ['}', .. source] => continue source
-        [.. source] => raise SexpError::UnterminatedList(source)
-      }
-    }
-    ['#', .. source] => {
-      let command = StringBuilder::new()
-      match parse_symbol(source, command) {
-        ['?', .. source] => {
-          sexp.push(Atom(Predicate(command.to_string())))
-          continue source
-        }
-        ['!', .. source] => {
-          sexp.push(Atom(Directive(command.to_string())))
-          continue source
-        }
-        [':', ..] => raise SexpError::InvalidPairKey(command.to_string())
-        [.. source] => raise SexpError::InvalidCommand(source)
-      }
-    }
-    ['@', .. source] => {
-      let capture = StringBuilder::new()
-      match parse_symbol(source, capture) {
-        [':', .. source] => {
-          sexp.push(Atom(Narrow(capture.to_string())))
-          continue source
-        }
-        [.. source] => {
-          sexp.push(Atom(Capture(capture.to_string())))
-          continue source
+      ['(', .. source] => {
+        let list = []
+        let sexp_list = Sexp::List(list, delimiter=Parenthesis, quantifier=One)
+        guard sexp_list is (List(_, ..) as sexp_list)
+        sexp.push(sexp_list)
+        match parse_list(source, list) {
+          [')', '+' | '?' | '*' as quantifier, .. source] => {
+            sexp_list.quantifier = Quantifier::from_char(quantifier)
+            continue source
+          }
+          [')', .. source] => continue source
+          [.. source] => raise SexpError::UnterminatedList(source)
         }
       }
-    }
-    [';', .. source] => {
-      let comment = StringBuilder::new()
-      let source = parse_comment(source, comment)
-      sexp.push(Atom(Comment(comment.to_string())))
-      continue source
-    }
-    ['a'..<'z' | 'A'..<'Z' | '0'..<'9' | '_' as char, .. source] => {
-      let symbol = StringBuilder::new()
-      symbol.write_char(char)
-      match parse_symbol(source, symbol) {
-        [':', .. source] => {
-          sexp.push(Atom(Field(symbol.to_string())))
-          continue source
-        }
-        [.. source] => {
-          sexp.push(Atom(Symbol(symbol.to_string())))
-          continue source
+      ['[', .. source] => {
+        let list = []
+        let sexp_list = Sexp::List(list, delimiter=Bracket, quantifier=One)
+        guard sexp_list is (List(_, ..) as sexp_list)
+        sexp.push(sexp_list)
+        match parse_list(source, list) {
+          [']', '+' | '?' | '*' as quantifier, .. source] => {
+            sexp_list.quantifier = Quantifier::from_char(quantifier)
+            continue source
+          }
+          [']', .. source] => continue source
+          [.. source] => raise SexpError::UnterminatedList(source)
         }
       }
+      ['{', .. source] => {
+        let list = []
+        let sexp_list = Sexp::List(list, delimiter=Brace, quantifier=One)
+        guard sexp_list is (List(_, ..) as sexp_list)
+        sexp.push(sexp_list)
+        match parse_list(source, list) {
+          ['}', '+' | '?' | '*' as quantifier, .. source] => {
+            sexp_list.quantifier = Quantifier::from_char(quantifier)
+            continue source
+          }
+          ['}', .. source] => continue source
+          [.. source] => raise SexpError::UnterminatedList(source)
+        }
+      }
+      ['#', .. source] => {
+        let command = StringBuilder()
+        match parse_symbol(source, command) {
+          ['?', .. source] => {
+            sexp.push(Atom(Predicate(command.to_string())))
+            continue source
+          }
+          ['!', .. source] => {
+            sexp.push(Atom(Directive(command.to_string())))
+            continue source
+          }
+          [':', ..] => raise SexpError::InvalidPairKey(command.to_string())
+          [.. source] => raise SexpError::InvalidCommand(source)
+        }
+      }
+      ['@', .. source] => {
+        let capture = StringBuilder()
+        match parse_symbol(source, capture) {
+          [':', .. source] => {
+            sexp.push(Atom(Narrow(capture.to_string())))
+            continue source
+          }
+          [.. source] => {
+            sexp.push(Atom(Capture(capture.to_string())))
+            continue source
+          }
+        }
+      }
+      [';', .. source] => {
+        let comment = StringBuilder()
+        let source = parse_comment(source, comment)
+        sexp.push(Atom(Comment(comment.to_string())))
+        continue source
+      }
+      ['a'..<'z' | 'A'..<'Z' | '0'..<'9' | '_' as char, .. source] => {
+        let symbol = StringBuilder()
+        symbol.write_char(char)
+        match parse_symbol(source, symbol) {
+          [':', .. source] => {
+            sexp.push(Atom(Field(symbol.to_string())))
+            continue source
+          }
+          [.. source] => {
+            sexp.push(Atom(Symbol(symbol.to_string())))
+            continue source
+          }
+        }
+      }
+      [.. source] => return source
     }
-    [.. source] => return source
   }
 }
 
@@ -186,4 +195,9 @@ pub fn parse(source : StringView) -> Array[Sexp] raise SexpError {
     [_, ..] => raise SexpError::UnrecognizedCharacter(source)
     [] => return list
   }
+}
+
+///|
+pub impl Show for SexpError with fn output(self, logger) {
+  logger.write_string(@debug.to_string(self))
 }

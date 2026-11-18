@@ -58,14 +58,14 @@ pub fn Node::grammar_symbol(self : Node) -> Symbol {
 }
 
 ///|
-extern "js" fn ts_node_start_byte(node : Node) -> Int =
+extern "js" fn ts_node_start_byte(node : Node) -> Int32 =
   #|(node) => {
   #|  return node.startIndex;
   #|}
 
 ///|
 /// Get the node's start byte.
-pub fn Node::start_byte(self : Node) -> Int {
+pub fn Node::start_byte(self : Node) -> Int32 {
   return ts_node_start_byte(self)
 }
 
@@ -82,14 +82,14 @@ pub fn Node::start_point(self : Node) -> Point {
 }
 
 ///|
-extern "js" fn ts_node_end_byte(node : Node) -> Int =
+extern "js" fn ts_node_end_byte(node : Node) -> Int32 =
   #|(node) => {
   #|  return node.endIndex;
   #|}
 
 ///|
 /// Get the node's end byte.
-pub fn Node::end_byte(self : Node) -> Int {
+pub fn Node::end_byte(self : Node) -> Int32 {
   return ts_node_end_byte(self)
 }
 
@@ -106,7 +106,7 @@ pub fn Node::string(self : Node) -> StringView {
 }
 
 ///|
-pub impl Show for Node with output(self : Node, logger : &@builtin.Logger) -> Unit {
+pub impl Show for Node with fn output(self : Node, logger : &@builtin.Logger) -> Unit {
   try self.string() |> @sexp.parse() |> @sexp.print_to(logger) catch {
     _ => logger.write_string(self.string().to_string())
   }
@@ -279,27 +279,27 @@ pub fn Node::child_with_descendant(self : Node, descendant : Node) -> Node? {
 }
 
 ///|
-extern "js" fn ts_node_child(node : Node, index : UInt) -> Node =
+extern "js" fn ts_node_child(node : Node, index : UInt32) -> Node =
   #|(node, index) => {
   #|  return node.child(index);
   #|}
 
 ///|
-fn int_to_uint(value : Int) -> UInt {
+fn int_to_uint(value : Int32) -> UInt32 {
   guard value >= 0
   value.reinterpret_as_uint()
 }
 
 ///|
-fn uint_to_int(value : UInt) -> Int {
-  guard value <= @int.max_value.reinterpret_as_uint()
+fn uint_to_int(value : UInt32) -> Int32 {
+  guard value <= @int.MAX_VALUE.reinterpret_as_uint()
   value.reinterpret_as_int()
 }
 
 ///|
 /// Get the node's child at the given index, where zero represents the first
 /// child.
-pub fn Node::child(self : Node, index : Int) -> Node? {
+pub fn Node::child(self : Node, index : Int32) -> Node? {
   let index = int_to_uint(index)
   let child = ts_node_child(self, index)
   if ts_node_is_null(child) {
@@ -328,7 +328,7 @@ pub fn Node::children(self : Node) -> Iter[Node] {
 ///|
 extern "js" fn ts_node_field_name_for_child(
   node : Node,
-  child_index : UInt,
+  child_index : UInt32,
 ) -> String =
   #|(node, tree, child_index) => {
   #|  return node.fieldNameForChild(child_index);
@@ -339,7 +339,7 @@ extern "js" fn ts_node_field_name_for_child(
 /// the first child. Returns `None`, if no field is found.
 pub fn Node::field_name_for_child(
   self : Node,
-  child_index : Int,
+  child_index : Int32,
 ) -> StringView? {
   let child_index = int_to_uint(child_index)
   let field_name = Nullable::to_option(
@@ -355,7 +355,7 @@ pub fn Node::field_name_for_child(
 ///|
 extern "js" fn ts_node_field_name_for_named_child(
   node : Node,
-  child_index : UInt,
+  child_index : UInt32,
 ) -> String =
   #|(node, child_index) => {
   #|  return node.fieldNameForNamedChild(child_index);
@@ -366,7 +366,7 @@ extern "js" fn ts_node_field_name_for_named_child(
 /// represents the first named child. Returns `None`, if no field is found.
 pub fn Node::field_name_for_named_child(
   self : Node,
-  child_index : Int,
+  child_index : Int32,
 ) -> StringView? {
   let child_index = int_to_uint(child_index)
   let field_name = Nullable::to_option(
@@ -380,19 +380,19 @@ pub fn Node::field_name_for_named_child(
 }
 
 ///|
-extern "js" fn ts_node_child_count(node : Node) -> UInt =
+extern "js" fn ts_node_child_count(node : Node) -> UInt32 =
   #|(node) => {
   #|  return node.childCount;
   #|}
 
 ///|
 /// Get the node's number of children.
-pub fn Node::child_count(self : Node) -> Int {
+pub fn Node::child_count(self : Node) -> Int32 {
   uint_to_int(ts_node_child_count(self))
 }
 
 ///|
-extern "js" fn ts_node_named_child(node : Node, child_index : UInt) -> Node =
+extern "js" fn ts_node_named_child(node : Node, child_index : UInt32) -> Node =
   #|(node, tree, child_index) => {
   #|  return node.namedChild(child_index);
   #|}
@@ -401,7 +401,7 @@ extern "js" fn ts_node_named_child(node : Node, child_index : UInt) -> Node =
 /// Get the node's *named* child at the given index.
 ///
 /// See also `Node::is_named`.
-pub fn Node::named_child(self : Node, child_index : Int) -> Node? {
+pub fn Node::named_child(self : Node, child_index : Int32) -> Node? {
   let child_index = int_to_uint(child_index)
   let child = ts_node_named_child(self, child_index)
   if ts_node_is_null(child) {
@@ -412,7 +412,7 @@ pub fn Node::named_child(self : Node, child_index : Int) -> Node? {
 }
 
 ///|
-extern "js" fn ts_node_named_child_count(node : Node) -> UInt =
+extern "js" fn ts_node_named_child_count(node : Node) -> UInt32 =
   #|(node) => {
   #|  return node.namedChildCount;
   #|}
@@ -421,7 +421,7 @@ extern "js" fn ts_node_named_child_count(node : Node) -> UInt =
 /// Get the node's number of *named* children.
 ///
 /// See also `Node::is_named`.
-pub fn Node::named_child_count(self : Node) -> Int {
+pub fn Node::named_child_count(self : Node) -> Int32 {
   uint_to_int(ts_node_named_child_count(self))
 }
 
@@ -545,14 +545,14 @@ pub fn Node::prev_named_sibling(self : Node) -> Node? {
 }
 
 ///|
-extern "js" fn ts_node_first_child_for_byte(node : Node, byte : UInt) -> Node =
+extern "js" fn ts_node_first_child_for_byte(node : Node, byte : UInt32) -> Node =
   #|(node, byte) => {
   #|  return node.firstChildForIndex(byte);
   #|}
 
 ///|
 /// Get the node's first child that contains or starts after the given byte offset.
-pub fn Node::first_child_for_byte(self : Node, byte : Int) -> Node? {
+pub fn Node::first_child_for_byte(self : Node, byte : Int32) -> Node? {
   let byte = int_to_uint(byte)
   let child = ts_node_first_child_for_byte(self, byte)
   if ts_node_is_null(child) {
@@ -565,7 +565,7 @@ pub fn Node::first_child_for_byte(self : Node, byte : Int) -> Node? {
 ///|
 extern "js" fn ts_node_first_named_child_for_byte(
   node : Node,
-  byte : UInt,
+  byte : UInt32,
 ) -> Node =
   #|(node, byte) => {
   #|  return node.firstNamedChildForIndex(byte);
@@ -573,7 +573,7 @@ extern "js" fn ts_node_first_named_child_for_byte(
 
 ///|
 /// Get the node's first named child that contains or starts after the given byte offset.
-pub fn Node::first_named_child_for_byte(self : Node, byte : Int) -> Node? {
+pub fn Node::first_named_child_for_byte(self : Node, byte : Int32) -> Node? {
   let byte = int_to_uint(byte)
   let child = ts_node_first_named_child_for_byte(self, byte)
   if ts_node_is_null(child) {
@@ -584,22 +584,22 @@ pub fn Node::first_named_child_for_byte(self : Node, byte : Int) -> Node? {
 }
 
 ///|
-extern "js" fn ts_node_descendant_count(node : Node) -> Int =
+extern "js" fn ts_node_descendant_count(node : Node) -> Int32 =
   #|(node) => {
   #|  return node.descendantCount;
   #|}
 
 ///|
 /// Get the node's number of descendants, including one for the node itself.
-pub fn Node::descendant_count(self : Node) -> Int {
+pub fn Node::descendant_count(self : Node) -> Int32 {
   return ts_node_descendant_count(self)
 }
 
 ///|
 extern "js" fn ts_node_descendant_for_byte_range(
   node : Node,
-  start_byte : UInt,
-  end_byte : UInt,
+  start_byte : UInt32,
+  end_byte : UInt32,
 ) -> Node =
   #|(node, start_byte, end_byte) => {
   #|  return node.descendantForIndex(start_byte, end_byte);
@@ -609,8 +609,8 @@ extern "js" fn ts_node_descendant_for_byte_range(
 /// Get the smallest node within this node that spans the given range of bytes.
 pub fn Node::descendant_for_byte_range(
   self : Node,
-  start_byte : Int,
-  end_byte : Int,
+  start_byte : Int32,
+  end_byte : Int32,
 ) -> Node? {
   let start_byte = int_to_uint(start_byte)
   let end_byte = int_to_uint(end_byte)
@@ -653,8 +653,8 @@ pub fn Node::descendant_for_point_range(
 ///|
 extern "js" fn ts_node_named_descendant_for_byte_range(
   node : Node,
-  start_byte : UInt,
-  end_byte : UInt,
+  start_byte : UInt32,
+  end_byte : UInt32,
 ) -> Node =
   #|(node, start_byte, end_byte) => {
   #|  return node.namedDescendantForIndex(start_byte, end_byte);
@@ -665,8 +665,8 @@ extern "js" fn ts_node_named_descendant_for_byte_range(
 /// bytes.
 pub fn Node::named_descendant_for_byte_range(
   self : Node,
-  start_byte : Int,
-  end_byte : Int,
+  start_byte : Int32,
+  end_byte : Int32,
 ) -> Node? {
   let start_byte = int_to_uint(start_byte)
   let end_byte = int_to_uint(end_byte)
@@ -739,30 +739,30 @@ pub fn Node::eq(self : Node, other : Node) -> Bool {
 }
 
 ///|
-pub impl Eq for Node with op_equal(self, other) -> Bool {
+pub impl Eq for Node with fn op_equal(self, other) -> Bool {
   ts_node_eq(self, other)
 }
 
 ///|
-pub impl ToJson for Node with to_json(self : Node) -> Json {
+pub impl ToJson for Node with fn to_json(self : Node) -> Json {
   {
-    "node": self.string().to_json(),
-    "text": self.text().to_json(),
+    "node": @json.to_json(self.string()),
+    "text": @json.to_json(self.text()),
     "range": {
-      "start": self.start_point().to_json(),
-      "end": self.end_point().to_json(),
+      "start": @json.to_json(self.start_point()),
+      "end": @json.to_json(self.end_point()),
     },
   }
 }
 
 ///|
-extern "js" fn Node::id(self : Node) -> Int =
+extern "js" fn Node::id(self : Node) -> Int32 =
   #|(node) => {
   #|  return node.id;
   #|}
 
 ///|
-pub impl Hash for Node with hash_combine(self, hasher) {
+pub impl Hash for Node with fn hash_combine(self, hasher) {
   let id = Node::id(self)
   hasher.combine(id)
 }
@@ -803,4 +803,9 @@ pub fn Node::query(
   let query_cursor = QueryCursor::new()
   query_cursor.exec(query, self)
   return query_cursor
+}
+
+///|
+pub impl Debug for Node with fn to_repr(self) {
+  Repr::literal(Show::to_string(self))
 }

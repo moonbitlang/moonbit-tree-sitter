@@ -1,9 +1,10 @@
 ///|
+#derive(Debug, ToJson)
 struct Edit {
   name : StringView
   search : StringView
   replace : StringView
-} derive(Show, ToJson)
+}
 
 ///|
 fn parse_rules(source : Bytes) -> Array[Edit] raise {
@@ -56,8 +57,8 @@ fn parse_rules(source : Bytes) -> Array[Edit] raise {
     }
     edits.push(Edit::{
       name,
-      search: search.trim().to_string(),
-      replace: replace.trim().to_string(),
+      search: search.trim().to_owned(),
+      replace: replace.trim().to_owned(),
     })
   }
   return edits
@@ -146,4 +147,9 @@ test "parse_rules" {
       "replace": "for $binderDefinition in $rangeLower..<($rangeUpper) $forBody",
     },
   ])
+}
+
+///|
+pub impl Show for Edit with fn output(self, logger) {
+  logger.write_string(@debug.to_string(self))
 }

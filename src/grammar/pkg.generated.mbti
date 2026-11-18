@@ -1,0 +1,67 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "tonyfettes/tree_sitter/grammar"
+
+import {
+  "moonbitlang/core/debug",
+  "moonbitlang/core/json",
+}
+
+// Values
+
+// Errors
+#derive(@debug.Debug)
+type GrammarParseError
+pub impl Show for GrammarParseError
+
+// Types and methods
+#derive(@debug.Debug)
+pub struct Grammar {
+  schema : String
+  name : String
+  rules : Map[String, Rule]
+  extras : Array[Rule]
+  supertypes : Array[RuleName]
+  reserved : Map[String, Rule]
+  precedences : Array[Array[Rule]]
+  externals : Array[Rule]
+  inline : Array[RuleName]
+  conflicts : Array[Array[RuleName]]
+  word : RuleName?
+}
+pub fn Grammar::from_json(@json.Json) -> Self raise GrammarParseError
+pub impl Show for Grammar
+pub impl @json.FromJson for Grammar
+pub impl @json.ToJson for Grammar
+
+#derive(Eq, Hash)
+type PrecType
+pub impl @debug.Debug for PrecType
+
+#derive(Eq, Hash, @debug.Debug)
+type PrecValue
+pub impl Show for PrecValue
+
+#derive(Eq, Hash, @debug.Debug)
+pub enum Rule {
+  Alias(named~ : Bool, String, Rule)
+  Blank
+  Symbol(String)
+  String(String)
+  Repeat(Rule)
+  Repeat1(Rule)
+  Choice(Array[Rule])
+  Seq(Array[Rule])
+  Field(name~ : String, Rule)
+  Token(immediate~ : Bool, Rule)
+  Prec(prec~ : PrecType, value~ : PrecValue, Rule)
+  Pattern(String)
+}
+pub impl Show for Rule
+
+#derive(@debug.Debug)
+type RuleName
+pub impl Show for RuleName
+
+// Type aliases
+
+// Traits

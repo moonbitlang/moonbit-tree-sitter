@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import re
 import shutil
 from pathlib import Path
@@ -17,7 +19,7 @@ def get_pkg_file(path: Path) -> Path | None:
 def collect_package(path: Path) -> list[Path]:
     if path.name == ".mooncakes":
         return []
-    if (path / "moon.mod.json").exists():
+    if (path / "moon.mod").exists():
         return []
     if get_pkg_file(path) is not None:
         pkgs = [path]
@@ -144,25 +146,15 @@ def prepare_main():
         shutil.rmtree("publish")
 
     publish_path.mkdir()
-    moon_mod_json = json.loads(Path("moon.mod.json").read_text())
-    clean_deps = {}
-    for name, spec in moon_mod_json.get("deps", {}).items():
-        if (
-            name.startswith("tonyfettes/tree_sitter_")
-            and name != "tonyfettes/tree_sitter_language"
-        ):
-            continue
-        clean_deps[name] = spec
-    moon_mod_json["deps"] = clean_deps
-    (publish_path / "moon.mod.json").write_text(
-        json.dumps(
-            moon_mod_json,
-            indent=2,
-            ensure_ascii=False,
-        )
-        + "\n",
-        encoding="utf-8",
+    manifest = Path("moon.mod").read_text(encoding="utf-8")
+    # Grammar modules are used only by tests; retain the shared language type.
+    manifest = re.sub(
+        r'^[ \t]*"tonyfettes/tree_sitter_(?!language@)[^"\n]+",?[ \t]*\n',
+        "",
+        manifest,
+        flags=re.MULTILINE,
     )
+    (publish_path / "moon.mod").write_text(manifest, encoding="utf-8")
     shutil.copy("README.md", publish_path / "README.md")
     shutil.copy("LICENSE", publish_path / "LICENSE")
     copy_source(Path("src"), publish_path)
@@ -199,7 +191,7 @@ def publish_languages():
     for lang_dir in sorted(languages_path.iterdir()):
         if not lang_dir.is_dir():
             continue
-        if not (lang_dir / "moon.mod.json").exists():
+        if not (lang_dir / "moon.mod").exists():
             continue
         print(f"Publishing {lang_dir.name}")
         try:

@@ -3,12 +3,12 @@ type Tree
 
 ///|
 priv trait Nullable {
-  is_null(Self) -> Bool
-  to_option(Self) -> Self? = _
+  fn is_null(Self) -> Bool
+  fn to_option(Self) -> Self? = _
 }
 
 ///|
-impl Nullable with to_option(self : Self) -> Self? {
+impl Nullable with fn to_option(self : Self) -> Self? {
   if self.is_null() {
     return None
   }
@@ -28,7 +28,7 @@ extern "js" fn ts_tree_is_null(tree : Tree) -> Bool =
   #|}
 
 ///|
-impl Nullable for Tree with is_null(self : Tree) -> Bool {
+impl Nullable for Tree with fn is_null(self : Tree) -> Bool {
   ts_tree_is_null(self)
 }
 
@@ -62,7 +62,7 @@ pub fn Tree::root_node(self : Tree) -> Node {
 ///|
 extern "js" fn ts_tree_root_node_with_offset(
   tree : Tree,
-  offset_bytes : UInt,
+  offset_bytes : UInt32,
   offset_extent : Point,
 ) -> Node =
   #|(tree, offsetBytes, offsetExtent) => {
@@ -74,7 +74,7 @@ extern "js" fn ts_tree_root_node_with_offset(
 /// shifted forward by the given offset.
 pub fn Tree::root_node_with_offset(
   self : Tree,
-  offset_bytes : Int,
+  offset_bytes : Int32,
   offset_extent : Point,
 ) -> Node {
   ts_tree_root_node_with_offset(self, int_to_uint(offset_bytes), offset_extent)

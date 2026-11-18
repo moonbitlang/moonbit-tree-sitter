@@ -76,10 +76,10 @@ test "moonbit" {
       .node()
     let start_byte = comment_node.start_byte()
     let end_byte = comment_node.end_byte()
-    let comment = source.view(start_offset=start_byte, end_offset=end_byte)
+    let comment = source.clamped_view(start=start_byte, end=end_byte)
     match comment {
       [.. "/// ", .. comment_content] =>
-        comment_document.push(comment_content.to_string())
+        comment_document.push(comment_content.to_owned())
       [.. "///"] => comment_document.push("")
       _ => continue
     }
@@ -143,7 +143,7 @@ test "markdown" {
       continue
     }
   }
-  guard not(moonbit_ranges.is_empty())
+  guard !moonbit_ranges.is_empty()
   parser.set_language(moonbit)
   parser.set_included_ranges(moonbit_ranges) |> ignore()
 }
@@ -152,7 +152,7 @@ test "markdown" {
 struct UTF32BE {}
 
 ///|
-impl @tree_sitter.DecodeFunction for UTF32BE with decode(bytes : BytesView) -> @tree_sitter.DecodeResult? {
+impl @tree_sitter.DecodeFunction for UTF32BE with fn decode(bytes : BytesView) -> @tree_sitter.DecodeResult? {
   match bytes {
     [u32be(code_point), .. _bytes] =>
       match code_point.reinterpret_as_int().to_char() {
@@ -172,14 +172,16 @@ test "custom-encoding" {
     #|  "name": "John Doe",
     #|  "age": 43
     #|}
-  let source_buffer = @buffer.new()
-  loop source[:] {
-    [char, .. source] => {
-      let char = char.to_int()
-      source_buffer.write_int_be(char)
-      continue source
+  let source_buffer = Buffer()
+  for loop_state = source[:] {
+    break match loop_state {
+      [char, .. source] => {
+        let char = char.to_int()
+        source_buffer.write_int_be(char)
+        continue source
+      }
+      _ => break
     }
-    _ => break
   }
   let source_bytes = source_buffer.contents()
   let input = @tree_sitter.Input::new(
@@ -188,7 +190,7 @@ test "custom-encoding" {
       let end = @cmp.minimum(offset + 4, source_bytes.length())
       return source_bytes[start:end]
     },
-    UTF32BE::{  },
+    UTF32BE::{ },
   )
   let tree = parser.parse(input)
   let root_node = tree.root_node()

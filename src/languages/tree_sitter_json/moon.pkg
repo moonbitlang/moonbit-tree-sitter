@@ -2,8 +2,9 @@ import {
   "tonyfettes/tree_sitter_language",
 }
 
+supported_targets = "+native"
+
 options(
   native_stub: [ "parser.c" ],
-  "supported-targets": "+native",
   targets: { "binding.mbt": [ "native" ] },
 )

@@ -1,11 +1,11 @@
 ///|
-struct InputEdit(FixedArray[UInt])
+struct InputEdit(FixedArray[UInt32])
 
 ///|
 extern "js" fn ts_input_edit_new(
-  start_byte : UInt,
-  old_end_byte : UInt,
-  new_end_byte : UInt,
+  start_byte : UInt32,
+  old_end_byte : UInt32,
+  new_end_byte : UInt32,
   start_point : Point,
   old_end_point : Point,
   new_end_point : Point,
@@ -23,9 +23,9 @@ extern "js" fn ts_input_edit_new(
 
 ///|
 pub fn InputEdit::new(
-  start_byte~ : Int,
-  old_end_byte~ : Int,
-  new_end_byte~ : Int,
+  start_byte~ : Int32,
+  old_end_byte~ : Int32,
+  new_end_byte~ : Int32,
   start_point~ : Point,
   old_end_point~ : Point,
   new_end_point~ : Point,

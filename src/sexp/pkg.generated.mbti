@@ -1,0 +1,78 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "tonyfettes/tree_sitter/sexp"
+
+import {
+  "moonbitlang/core/debug",
+  "moonbitlang/core/json",
+}
+
+// Values
+pub fn parse(StringView) -> Array[Sexp] raise SexpError
+
+pub fn print(Array[Sexp]) -> String
+
+pub fn print_to(ArrayView[Sexp], &Logger, indent? : Int32) -> Unit
+
+// Errors
+#derive(@debug.Debug)
+pub suberror SexpError {
+  UnrecognizedCharacter(StringView)
+  UnterminatedString(StringView)
+  UnterminatedList(StringView)
+  ExtraContent(ArrayView[Sexp])
+  InvalidPairKey(StringView)
+  InvalidQuantifier(Char)
+  InvalidCommand(StringView)
+}
+pub impl Show for SexpError
+
+// Types and methods
+#derive(Eq)
+pub enum Atom {
+  Field(String)
+  Symbol(String)
+  String(String)
+  Narrow(String)
+  Anchor
+  Capture(String)
+  Comment(String)
+  Predicate(String)
+  Directive(String)
+}
+pub impl Show for Atom
+pub impl @debug.Debug for Atom
+
+#derive(Eq, @debug.Debug)
+pub enum Delimiter {
+  Bracket
+  Parenthesis
+  Brace
+}
+pub impl Show for Delimiter
+
+#derive(Eq)
+pub enum Quantifier {
+  ZeroOrOne
+  ZeroOrMore
+  One
+  OneOrMore
+}
+pub fn Quantifier::from_char(Char) -> Self raise SexpError
+pub impl Show for Quantifier
+pub impl @debug.Debug for Quantifier
+
+#derive(Eq)
+pub enum Sexp {
+  Atom(Atom)
+  List(Array[Sexp], delimiter~ : Delimiter, mut quantifier~ : Quantifier)
+}
+pub fn Sexp::list(Array[Self], delimiter? : Delimiter, quantifier? : Quantifier) -> Self
+pub fn Sexp::parse(StringView) -> Self raise SexpError
+pub fn Sexp::print_to(Self, &Logger, indent? : Int32) -> Unit
+pub impl Show for Sexp
+pub impl @debug.Debug for Sexp
+pub impl @json.ToJson for Sexp
+
+// Type aliases
+
+// Traits

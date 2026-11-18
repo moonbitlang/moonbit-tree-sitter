@@ -1,0 +1,17 @@
+name = "tonyfettes/tree_sitter_language"
+
+version = "0.1.4"
+
+readme = "README.md"
+
+repository = "https://github.com/moonbitlang/moonbit-tree-sitter"
+
+license = "Apache-2.0"
+
+keywords = [ "tree-sitter", "parser", "language" ]
+
+description = "Tree-sitter language type for MoonBit grammar bindings"
+
+supported_targets = "native"
+
+preferred_target = "native"

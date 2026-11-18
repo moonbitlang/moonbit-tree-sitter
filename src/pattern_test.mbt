@@ -1,5 +1,15 @@
 ///|
-struct Range(Int, Int) derive(Eq, Hash, ToJson)
+priv struct Context {
+  replaced : StringBuilder
+  brackets : Array[Int32]
+  mut start : Int32?
+  mut end : Int32?
+  mut variable : (Int32, StringBuilder)?
+}
+
+///|
+#derive(Eq, Hash, ToJson)
+struct Range(Int32, Int32)
 
 ///|
 struct Environment {
@@ -27,8 +37,8 @@ struct Query {
 
 ///|
 suberror PatternError {
-  NestedPattern(Int)
-  MetaVarOutOfPattern(Int)
+  NestedPattern(Int32)
+  MetaVarOutOfPattern(Int32)
   UnterminatedPattern
 }
 
@@ -38,93 +48,88 @@ fn pattern_query(
   env : Environment,
   pattern : StringView,
 ) -> Query raise {
-  struct Context {
-    replaced : StringBuilder
-    brackets : Array[Int]
-    mut start : Int?
-    mut end : Int?
-    mut variable : (Int, StringBuilder)?
-  }
   let context = Context::{
-    replaced: StringBuilder::new(),
+    replaced: StringBuilder(),
     brackets: [],
     start: None,
     end: None,
     variable: None,
   }
-  loop (0, pattern) {
-    (offset, ['$', '[', .. pattern]) => {
-      if context.variable is Some(_) {
-        raise MetaVarOutOfPattern(offset)
-      }
-      if context.start is Some(_) {
-        raise NestedPattern(offset)
-      }
-      context.replaced.write_string("  ")
-      context.start = Some(offset)
-      continue (offset + 2, pattern)
-    }
-    (offset, ['[', .. pattern]) => {
-      context.replaced.write_char('[')
-      if context.start is Some(_) {
-        context.brackets.push(offset)
-      }
-      continue (offset + 1, pattern)
-    }
-    (offset, [']', .. pattern]) =>
-      match context.start {
-        None => {
-          context.replaced.write_char(']')
-          continue (offset + 1, pattern)
+  for offset = 0, pattern = pattern {
+    break match (offset, pattern) {
+      (offset, ['$', '[', .. pattern]) => {
+        if context.variable is Some(_) {
+          raise MetaVarOutOfPattern(offset)
         }
-        Some(_) =>
-          match context.brackets.pop() {
-            None => {
-              context.end = Some(offset)
-              context.replaced.write_char(' ')
-              continue (offset + 1, pattern)
-            }
-            Some(_) => {
-              context.replaced.write_char(']')
-              continue (offset + 1, pattern)
-            }
+        if context.start is Some(_) {
+          raise NestedPattern(offset)
+        }
+        context.replaced.write_string("  ")
+        context.start = Some(offset)
+        continue offset + 2, pattern
+      }
+      (offset, ['[', .. pattern]) => {
+        context.replaced.write_char('[')
+        if context.start is Some(_) {
+          context.brackets.push(offset)
+        }
+        continue offset + 1, pattern
+      }
+      (offset, [']', .. pattern]) =>
+        match context.start {
+          None => {
+            context.replaced.write_char(']')
+            continue offset + 1, pattern
           }
-      }
-    (offset, ['$', .. pattern]) => {
-      if context.start is None {
-        raise MetaVarOutOfPattern(offset)
-      }
-      context.replaced.write_char('_')
-      match context.variable {
-        None => context.variable = Some((offset, StringBuilder::new()))
-        Some((start, name)) => {
-          env.add_var(name.to_string(), Range(start, offset))
-          context.variable = Some((offset, StringBuilder::new()))
+          Some(_) =>
+            match context.brackets.pop() {
+              None => {
+                context.end = Some(offset)
+                context.replaced.write_char(' ')
+                continue offset + 1, pattern
+              }
+              Some(_) => {
+                context.replaced.write_char(']')
+                continue offset + 1, pattern
+              }
+            }
         }
-      }
-      continue (offset + 1, pattern)
-    }
-    (offset, [char, .. pattern]) =>
-      match context.variable {
-        None => {
-          context.replaced.write_char(char)
-          continue (offset + 1, pattern)
+      (offset, ['$', .. pattern]) => {
+        if context.start is None {
+          raise MetaVarOutOfPattern(offset)
         }
-        Some((start, name)) =>
-          if char.is_ascii_alphabetic() {
-            context.replaced.write_char(' ')
-            name.write_char(char)
-            continue (offset + 1, pattern)
-          } else {
-            context.replaced.write_char(char)
+        context.replaced.write_char('_')
+        match context.variable {
+          None => context.variable = Some((offset, StringBuilder()))
+          Some((start, name)) => {
             env.add_var(name.to_string(), Range(start, offset))
-            continue (offset + 1, pattern)
+            context.variable = Some((offset, StringBuilder()))
           }
+        }
+        continue offset + 1, pattern
       }
-    (offset, []) =>
-      if context.variable is Some((start, name)) {
-        env.add_var(name.to_string(), Range(start, offset))
-      }
+      (offset, [char, .. pattern]) =>
+        match context.variable {
+          None => {
+            context.replaced.write_char(char)
+            continue offset + 1, pattern
+          }
+          Some((start, name)) =>
+            if char.is_ascii_alphabetic() {
+              context.replaced.write_char(' ')
+              name.write_char(char)
+              continue offset + 1, pattern
+            } else {
+              context.replaced.write_char(char)
+              env.add_var(name.to_string(), Range(start, offset))
+              continue offset + 1, pattern
+            }
+        }
+      (offset, []) =>
+        if context.variable is Some((start, name)) {
+          env.add_var(name.to_string(), Range(start, offset))
+        }
+    }
   }
   guard context.start is Some(pattern_start) && context.end is Some(pattern_end) else {
     raise UnterminatedPattern
@@ -156,10 +161,10 @@ fn pattern_query(
         }
         [child_pattern] => return child_pattern
         child_patterns => {
-          let pattern = StringBuilder::new()
+          let pattern = StringBuilder()
           pattern.write_char('(')
           pattern.write_string(
-            child_patterns.map(fn(x) { x.to_string() }).join(" "),
+            child_patterns.map(fn(x) { x.to_owned() }).join(" "),
           )
           pattern.write_char(')')
           return pattern.to_string()
@@ -172,7 +177,7 @@ fn pattern_query(
       }
     }
     let stripping = Some(false)
-    if not(node.is_named()) {
+    if !node.is_named() {
       if node.type_() == "_" {
         for range, name in env.ranges {
           if node.start_byte() == range.0 {
@@ -183,7 +188,7 @@ fn pattern_query(
                 break
               }
             }
-            if not(exists) {
+            if !exists {
               capture_name.push(name)
             }
             return "(_) @\{name}"
@@ -199,14 +204,14 @@ fn pattern_query(
       }
       child_patterns.push(generate_pattern(child, stripping))
     }
-    let child_patterns = child_patterns.map(fn(x) { x.to_string() }).join(" ")
+    let child_patterns = child_patterns.map(fn(x) { x.to_owned() }).join(" ")
     return "(\{node.type_()} \{child_patterns})"
   }
 
   let pattern = generate_pattern(context_root, None)
-  let pattern = pattern.to_string() + " @pattern"
+  let pattern = pattern.to_owned() + " @pattern"
   capture_name.push("pattern")
-  { source: pattern }
+  { source: pattern, }
 }
 
 ///|
@@ -217,7 +222,7 @@ fn node_equal(node : @tree_sitter.Node, other : @tree_sitter.Node) -> Bool {
   for i in 0..<node.child_count() {
     match (node.child(i), other.child(i)) {
       (Some(self_child), Some(other_child)) =>
-        if not(node_equal(self_child, other_child)) {
+        if !node_equal(self_child, other_child) {
           return false
         }
       _ => return false
@@ -228,7 +233,7 @@ fn node_equal(node : @tree_sitter.Node, other : @tree_sitter.Node) -> Bool {
 
 ///|
 test "pattern" {
-  let env = Environment::{ vars: Map::new(), ranges: Map::new() }
+  let env = Environment::{ vars: Map([]), ranges: Map([]), }
   let pattern =
     #|fn main {
     #|  $[ $A == $A ]
@@ -262,19 +267,19 @@ test "pattern" {
     let mut satisfied = true
     for _, nodes in meta_var_nodes {
       for i in 1..<nodes.length() {
-        if not(node_equal(nodes[i], nodes[0])) {
+        if !node_equal(nodes[i], nodes[0]) {
           satisfied = false
           break
         }
       }
-      if not(satisfied) {
+      if !satisfied {
         break
       }
     }
     if satisfied {
       let pattern_node = meta_var_nodes.get("pattern").unwrap()[0]
       let (start, end) = (pattern_node.start_byte(), pattern_node.end_byte())
-      let text = source.view(start_offset=start, end_offset=end)
+      let text = source.clamped_view(start~, end~)
       ranges.push((text, start, end))
     }
   }

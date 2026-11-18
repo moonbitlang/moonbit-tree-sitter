@@ -2,17 +2,18 @@
 type Query
 
 ///|
+#derive(Debug)
 suberror QueryError {
-  Syntax(UInt)
-  NodeType(UInt)
-  Field(UInt)
-  Capture(UInt)
-  Structure(UInt)
-  Language(UInt)
-} derive(Show)
+  Syntax(UInt32)
+  NodeType(UInt32)
+  Field(UInt32)
+  Capture(UInt32)
+  Structure(UInt32)
+  Language(UInt32)
+}
 
 ///|
-pub fn QueryError::offset(self : QueryError) -> UInt {
+pub fn QueryError::offset(self : QueryError) -> UInt32 {
   match self {
     QueryError::Syntax(offset) => offset
     QueryError::NodeType(offset) => offset
@@ -24,7 +25,7 @@ pub fn QueryError::offset(self : QueryError) -> UInt {
 }
 
 ///|
-fn QueryError::from(offset : UInt, type_ : UInt) -> QueryError {
+fn QueryError::from(offset : UInt32, type_ : UInt32) -> QueryError {
   match type_ {
     1 => QueryError::Syntax(offset)
     2 => QueryError::NodeType(offset)
@@ -41,7 +42,7 @@ extern "js" fn ts_query_new(
   ts : TS,
   language : Language,
   source : String,
-  error : FixedArray[UInt],
+  error : FixedArray[UInt32],
 ) -> Query =
   #|(ts, language, source, error) => {
   #|  try {
@@ -76,46 +77,46 @@ pub fn Query::new(
 }
 
 ///|
-extern "js" fn ts_query_pattern_count(query : Query) -> UInt =
+extern "js" fn ts_query_pattern_count(query : Query) -> UInt32 =
   #|() => {
   #|  return query.patternCount;
   #|}
 
 ///|
 /// Get the number of patterns in the query.
-pub fn Query::pattern_count(self : Query) -> Int {
+pub fn Query::pattern_count(self : Query) -> Int32 {
   self |> ts_query_pattern_count() |> uint_to_int()
 }
 
 ///|
-extern "js" fn ts_query_capture_count(query : Query) -> UInt =
+extern "js" fn ts_query_capture_count(query : Query) -> UInt32 =
   #|(query) => {
   #|  return query.captureCount;
   #|}
 
 ///|
 /// Get the number of captures in the query.
-pub fn Query::capture_count(self : Query) -> Int {
+pub fn Query::capture_count(self : Query) -> Int32 {
   self |> ts_query_capture_count() |> uint_to_int()
 }
 
 ///|
-extern "js" fn ts_query_string_count(query : Query) -> UInt =
+extern "js" fn ts_query_string_count(query : Query) -> UInt32 =
   #|(query) => {
   #|  return query.stringCount;
   #|}
 
 ///|
 /// Get the number of string literals in the query.
-pub fn Query::string_count(self : Query) -> Int {
+pub fn Query::string_count(self : Query) -> Int32 {
   self |> ts_query_string_count() |> uint_to_int()
 }
 
 ///|
 extern "js" fn ts_query_start_byte_for_pattern(
   query : Query,
-  pattern_index : UInt,
-) -> UInt =
+  pattern_index : UInt32,
+) -> UInt32 =
   #|(query, patternIndex) => {
   #|  return query.startIndexForPattern(patternIndex);
   #|}
@@ -125,7 +126,10 @@ extern "js" fn ts_query_start_byte_for_pattern(
 ///
 /// This can be useful when combining queries by concatenating their source
 /// code strings.
-pub fn Query::start_byte_for_pattern(self : Query, pattern_index : Int) -> Int {
+pub fn Query::start_byte_for_pattern(
+  self : Query,
+  pattern_index : Int32,
+) -> Int32 {
   let pattern_index = int_to_uint(pattern_index)
   ts_query_start_byte_for_pattern(self, pattern_index) |> uint_to_int()
 }
@@ -133,8 +137,8 @@ pub fn Query::start_byte_for_pattern(self : Query, pattern_index : Int) -> Int {
 ///|
 extern "js" fn ts_query_end_byte_for_pattern(
   query : Query,
-  pattern_index : UInt,
-) -> UInt =
+  pattern_index : UInt32,
+) -> UInt32 =
   #|(patternIndex) => {
   #|  return self.endIndexForPattern(patternIndex);
   #|}
@@ -144,7 +148,10 @@ extern "js" fn ts_query_end_byte_for_pattern(
 ///
 /// This can be useful when combining queries by concatenating their source
 /// code strings.
-pub fn Query::end_byte_for_pattern(self : Query, pattern_index : Int) -> Int {
+pub fn Query::end_byte_for_pattern(
+  self : Query,
+  pattern_index : Int32,
+) -> Int32 {
   let pattern_index = int_to_uint(pattern_index)
   ts_query_end_byte_for_pattern(self, pattern_index) |> uint_to_int()
 }
@@ -194,7 +201,7 @@ pub enum QueryPredicateStep {
 }
 
 ///|
-pub impl Show for QueryPredicateStep with output(
+pub impl Show for QueryPredicateStep with fn output(
   self,
   logger : &@builtin.Logger,
 ) -> Unit {
@@ -205,8 +212,8 @@ pub impl Show for QueryPredicateStep with output(
 }
 
 ///|
-pub impl ToJson for QueryPredicateStep with to_json(self) -> Json {
-  self.to_string().to_json()
+pub impl ToJson for QueryPredicateStep with fn to_json(self) -> Json {
+  @json.to_json(Show::to_string(self))
 }
 
 ///|
@@ -229,7 +236,7 @@ extern "js" fn TSQueryPredicate::operands(
 ///|
 extern "js" fn ts_query_predicates_for_pattern(
   query : Query,
-  pattern_index : Int,
+  pattern_index : Int32,
 ) -> Array[TSQueryPredicate] =
   #|(query, patternIndex) => {
   #|  return query.predicates[patternIndex];
@@ -241,7 +248,7 @@ type QueryPredicate = Array[QueryPredicateStep]
 ///|
 pub fn Query::predicates_for_pattern(
   self : Query,
-  pattern_index : Int,
+  pattern_index : Int32,
 ) -> Array[QueryPredicate] {
   let ts_predicates = ts_query_predicates_for_pattern(self, pattern_index)
   let predicates = []
@@ -267,7 +274,7 @@ pub fn Query::predicates_for_pattern(
 ///|
 extern "js" fn ts_query_is_pattern_rooted(
   query : Query,
-  pattern_index : UInt,
+  pattern_index : UInt32,
 ) -> Bool =
   #|(query, patternIndex) => {
   #|  return query.isPatternRooted(patternIndex);
@@ -275,14 +282,14 @@ extern "js" fn ts_query_is_pattern_rooted(
 
 ///|
 /// Check if the given pattern in the query has a single root node.
-pub fn Query::is_pattern_rooted(self : Query, pattern_index : Int) -> Bool {
+pub fn Query::is_pattern_rooted(self : Query, pattern_index : Int32) -> Bool {
   ts_query_is_pattern_rooted(self, int_to_uint(pattern_index))
 }
 
 ///|
 extern "js" fn ts_query_is_pattern_non_local(
   query : Query,
-  pattern_index : UInt,
+  pattern_index : UInt32,
 ) -> Bool =
   #|(query, patternIndex) => {
   #|  return query.isPatternNonLocal(patternIndex);
@@ -295,14 +302,14 @@ extern "js" fn ts_query_is_pattern_non_local(
 /// repeating sequence of nodes, as specified by the grammar. Non-local
 /// patterns disable certain optimizations that would otherwise be possible
 /// when executing a query on a specific range of a syntax tree.
-pub fn Query::is_pattern_non_local(self : Query, pattern_index : Int) -> Bool {
+pub fn Query::is_pattern_non_local(self : Query, pattern_index : Int32) -> Bool {
   ts_query_is_pattern_non_local(self, int_to_uint(pattern_index))
 }
 
 ///|
 extern "js" fn ts_query_is_pattern_guaranteed_at_step(
   query : Query,
-  byte_offset : UInt,
+  byte_offset : UInt32,
 ) -> Bool =
   #|(query, byteIndex) => {
   #|  return query.isPatternGuaranteedAtStep(byteIndex);
@@ -313,7 +320,7 @@ extern "js" fn ts_query_is_pattern_guaranteed_at_step(
 /// The step is specified by its byte offset in the query's source code.
 pub fn Query::is_pattern_guaranteed_at_step(
   self : Query,
-  byte_offset : Int,
+  byte_offset : Int32,
 ) -> Bool {
   ts_query_is_pattern_guaranteed_at_step(self, int_to_uint(byte_offset))
 }
@@ -321,7 +328,7 @@ pub fn Query::is_pattern_guaranteed_at_step(
 ///|
 extern "js" fn ts_query_capture_name_for_id(
   query : Query,
-  capture_id : UInt,
+  capture_id : UInt32,
 ) -> String =
   #|(query, captureId) => {
   #|  return query.captureNames[captureId];
@@ -330,22 +337,26 @@ extern "js" fn ts_query_capture_name_for_id(
 ///|
 /// Get the name of one of the query's captures. Each capture is associated with a
 /// numeric id based on the order that it appeared in the query's source.
-pub fn Query::capture_name_for_id(self : Query, capture_id : Int) -> StringView {
+pub fn Query::capture_name_for_id(
+  self : Query,
+  capture_id : Int32,
+) -> StringView {
   let capture_id = int_to_uint(capture_id)
   ts_query_capture_name_for_id(self, capture_id)
 }
 
 ///|
+#derive(Debug)
 pub enum Quantifier {
   Zero
   ZeroOrOne
   ZeroOrMore
   One
   OneOrMore
-} derive(Show)
+}
 
 ///|
-fn Quantifier::of_uint(value : UInt) -> Quantifier {
+fn Quantifier::of_uint(value : UInt32) -> Quantifier {
   match value {
     0 => Quantifier::Zero
     1 => Quantifier::ZeroOrOne
@@ -359,9 +370,9 @@ fn Quantifier::of_uint(value : UInt) -> Quantifier {
 ///|
 extern "js" fn ts_query_capture_quantifier_for_id(
   query : Query,
-  pattern_index : UInt,
-  capture_index : UInt,
-) -> UInt =
+  pattern_index : UInt32,
+  capture_index : UInt32,
+) -> UInt32 =
   #|(query, patternIndex, captureIndex) => {
   #|  return query.captureQuantifiers[patternIndex][captureIndex];
   #|}
@@ -371,8 +382,8 @@ extern "js" fn ts_query_capture_quantifier_for_id(
 /// associated with a numeric id based on the order that it appeared in the query's source.
 pub fn Query::capture_quantifier_for_id(
   self : Query,
-  pattern_index : Int,
-  capture_index : Int,
+  pattern_index : Int32,
+  capture_index : Int32,
 ) -> Quantifier {
   let pattern_index = int_to_uint(pattern_index)
   let capture_index = int_to_uint(capture_index)
@@ -398,7 +409,7 @@ pub fn Query::disable_capture(self : Query, name : StringView) -> Unit {
 }
 
 ///|
-extern "js" fn ts_query_disable_pattern(query : Query, pattern_index : UInt) =
+extern "js" fn ts_query_disable_pattern(query : Query, pattern_index : UInt32) =
   #|(query, patternIndex) => {
   #|  return query.disablePattern(patternIndex);
   #|}
@@ -408,7 +419,7 @@ extern "js" fn ts_query_disable_pattern(query : Query, pattern_index : UInt) =
 ///
 /// This prevents the pattern from matching and removes most of the overhead
 /// associated with the pattern. Currently, there is no way to undo this.
-pub fn Query::disable_pattern(self : Query, pattern_index : Int) -> Unit {
+pub fn Query::disable_pattern(self : Query, pattern_index : Int32) -> Unit {
   ts_query_disable_pattern(self, int_to_uint(pattern_index))
 }
 
@@ -426,7 +437,7 @@ pub fn Query::matches(self : Query, node : Node) -> Array[QueryMatch] {
   let ts_matches = ts_query_matches(self, node)
   let matches = []
   for ts_match in ts_matches {
-    let query_match = QueryMatch::{ query: self, query_match: ts_match }
+    let query_match = QueryMatch::{ query: self, query_match: ts_match, }
     matches.push(query_match)
   }
   matches
@@ -440,3 +451,18 @@ pub extern "js" fn Query::captures(
   #|(query, node) => {
   #|  return query.captures(node);
   #|}
+
+///|
+pub impl Debug for QueryPredicateStep with fn to_repr(self) {
+  Repr::literal(Show::to_string(self))
+}
+
+///|
+pub impl Show for QueryError with fn output(self, logger) {
+  logger.write_string(@debug.to_string(self))
+}
+
+///|
+pub impl Show for Quantifier with fn output(self, logger) {
+  logger.write_string(@debug.to_string(self))
+}

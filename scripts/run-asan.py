@@ -2,21 +2,23 @@
 """Run MoonBit native tests with AddressSanitizer.
 
 Snapshots each specified package file (`moon.pkg` DSL or `moon.pkg.json`),
-patches `link.native` with ASan flags, disables mimalloc, runs `moon test`,
-and restores everything in a finally block.
+patches `link.native` with ASan flags, runs `moon test` with the system
+allocator, and restores the package files in a finally block.
 
 The script uses two mechanisms:
   - Package config patching: adds ASan flags to cc-flags and stub-cc-flags
     (preserving existing flags like -I, -D). stub-cc-flags is patched on all
     packages; cc-flags is patched only on entry packages (is-main or test).
-  - mimalloc disable: replaces libmoonbitrun.o with a dummy empty object so
-    ASan can intercept all memory allocations
+  - Allocator selection: MOONBIT_ALLOCATOR=system lets ASan intercept
+    allocations without modifying the installed toolchain.
 
 On macOS, MOON_CC/MOON_AR env vars are set to use Homebrew LLVM (Apple Clang
 lacks LeakSanitizer). On other platforms the system compiler is used directly.
 
 Both `moon.pkg` (DSL format) and `moon.pkg.json` (JSON format) are supported.
 """
+
+from __future__ import annotations
 
 import argparse
 import json
@@ -26,7 +28,6 @@ import re
 import shutil
 import subprocess
 import sys
-import tempfile
 from pathlib import Path
 from typing import Any
 
@@ -93,7 +94,7 @@ def windows_flags() -> tuple[str, dict[str, str]]:
 
 
 def get_flags() -> tuple[str, dict[str, str]]:
-    """Return (cc_path, flags_dict). cc_path is used for mimalloc and macOS MOON_CC."""
+    """Return the compiler path for macOS and the platform sanitizer flags."""
     system = platform.system()
     if system == "Darwin":
         return macos_flags()
@@ -102,67 +103,6 @@ def get_flags() -> tuple[str, dict[str, str]]:
     elif system == "Windows":
         return windows_flags()
     raise Exception(f"Unsupported platform: {system}")
-
-
-# ---------------------------------------------------------------------------
-# mimalloc disable
-# ---------------------------------------------------------------------------
-
-
-def _find_libmoonbitrun() -> Path | None:
-    """Find libmoonbitrun.o by deriving the path from the moon binary."""
-    moon_bin = shutil.which("moon")
-    if not moon_bin:
-        return None
-    lib_dir = Path(moon_bin).resolve().parent.parent / "lib"
-    moonbitrun = lib_dir / "libmoonbitrun.o"
-    if moonbitrun.exists():
-        return moonbitrun
-    # Fallback: $MOON_HOME/lib/ (default: ~/.moon/lib/)
-    moon_home = os.environ.get("MOON_HOME", str(Path.home() / ".moon"))
-    moonbitrun = Path(moon_home) / "lib" / "libmoonbitrun.o"
-    if moonbitrun.exists():
-        return moonbitrun
-    return None
-
-
-def disable_mimalloc(cc_path: str) -> tuple[Path, bytes] | None:
-    """Replace libmoonbitrun.o with a dummy empty object to disable mimalloc.
-
-    MoonBit bundles mimalloc as its allocator via libmoonbitrun.o. mimalloc
-    intercepts malloc/free, which prevents ASan from tracking allocations.
-    Replacing it with an empty object lets ASan's allocator take over.
-
-    Returns (path, original_bytes) for restoration, or None if not found.
-    """
-    moonbitrun = _find_libmoonbitrun()
-    if moonbitrun is None:
-        print("Warning: libmoonbitrun.o not found, skipping mimalloc disable")
-        return None
-
-    original = moonbitrun.read_bytes()
-
-    # Compile an empty C file as the replacement
-    fd, dummy_c = tempfile.mkstemp(suffix=".c")
-    os.close(fd)
-    try:
-        if platform.system() == "Windows":
-            subprocess.run(
-                ["cl.exe", dummy_c, "/c", f"/Fo:{moonbitrun}"],
-                check=True,
-                capture_output=True,
-            )
-        else:
-            subprocess.run(
-                [cc_path, "-c", dummy_c, "-o", str(moonbitrun)],
-                check=True,
-                capture_output=True,
-            )
-    finally:
-        os.unlink(dummy_c)
-
-    print(f"Disabled mimalloc: {moonbitrun}")
-    return (moonbitrun, original)
 
 
 # ---------------------------------------------------------------------------
@@ -630,16 +570,16 @@ def main():
     parser.add_argument(
         "--no-disable-mimalloc",
         action="store_true",
-        help="Skip disabling mimalloc (not recommended).",
+        help="Keep the allocator selected by the caller or MoonBit.",
     )
     args = parser.parse_args()
 
     repo_root = args.repo_root.resolve()
     if not repo_root.is_dir():
         sys.exit(f"--repo-root is not a directory: {repo_root}")
-    if not (repo_root / "moon.mod.json").is_file():
+    if not (repo_root / "moon.mod").is_file():
         print(
-            f"Warning: no moon.mod.json found in {repo_root}. "
+            f"Warning: no moon.mod found in {repo_root}. "
             "Is --repo-root pointing at the right directory?",
             file=sys.stderr,
         )
@@ -688,15 +628,9 @@ def main():
     for pkg_path in extra_entry_paths:
         snapshots[pkg_path] = pkg_path.read_text(encoding="utf-8")
 
-    # Disable mimalloc by replacing libmoonbitrun.o with an empty object.
-    # MoonBit bundles mimalloc which intercepts malloc/free and prevents
-    # ASan from tracking allocations properly.
-    mimalloc_backup: tuple[Path, bytes] | None = None
-    if not args.no_disable_mimalloc:
-        mimalloc_backup = disable_mimalloc(cc_path)
-
-    # Build environment
     env = os.environ.copy()
+    if not args.no_disable_mimalloc:
+        env["MOONBIT_ALLOCATOR"] = "system"
     # MOON_CC/MOON_AR only needed on macOS (Apple Clang lacks LSan)
     if platform.system() == "Darwin":
         env["MOON_CC"] = cc_path
@@ -747,10 +681,6 @@ def main():
         for pkg_path, original in snapshots.items():
             pkg_path.write_text(original, encoding="utf-8")
             print(f"Restored: {display_path(pkg_path, repo_root)}")
-        if mimalloc_backup is not None:
-            moonbitrun_path, original_bytes = mimalloc_backup
-            moonbitrun_path.write_bytes(original_bytes)
-            print(f"Restored mimalloc: {moonbitrun_path}")
 
 
 if __name__ == "__main__":

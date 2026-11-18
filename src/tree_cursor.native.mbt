@@ -23,7 +23,7 @@ extern "c" fn ts_tree_cursor_new(node : TSNode) -> TSTreeCursor = "moonbit_ts_tr
 /// and the cursor cannot walk outside this node.
 pub fn TreeCursor::new(node : Node) -> TreeCursor {
   let cursor = ts_tree_cursor_new(node.node)
-  TreeCursor::{ cursor, tree: node.tree, text: node.text }
+  TreeCursor::{ cursor, tree: node.tree, text: node.text, }
 }
 
 ///|
@@ -183,7 +183,7 @@ pub fn TreeCursor::goto_last_child(self : TreeCursor) -> Bool {
 #borrow(cursor)
 extern "c" fn ts_tree_cursor_goto_descendant(
   cursor : TSTreeCursor,
-  goal_descendant_index : UInt,
+  goal_descendant_index : UInt32,
 ) -> Unit = "moonbit_ts_tree_cursor_goto_descendant"
 
 ///|
@@ -192,7 +192,7 @@ extern "c" fn ts_tree_cursor_goto_descendant(
 /// zero represents the original node itself.
 pub fn TreeCursor::goto_descendant(
   self : TreeCursor,
-  goal_descendant_index : Int,
+  goal_descendant_index : Int32,
 ) -> Unit {
   ts_tree_cursor_goto_descendant(
     self.cursor,
@@ -204,23 +204,23 @@ pub fn TreeCursor::goto_descendant(
 #borrow(cursor)
 extern "c" fn ts_tree_cursor_current_descendant_index(
   cursor : TSTreeCursor,
-) -> UInt = "moonbit_ts_tree_cursor_current_descendant_index"
+) -> UInt32 = "moonbit_ts_tree_cursor_current_descendant_index"
 
 ///|
 /// Get the index of the cursor's current node out of all of the
 /// descendants of the original node that the cursor was constructed with.
-pub fn TreeCursor::current_descendant_index(self : TreeCursor) -> Int {
+pub fn TreeCursor::current_descendant_index(self : TreeCursor) -> Int32 {
   uint_to_int(ts_tree_cursor_current_descendant_index(self.cursor))
 }
 
 ///|
 #borrow(cursor)
-extern "c" fn ts_tree_cursor_current_depth(cursor : TSTreeCursor) -> UInt = "moonbit_ts_tree_cursor_current_depth"
+extern "c" fn ts_tree_cursor_current_depth(cursor : TSTreeCursor) -> UInt32 = "moonbit_ts_tree_cursor_current_depth"
 
 ///|
 /// Get the depth of the cursor's current node relative to the original
 /// node that the cursor was constructed with.
-pub fn TreeCursor::current_depth(self : TreeCursor) -> Int {
+pub fn TreeCursor::current_depth(self : TreeCursor) -> Int32 {
   uint_to_int(ts_tree_cursor_current_depth(self.cursor))
 }
 
@@ -228,7 +228,7 @@ pub fn TreeCursor::current_depth(self : TreeCursor) -> Int {
 #borrow(cursor)
 extern "c" fn ts_tree_cursor_goto_first_child_for_byte(
   cursor : TSTreeCursor,
-  goal_byte : UInt,
+  goal_byte : UInt32,
 ) -> Bool = "moonbit_ts_tree_cursor_goto_first_child_for_byte"
 
 ///|
@@ -239,7 +239,7 @@ extern "c" fn ts_tree_cursor_goto_first_child_for_byte(
 /// if no such child was found.
 pub fn TreeCursor::goto_first_child_for_byte(
   self : TreeCursor,
-  goal_byte : Int,
+  goal_byte : Int32,
 ) -> Bool {
   ts_tree_cursor_goto_first_child_for_byte(self.cursor, int_to_uint(goal_byte))
 }
@@ -271,5 +271,5 @@ extern "c" fn ts_tree_cursor_copy(cursor : TSTreeCursor) -> TSTreeCursor = "moon
 ///|
 pub fn TreeCursor::copy(self : TreeCursor) -> TreeCursor {
   let cursor = ts_tree_cursor_copy(self.cursor)
-  TreeCursor::{ cursor, tree: self.tree, text: self.text }
+  TreeCursor::{ cursor, tree: self.tree, text: self.text, }
 }

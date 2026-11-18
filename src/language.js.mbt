@@ -27,36 +27,37 @@ extern "js" fn ts_language_is_null(language : Language) -> Bool =
   #|}
 
 ///|
-impl Nullable for Language with is_null(self : Language) -> Bool {
+impl Nullable for Language with fn is_null(self : Language) -> Bool {
   ts_language_is_null(self)
 }
 
 ///|
-extern "js" fn ts_language_symbol_count(language : Language) -> UInt =
+extern "js" fn ts_language_symbol_count(language : Language) -> UInt32 =
   #|(language) => {
   #|  return language.nodeTypeCount;
   #|}
 
 ///|
 /// Get the number of distinct node types in the language.
-pub fn Language::symbol_count(self : Language) -> Int {
+pub fn Language::symbol_count(self : Language) -> Int32 {
   uint_to_int(ts_language_symbol_count(self))
 }
 
 ///|
-extern "js" fn ts_language_state_count(language : Language) -> UInt =
+extern "js" fn ts_language_state_count(language : Language) -> UInt32 =
   #|(language) => {
   #|  return language.stateCount;
   #|}
 
 ///|
 /// Get the number of valid states in this language.
-pub fn Language::state_count(self : Language) -> Int {
+pub fn Language::state_count(self : Language) -> Int32 {
   uint_to_int(ts_language_state_count(self))
 }
 
 ///|
-struct Symbol(UInt) derive(Eq)
+#derive(Eq)
+struct Symbol(UInt32)
 
 ///|
 /// Get the numerical id for the given node type string.
@@ -84,14 +85,14 @@ pub fn Language::symbol_for_name(self : Language, name : StringView) -> Symbol? 
 struct FieldId(UInt16)
 
 ///|
-extern "js" fn ts_language_field_count(language : Language) -> Int =
+extern "js" fn ts_language_field_count(language : Language) -> Int32 =
   #|(language) => {
   #|  return language.fieldCount;
   #|}
 
 ///|
 /// Get the number of distinct field names in the language.
-pub fn Language::field_count(self : Language) -> Int {
+pub fn Language::field_count(self : Language) -> Int32 {
   ts_language_field_count(self)
 }
 
@@ -102,7 +103,7 @@ extern "js" fn js_string_is_null(string : String) -> Bool =
   #|}
 
 ///|
-impl Nullable for String with is_null(self : String) -> Bool {
+impl Nullable for String with fn is_null(self : String) -> Bool {
   js_string_is_null(self)
 }
 
@@ -133,14 +134,14 @@ pub fn Language::field_name_for_id(
 extern "js" fn ts_language_field_id_for_name(
   language : Language,
   name : String,
-) -> UInt =
+) -> UInt32 =
   #|(language, name) => {
   #|  return language.fieldIdForName(name);
   #|}
 
 ///|
 /// Get the numerical id for the given field name string.
-pub fn Language::field_id_for_name(self : Language, name : StringView) -> Int {
+pub fn Language::field_id_for_name(self : Language, name : StringView) -> Int32 {
   ts_language_field_id_for_name(self, name.to_string()) |> uint_to_int()
 }
 
@@ -238,7 +239,7 @@ pub fn Language::symbol_type(self : Language, symbol : Symbol) -> SymbolType {
 }
 
 ///|
-extern "js" fn ts_language_version(language : Language) -> UInt =
+extern "js" fn ts_language_version(language : Language) -> UInt32 =
   #|(language) => {
   #|  return language.version;
   #|}
@@ -250,12 +251,12 @@ extern "js" fn ts_language_version(language : Language) -> UInt =
 ///
 /// See also `Parser::set_language`.
 #deprecated("Use `Language::abi_version` instead")
-pub fn Language::version(self : Language) -> Int {
+pub fn Language::version(self : Language) -> Int32 {
   uint_to_int(ts_language_version(self))
 }
 
 ///|
-extern "js" fn ts_language_abi_version(language : Language) -> UInt =
+extern "js" fn ts_language_abi_version(language : Language) -> UInt32 =
   #|(language) => {
   #|  return language.abiVersion;
   #|}
@@ -266,7 +267,7 @@ extern "js" fn ts_language_abi_version(language : Language) -> UInt =
 /// Tree-sitter.
 ///
 /// See also `Parser::set_language`.
-pub fn Language::abi_version(self : Language) -> Int {
+pub fn Language::abi_version(self : Language) -> Int32 {
   uint_to_int(ts_language_abi_version(self))
 }
 

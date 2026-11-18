@@ -44,26 +44,27 @@ extern "c" fn ts_parser_set_language(
 ) -> Bool = "moonbit_ts_parser_set_language"
 
 ///|
+#derive(Debug)
 suberror LanguageError {
   VersionMismatch(
-    language_abi_version~ : Int,
-    library_version~ : Int,
-    min_compatible_version~ : Int
+    language_abi_version~ : Int32,
+    library_version~ : Int32,
+    min_compatible_version~ : Int32,
   )
-} derive(Show)
+}
 
 ///|
-pub impl ToJson for LanguageError with to_json(self) -> Json {
+pub impl ToJson for LanguageError with fn to_json(self) -> Json {
   match self {
     VersionMismatch(
       language_abi_version~,
       library_version~,
-      min_compatible_version~
+      min_compatible_version~,
     ) =>
       {
-        "language_abi_version": language_abi_version.to_json(),
-        "library_version": library_version.to_json(),
-        "min_compatible_version": min_compatible_version.to_json(),
+        "language_abi_version": @json.to_json(language_abi_version),
+        "library_version": @json.to_json(library_version),
+        "min_compatible_version": @json.to_json(min_compatible_version),
       }
   }
 }
@@ -82,7 +83,7 @@ pub fn Parser::set_language(
   language : Language,
 ) -> Unit raise LanguageError {
   let succeed = ts_parser_set_language(self, language)
-  if not(succeed) {
+  if !succeed {
     raise VersionMismatch(
       language_abi_version=language.abi_version(),
       library_version=LANGUAGE_VERSION,
@@ -109,7 +110,7 @@ pub const MIN_COMPATIBLE_LANGUAGE_VERSION = 13
 #borrow(parser, ranges)
 extern "c" fn ts_parser_set_included_ranges(
   parser : Parser,
-  ranges : FixedArray[UInt],
+  ranges : FixedArray[UInt32],
 ) -> Bool = "moonbit_ts_parser_set_included_ranges"
 
 ///|
@@ -150,7 +151,7 @@ pub fn Parser::set_included_ranges(
 
 ///|
 #borrow(parser)
-extern "c" fn ts_parser_included_ranges(parser : Parser) -> FixedArray[UInt] = "moonbit_ts_parser_included_ranges"
+extern "c" fn ts_parser_included_ranges(parser : Parser) -> FixedArray[UInt32] = "moonbit_ts_parser_included_ranges"
 
 ///|
 /// Get the ranges of text that the parser will include when parsing.
@@ -168,18 +169,19 @@ pub fn Parser::included_ranges(self : Parser) -> Array[Range] {
 
 ///|
 #borrow(parser, old_tree)
+#owned(input)
 extern "c" fn ts_parser_parse(
   parser : Parser,
   old_tree : TSTree,
-  input : (UInt, Point, FixedArray[UInt]) -> Bytes,
+  input : (UInt32, Point, FixedArray[UInt32]) -> Bytes,
   encoding : InputEncoding,
-  decode : FuncRef[(@c.Pointer[Byte], UInt, @c.Pointer[Int]) -> Int],
+  decode : FuncRef[(@c.Pointer[Byte], UInt32, @c.Pointer[Int32]) -> Int32],
 ) -> TSTree = "moonbit_ts_parser_parse"
 
 ///|
 /// The state of a parse operation.
 pub struct ParseState {
-  current_byte_offset : Int
+  current_byte_offset : Int32
   has_error : Bool
 }
 
@@ -199,13 +201,14 @@ pub fn ParseOptions::new(
 
 ///|
 #borrow(parser, old_tree)
+#owned(input, progress_callback)
 extern "c" fn ts_parser_parse_with_options(
   parser : Parser,
   old_tree : TSTree,
-  input : (UInt, Point, FixedArray[UInt]) -> Bytes,
-  encoding : UInt,
-  decode : FuncRef[(@c.Pointer[Byte], UInt, @c.Pointer[Int]) -> Int],
-  progress_callback : (UInt, Bool) -> Bool,
+  input : (UInt32, Point, FixedArray[UInt32]) -> Bytes,
+  encoding : UInt32,
+  decode : FuncRef[(@c.Pointer[Byte], UInt32, @c.Pointer[Int32]) -> Int32],
+  progress_callback : (UInt32, Bool) -> Bool,
 ) -> TSTree = "moonbit_ts_parser_parse_with_options"
 
 ///|
@@ -254,10 +257,11 @@ pub fn[Encoding : DecodeFunction] Parser::parse(
   options? : ParseOptions,
 ) -> Tree raise ParseError {
   let encoding = input.decode.encoding()
-  let decode : FuncRef[(@c.Pointer[Byte], UInt, @c.Pointer[Int]) -> Int] = match encoding {
+  let decode : FuncRef[(@c.Pointer[Byte], UInt32, @c.Pointer[Int32]) -> Int32] = match
+    encoding {
     Custom =>
       fn(bytes, length, code_point) {
-        let buffer = @buffer.new()
+        let buffer = Buffer()
         for i in 0..<length.reinterpret_as_int() {
           buffer.write_byte(bytes[i])
         }
@@ -273,26 +277,28 @@ pub fn[Encoding : DecodeFunction] Parser::parse(
     _ => fn(_bytes, _length, _code_point) { 0 }
   }
   let mut stage : BytesView = []
-  let text = StringBuilder::new()
+  let text = StringBuilder()
   let mut chunk = None
-  let read : (UInt, Point, FixedArray[UInt]) -> Bytes = fn(
-    offset : UInt,
+  let read : (UInt32, Point, FixedArray[UInt32]) -> Bytes = fn(
+    offset : UInt32,
     point : Point,
-    range : FixedArray[UInt],
+    range : FixedArray[UInt32],
   ) {
     let bytes_view = (input.read)(offset, point)
     stage = [..stage, ..bytes_view]
-    loop Encoding::decode(stage) {
-      Some(result) => {
-        text.write_char(result.code_point)
-        stage = stage[result.bytes_read:]
-        if stage.length() == 0 {
-          break
-        } else {
-          continue Encoding::decode(stage)
+    for loop_state = Encoding::decode(stage) {
+      break match loop_state {
+        Some(result) => {
+          text.write_char(result.code_point)
+          stage = stage[result.bytes_read:]
+          if stage.length() == 0 {
+            break
+          } else {
+            continue Encoding::decode(stage)
+          }
         }
+        None => ()
       }
-      None => ()
     }
     let bytes_start = bytes_view.start_offset()
     let bytes_length = bytes_view.length()
@@ -314,21 +320,23 @@ pub fn[Encoding : DecodeFunction] Parser::parse(
     Some(tree) => tree.tree
   }
   guard options is Some(options) else {
-    let tree = ts_parser_parse(self, old_ts_tree, read, encoding, decode).to_option()
-    { tree: self.raise_parse_error(tree), text: text.to_string() }
+    let tree = ts_parser_parse(self, old_ts_tree, read, encoding, decode)
+      |> Nullable::to_option
+    { tree: self.raise_parse_error(tree), text: text.to_string(), }
   }
   let tree = ts_parser_parse_with_options(
-    self,
-    old_ts_tree,
-    read,
-    encoding.to_uint(),
-    decode,
-    fn(current_byte_offset, has_error) {
-      let current_byte_offset = uint_to_int(current_byte_offset)
-      (options.progress_callback)({ current_byte_offset, has_error })
-    },
-  ).to_option()
-  { tree: self.raise_parse_error(tree), text: text.to_string() }
+      self,
+      old_ts_tree,
+      read,
+      encoding.to_uint(),
+      decode,
+      fn(current_byte_offset, has_error) {
+        let current_byte_offset = uint_to_int(current_byte_offset)
+        (options.progress_callback)({ current_byte_offset, has_error, })
+      },
+    )
+    |> Nullable::to_option
+  { tree: self.raise_parse_error(tree), text: text.to_string(), }
 }
 
 ///|
@@ -345,7 +353,7 @@ extern "c" fn ts_parser_parse_bytes_encoding(
   parser : Parser,
   old_tree : TSTree,
   string : Bytes,
-  encoding : UInt,
+  encoding : UInt32,
 ) -> TSTree = "moonbit_ts_parser_parse_string_encoding"
 
 ///|
@@ -364,25 +372,27 @@ pub fn Parser::parse_bytes(
     Some(tree) => tree.tree
   }
   let tree = ts_parser_parse_bytes_encoding(
-    self,
-    old_ts_tree,
-    bytes,
-    encoding.to_uint(),
-  ).to_option()
+      self,
+      old_ts_tree,
+      bytes,
+      encoding.to_uint(),
+    )
+    |> Nullable::to_option
   let text : StringView = match encoding {
     UTF8 => @utf8.decode_lossy(bytes)
     UTF16LE => @utf16.decode_lossy(bytes, endianness=Little)
     UTF16BE => @utf16.decode_lossy(bytes, endianness=Big)
     Custom => @utf8.decode_lossy(bytes)
   }
-  { tree: self.raise_parse_error(tree), text }
+  { tree: self.raise_parse_error(tree), text, }
 }
 
 ///|
+#derive(Debug)
 pub suberror ParseError {
   MissingLanguage
   Cancelled
-} derive(Show)
+}
 
 ///|
 fn Parser::raise_parse_error(
@@ -412,8 +422,9 @@ pub fn Parser::parse_string(
     None => ts_tree_null()
     Some(tree) => tree.tree
   }
-  let tree = ts_parser_parse_bytes(self, old_ts_tree, @utf8.encode(string)).to_option()
-  { tree: self.raise_parse_error(tree), text: string }
+  let tree = ts_parser_parse_bytes(self, old_ts_tree, @utf8.encode(string))
+    |> Nullable::to_option
+  { tree: self.raise_parse_error(tree), text: string, }
 }
 
 ///|
@@ -439,7 +450,7 @@ pub enum LogType {
 }
 
 ///|
-fn LogType::of_uint(value : UInt) -> LogType {
+fn LogType::of_uint(value : UInt32) -> LogType {
   match value {
     0 => Parse
     1 => Lex
@@ -448,7 +459,7 @@ fn LogType::of_uint(value : UInt) -> LogType {
 }
 
 ///|
-struct Logger((UInt, Bytes) -> Unit)
+struct Logger((UInt32, Bytes) -> Unit)
 
 ///|
 pub fn Logger::new(log : (LogType, StringView) -> Unit) -> Logger {
@@ -479,4 +490,14 @@ extern "c" fn ts_parser_logger(parser : Parser) -> Logger = "moonbit_ts_parser_l
 /// Get the parser's current logger.
 pub fn Parser::logger(self : Parser) -> Logger {
   ts_parser_logger(self)
+}
+
+///|
+pub impl Show for LanguageError with fn output(self, logger) {
+  logger.write_string(@debug.to_string(self))
+}
+
+///|
+pub impl Show for ParseError with fn output(self, logger) {
+  logger.write_string(@debug.to_string(self))
 }

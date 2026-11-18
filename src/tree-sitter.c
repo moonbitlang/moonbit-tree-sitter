@@ -290,18 +290,13 @@ moonbit_ts_input_read(
   range->offset = 0;
   range->length = 0;
   moonbit_ts_trace("range = %p\n", (void *)range);
-  moonbit_incref(input);
-  // We incref `range` here as we wish it to be valid after the read function.
-  moonbit_incref(range);
+  // The generated closure borrows its environment and reference arguments.
   moonbit_bytes_t bytes_data = input->read(input, byte, point, range);
+  moonbit_decref(point);
   // It is safe to decref the bytes_data here, since we keep a reference to it
   // inside the closure of the read function.
   moonbit_decref(bytes_data);
   *bytes_read = range->length;
-  if (*bytes_read == 0) {
-    moonbit_ts_trace("moonbit_decref(input)\n");
-    moonbit_decref(input);
-  }
   const char *bytes = (const char *)bytes_data + range->offset;
   // Decref `range` here as we no longer need it.
   moonbit_decref(range);
@@ -340,6 +335,7 @@ moonbit_ts_parser_parse(
     moonbit_ts_tree_delete, sizeof(TSTree *)
   );
   tree->tree = ts_parser_parse(self->parser, ts_old_tree, ts_input);
+  moonbit_decref(input);
   return tree;
 }
 
@@ -386,6 +382,8 @@ moonbit_ts_parser_parse_with_options(
   );
   tree->tree =
     ts_parser_parse_with_options(self->parser, ts_old_tree, ts_input, options);
+  moonbit_decref(input);
+  moonbit_decref(progress_callback);
   return tree;
 }
 

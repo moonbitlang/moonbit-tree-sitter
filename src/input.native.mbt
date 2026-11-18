@@ -1,12 +1,12 @@
 ///|
 struct Input[DecodeFunction] {
-  read : (UInt, Point) -> BytesView
+  read : (UInt32, Point) -> BytesView
   decode : DecodeFunction
 }
 
 ///|
 pub fn[DecodeFunction] Input::new(
-  read : (Int, Point) -> BytesView,
+  read : (Int32, Point) -> BytesView,
   decode : DecodeFunction,
 ) -> Input[DecodeFunction] {
   {
@@ -19,13 +19,13 @@ pub fn[DecodeFunction] Input::new(
 }
 
 ///|
-struct InputEdit(FixedArray[UInt])
+struct InputEdit(FixedArray[UInt32])
 
 ///|
 fn ts_input_edit_new(
-  start_byte : UInt,
-  old_end_byte : UInt,
-  new_end_byte : UInt,
+  start_byte : UInt32,
+  old_end_byte : UInt32,
+  new_end_byte : UInt32,
   start_point : Point,
   old_end_point : Point,
   new_end_point : Point,
@@ -45,9 +45,9 @@ fn ts_input_edit_new(
 
 ///|
 pub fn InputEdit::new(
-  start_byte~ : Int,
-  old_end_byte~ : Int,
-  new_end_byte~ : Int,
+  start_byte~ : Int32,
+  old_end_byte~ : Int32,
+  new_end_byte~ : Int32,
   start_point~ : Point,
   old_end_point~ : Point,
   new_end_point~ : Point,
@@ -63,12 +63,15 @@ pub fn InputEdit::new(
 ///|
 struct DecodeResult {
   code_point : Char
-  bytes_read : Int
+  bytes_read : Int32
 }
 
 ///|
-pub fn DecodeResult::new(code_point~ : Char, bytes_read~ : Int) -> DecodeResult {
-  { code_point, bytes_read }
+pub fn DecodeResult::new(
+  code_point~ : Char,
+  bytes_read~ : Int32,
+) -> DecodeResult {
+  { code_point, bytes_read, }
 }
 
 ///|
@@ -76,12 +79,12 @@ pub fn DecodeResult::new(code_point~ : Char, bytes_read~ : Int) -> DecodeResult 
 /// returning the number of bytes consumed and the code point.
 /// If the input is invalid, return `None`.
 pub(open) trait DecodeFunction {
-  encoding(Self) -> InputEncoding = _
-  decode(BytesView) -> DecodeResult?
+  fn encoding(Self) -> InputEncoding = _
+  fn decode(BytesView) -> DecodeResult?
 }
 
 ///|
-impl DecodeFunction with encoding(self) -> InputEncoding {
+impl DecodeFunction with fn encoding(self) -> InputEncoding {
   ignore(self)
   Custom
 }
@@ -100,17 +103,17 @@ pub fn InputEncoding::custom() -> InputEncoding {
 }
 
 ///|
-pub impl DecodeFunction for InputEncoding with encoding(self) -> InputEncoding {
+pub impl DecodeFunction for InputEncoding with fn encoding(self) -> InputEncoding {
   self
 }
 
 ///|
-pub impl DecodeFunction for InputEncoding with decode(_bytes) -> DecodeResult? {
+pub impl DecodeFunction for InputEncoding with fn decode(_bytes) -> DecodeResult? {
   None
 }
 
 ///|
-fn InputEncoding::to_uint(self : InputEncoding) -> UInt {
+fn InputEncoding::to_uint(self : InputEncoding) -> UInt32 {
   match self {
     UTF8 => 0
     UTF16LE => 1

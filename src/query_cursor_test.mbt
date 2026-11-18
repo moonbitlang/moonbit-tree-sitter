@@ -29,11 +29,11 @@ test "query cursor basics" {
 
     // We'll just use the name, not the value for this test
     let name = source
-      .view(
-        start_offset=variable_name_node.start_byte(),
-        end_offset=variable_name_node.end_byte(),
+      .clamped_view(
+        start=variable_name_node.start_byte(),
+        end=variable_name_node.end_byte(),
       )
-      .to_string()
+      .to_owned()
     variable_declarations.push(name)
   }
 

@@ -13,13 +13,11 @@ parsing library.
    moon add tonyfettes/tree_sitter
    ```
 
-2. Import the `tonyfettes/tree_sitter` package in `moon.pkg.json`:
+2. Import the `tonyfettes/tree_sitter` package in `moon.pkg`:
 
-   ```json
-   {
-     "import": [
-       "tonyfettes/tree_sitter"
-     ]
+   ```moonbit
+   import {
+     "tonyfettes/tree_sitter",
    }
    ```
 
@@ -32,29 +30,26 @@ parsing library.
    ```
 
    And then import the `tonyfettes/tree_sitter_moonbit` package in your
-   `moon.pkg.json` file as well:
+   `moon.pkg` file as well:
 
-    ```json
-    {
-      "import": [
-        "tonyfettes/tree_sitter",
-        "tonyfettes/tree_sitter_moonbit"
-      ]
+    ```moonbit
+    import {
+      "tonyfettes/tree_sitter",
+      "tonyfettes/tree_sitter_moonbit",
     }
     ```
 
 4. Use the `tonyfettes/tree_sitter` API to parse your code:
 
    ```moonbit
-   fn main {
+   fn main raise {
      let moonbit = @tree_sitter_moonbit.language()
-     let parser = @tree_sitter.Parser::new()
-     parser.set_language(moonbit)
+     let parser = @tree_sitter.parser(moonbit)
      let source_code =
-       #|fn main {
+       #|fn main raise {
        #|  println("Hello, World!")
        #|}
-     let tree = parser.parse_string(None, source_code)
+     let tree = parser.parse_string(source_code)
      let root_node = tree.root_node()
      println(root_node.string())
    }
@@ -80,7 +75,7 @@ MoonBit type definitions for a tree-sitter grammar.
 ### Prerequisites
 
 Other than MoonBit toolchain, this project requires Python (3.9 or later) to
-build. Please make sure your system has `python` available in the `PATH`.
+build. Please make sure your system has `python3` available in the `PATH`.
 
 ### Build
 
@@ -96,31 +91,44 @@ moon build --target native
 ```
 
 We amalgamate the tree-sitter source code with the C stubs together to build a
-monolithic C file (`src/tree-sitter-lib/lib.c`) that can be compiled as a single
+monolithic C file (`src/tree-sitter#lib#src#lib.c`) that can be compiled as a single
 object file. This step is done by a Python script at `scripts/prepare.py`. The
 script is set to run automatically when you run `moon build --target native` or
 `moon check --target native`. If you find the generated C file is out of date,
 you can run the script manually:
 
 ```bash
-python scripts/prepare.py
+python3 scripts/prepare.py
 ```
 
 ### Test
 
 Before running tests, make sure you have completed the build step above.
 
-To avoid introducing the dependency of the tree-sitter grammars, we put the
-majority of the tests inside the `test/` directory. To run the tests, you can
-cd into the `test/` directory and run `moon test --target native`:
+The repository uses `moon.work` to resolve the shared language type and all
+29 generated language modules locally. Run the existing checks and native tests
+from the repository root:
 
 ```bash
-cd test && moon test --target native
+moon check --target native
+moon test --target native
 ```
 
-> [!NOTE]
-> You may find that the LSP is not working when you are editing files under
-> the `test/` directory. This is because `test/` is a MoonBit module itself,
-> and therefore the LSP process has to be spawned in the `test/` directory
-> to work properly. In most cases, this means you need to spin up a new editor
-> instance inside the `test/` directory.
+CI runs `python3 scripts/test.py`, which also runs the tests with AddressSanitizer.
+
+### Generate and publish language modules
+
+`scripts/generate.py` writes current `moon.mod` and `moon.pkg` manifests. If a
+new grammar produces a new module directory, register it with
+`moon work use src/languages/tree_sitter_<name>`.
+
+The migrated releases are `tree_sitter_language@0.1.4`, language bindings at
+`0.1.27`, and the main binding at `0.4.7`. Publish the shared language type first,
+then the language bindings and main binding:
+
+```bash
+python3 scripts/publish.py language languages main
+```
+
+The main package's publishing step removes grammar dependencies and test imports.
+Consumers only depend on the shared language type and `tonyfettes/c`.

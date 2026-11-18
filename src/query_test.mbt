@@ -25,7 +25,7 @@ test "query with predicates" {
   inspect(predicates.length(), content="1")
 
   // Test string_value_for_id for a string in the query
-  inspect(
+  debug_inspect(
     query.string_value_for_id(0),
     content=(
       #|Some("eq?")

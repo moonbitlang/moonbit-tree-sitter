@@ -1,0 +1,46 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "tonyfettes/tree_sitter/query/deriv"
+
+import {
+  "moonbitlang/core/debug",
+  "moonbitlang/core/json",
+  "tonyfettes/tree_sitter",
+}
+
+// Values
+
+// Errors
+
+// Types and methods
+#derive(Eq, @json.ToJson)
+type Expr
+pub fn Expr::alt(Self, Self) -> Self
+pub fn Expr::and_(Self, Self) -> Self
+pub fn Expr::capture(Self, String, id? : Int32) -> Self
+pub fn Expr::matches(Self, Iter[@tree_sitter.Node]) -> Match?
+pub fn Expr::node(Node) -> Self
+pub fn Expr::repeat(Self) -> Self
+pub fn Expr::seq(Self, Self) -> Self
+pub impl @debug.Debug for Expr
+
+#derive(@debug.Debug, @json.ToJson)
+type Match
+pub impl Show for Match
+
+#derive(Eq)
+type Node
+pub fn Node::and_(Self, Self) -> Self
+pub fn Node::bool(Bool) -> Self
+pub fn Node::child(Expr) -> Self
+pub fn Node::descendant(Expr) -> Self
+pub fn Node::falsy() -> Self
+pub fn Node::matches(Self, @tree_sitter.Node) -> Map[String, Array[Match]]?
+pub fn Node::not(Self) -> Self
+pub fn Node::or_(Self, Self) -> Self
+pub fn Node::truthy() -> Self
+pub fn Node::type_(String) -> Self
+pub impl @debug.Debug for Node
+
+// Type aliases
+
+// Traits

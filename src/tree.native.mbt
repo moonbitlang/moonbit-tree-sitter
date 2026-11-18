@@ -9,12 +9,12 @@ struct Tree {
 
 ///|
 priv trait Nullable {
-  is_null(Self) -> Bool
-  to_option(Self) -> Self? = _
+  fn is_null(Self) -> Bool
+  fn to_option(Self) -> Self? = _
 }
 
 ///|
-impl Nullable with to_option(self : Self) -> Self? {
+impl Nullable with fn to_option(self : Self) -> Self? {
   if self.is_null() {
     return None
   }
@@ -29,7 +29,7 @@ extern "c" fn ts_tree_null() -> TSTree = "moonbit_c_null"
 extern "c" fn ts_tree_is_null(tree : TSTree) -> Bool = "moonbit_c_is_null"
 
 ///|
-impl Nullable for TSTree with is_null(self : TSTree) -> Bool {
+impl Nullable for TSTree with fn is_null(self : TSTree) -> Bool {
   ts_tree_is_null(self)
 }
 
@@ -43,7 +43,7 @@ extern "c" fn ts_tree_copy(tree : TSTree) -> TSTree = "moonbit_ts_tree_copy"
 /// You need to copy a syntax tree in order to use it on more than one thread at
 /// a time, as syntax trees are not thread safe.
 pub fn Tree::copy(self : Tree) -> Tree {
-  { ..self, tree: ts_tree_copy(self.tree) }
+  { ..self, tree: ts_tree_copy(self.tree), }
 }
 
 ///|
@@ -53,14 +53,18 @@ extern "c" fn ts_tree_root_node(tree : TSTree) -> TSNode = "moonbit_ts_tree_root
 ///|
 /// Get the root node of the syntax tree.
 pub fn Tree::root_node(self : Tree) -> Node {
-  Node::{ node: ts_tree_root_node(self.tree), tree: self.tree, text: self.text }
+  Node::{
+    node: ts_tree_root_node(self.tree),
+    tree: self.tree,
+    text: self.text,
+  }
 }
 
 ///|
 #borrow(tree, offset_extent)
 extern "c" fn ts_tree_root_node_with_offset(
   tree : TSTree,
-  offset_bytes : UInt,
+  offset_bytes : UInt32,
   offset_extent : Point,
 ) -> TSNode = "moonbit_ts_tree_root_node_with_offset"
 
@@ -69,7 +73,7 @@ extern "c" fn ts_tree_root_node_with_offset(
 /// shifted forward by the given offset.
 pub fn Tree::root_node_with_offset(
   self : Tree,
-  offset_bytes : Int,
+  offset_bytes : Int32,
   offset_extent : Point,
 ) -> Node {
   let node = ts_tree_root_node_with_offset(
@@ -77,7 +81,7 @@ pub fn Tree::root_node_with_offset(
     int_to_uint(offset_bytes),
     offset_extent,
   )
-  { node, tree: self.tree, text: self.text }
+  { node, tree: self.tree, text: self.text, }
 }
 
 ///|
@@ -92,7 +96,7 @@ pub fn Tree::language(self : Tree) -> Language {
 
 ///|
 #borrow(tree)
-extern "c" fn ts_tree_included_ranges(tree : TSTree) -> FixedArray[UInt] = "moonbit_ts_tree_included_ranges"
+extern "c" fn ts_tree_included_ranges(tree : TSTree) -> FixedArray[UInt32] = "moonbit_ts_tree_included_ranges"
 
 ///|
 /// Get the array of included ranges that was used to parse the syntax tree.
@@ -127,7 +131,7 @@ pub fn Tree::edit(self : Tree, edit : InputEdit) -> Unit {
 extern "c" fn ts_tree_get_changed_ranges(
   tree : TSTree,
   other : TSTree,
-) -> FixedArray[UInt] = "moonbit_ts_tree_get_changed_ranges"
+) -> FixedArray[UInt32] = "moonbit_ts_tree_get_changed_ranges"
 
 ///|
 /// Compare an old edited syntax tree to a new syntax tree representing the same
