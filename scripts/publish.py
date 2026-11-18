@@ -1,10 +1,14 @@
 from __future__ import annotations
 
+import argparse
+import json
 import re
 import shutil
-from pathlib import Path
-import json
 import subprocess
+from pathlib import Path
+from tempfile import TemporaryDirectory
+
+from prepare import prepare
 
 
 def get_pkg_file(path: Path) -> Path | None:
@@ -129,6 +133,9 @@ def copy_source(src: Path, dst: Path):
                 continue
             if file.name in ("moon.pkg.json", "moon.pkg"):
                 continue
+            if file.name.startswith("tree-sitter#"):
+                # Regenerate the flattened tree-sitter sources for the release.
+                continue
             if ".c" in file.suffixes or ".h" in file.suffixes:
                 shutil.copy(file, dst_pkg / file.name)
                 continue
@@ -139,13 +146,8 @@ def copy_source(src: Path, dst: Path):
                     shutil.copy(file, dst / file)
 
 
-def prepare_main():
+def prepare_main(publish_path: Path):
     """Prepare the main module (tonyfettes/tree_sitter) for publishing."""
-    publish_path = Path("publish")
-    if publish_path.exists():
-        shutil.rmtree("publish")
-
-    publish_path.mkdir()
     manifest = Path("moon.mod").read_text(encoding="utf-8")
     # Grammar modules are used only by tests; retain the shared language type.
     manifest = re.sub(
@@ -158,56 +160,43 @@ def prepare_main():
     shutil.copy("README.md", publish_path / "README.md")
     shutil.copy("LICENSE", publish_path / "LICENSE")
     copy_source(Path("src"), publish_path)
-
-    subprocess.run(
-        ["moon", "check", "--target", "native"], cwd=publish_path, check=True
-    )
-    for d in [".mooncakes", "target", "_build"]:
-        p = publish_path / d
-        if p.exists():
-            shutil.rmtree(p)
-    return publish_path
+    prepare(publish_path / "src")
 
 
-def publish_main():
+def publish_main(command: list[str]):
     """Prepare and publish the main module (tonyfettes/tree_sitter)."""
-    publish_path = prepare_main()
-    print("Publishing tonyfettes/tree_sitter")
-    subprocess.run(["moon", "publish"], cwd=publish_path, check=True)
-    print("Published tonyfettes/tree_sitter")
+    # A staging directory under the checkout inherits its packaging ignore rules.
+    with TemporaryDirectory(prefix="tree-sitter-publish-") as folder:
+        publish_path = Path(folder)
+        prepare_main(publish_path)
+        subprocess.run(command, cwd=publish_path, check=True)
 
 
-def publish_language():
+def publish_language(command: list[str]):
     """Publish the language definition (tonyfettes/tree_sitter_language)."""
     language_path = Path("src", "language")
-    print("Publishing tonyfettes/tree_sitter_language")
-    subprocess.run(["moon", "publish"], cwd=language_path, check=True)
-    print("Published tonyfettes/tree_sitter_language")
+    subprocess.run(command, cwd=language_path, check=True)
 
 
-def publish_languages():
+def publish_languages(command: list[str]):
     """Publish all generated language bindings."""
     languages_path = Path("src", "languages")
+    failed = []
     for lang_dir in sorted(languages_path.iterdir()):
         if not lang_dir.is_dir():
             continue
         if not (lang_dir / "moon.mod").exists():
             continue
-        print(f"Publishing {lang_dir.name}")
+        print(f"Processing {lang_dir.name}", flush=True)
         try:
             subprocess.run(
-                ["moon", "publish"],
-                cwd=lang_dir,
-                check=True,
-                capture_output=True,
-                text=True,
+                command, cwd=lang_dir, check=True, capture_output=True, text=True
             )
-            print(f"Published {lang_dir.name}")
         except subprocess.CalledProcessError as e:
-            print(f"Failed to publish {lang_dir.name}: {e.stderr}")
-
-
-import argparse
+            print(e.stdout + e.stderr, flush=True)
+            failed.append(lang_dir.name)
+    if failed:
+        raise SystemExit(f"Grammar package checks failed: {', '.join(failed)}")
 
 
 def main():
@@ -215,21 +204,31 @@ def main():
         description="Publish tree-sitter MoonBit packages"
     )
     parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Validate the package with Mooncakes without publishing it.",
+    )
+    parser.add_argument(
         "target",
         nargs="*",
-        choices=["main", "language", "languages"],
-        default=["main", "language", "languages"],
-        help="What to publish (default: all)",
+        help="What to publish: language, languages, or main (default: all)",
     )
     args = parser.parse_args()
 
-    targets = args.target
+    all_targets = ("language", "languages", "main")
+    targets = args.target or all_targets
+    for target in targets:
+        if target not in all_targets:
+            parser.error(f"unknown target {target!r}; choose from {', '.join(all_targets)}")
+    command = ["moon", "publish"]
+    if args.dry_run:
+        command.append("--dry-run")
     if "language" in targets:
-        publish_language()
+        publish_language(command)
     if "languages" in targets:
-        publish_languages()
+        publish_languages(command)
     if "main" in targets:
-        publish_main()
+        publish_main(command)
 
 
 if __name__ == "__main__":
