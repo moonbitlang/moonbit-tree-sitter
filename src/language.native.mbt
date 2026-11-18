@@ -21,25 +21,25 @@ pub fn Language::delete(self : Language) -> Unit {
 }
 
 ///|
-extern "c" fn ts_language_symbol_count(language : Language) -> UInt = "moonbit_ts_language_symbol_count"
+extern "c" fn ts_language_symbol_count(language : Language) -> UInt32 = "moonbit_ts_language_symbol_count"
 
 ///|
 /// Get the number of distinct node types in the language.
-pub fn Language::symbol_count(self : Language) -> Int {
+pub fn Language::symbol_count(self : Language) -> Int32 {
   uint_to_int(ts_language_symbol_count(self))
 }
 
 ///|
-extern "c" fn ts_language_state_count(language : Language) -> UInt = "moonbit_ts_language_state_count"
+extern "c" fn ts_language_state_count(language : Language) -> UInt32 = "moonbit_ts_language_state_count"
 
 ///|
 /// Get the number of valid states in this language.
-pub fn Language::state_count(self : Language) -> Int {
+pub fn Language::state_count(self : Language) -> Int32 {
   uint_to_int(ts_language_state_count(self))
 }
 
 ///|
-struct Symbol(UInt)
+struct Symbol(UInt32)
 
 ///|
 /// Get the numerical id for the given node type string.
@@ -65,11 +65,11 @@ pub fn Language::symbol_for_name(self : Language, name : StringView) -> Symbol? 
 struct FieldId(UInt16)
 
 ///|
-extern "c" fn ts_language_field_count(language : Language) -> Int = "moonbit_ts_language_field_count"
+extern "c" fn ts_language_field_count(language : Language) -> Int32 = "moonbit_ts_language_field_count"
 
 ///|
 /// Get the number of distinct field names in the language.
-pub fn Language::field_count(self : Language) -> Int {
+pub fn Language::field_count(self : Language) -> Int32 {
   ts_language_field_count(self)
 }
 
@@ -87,11 +87,11 @@ pub fn Language::field_name_for_id(self : Language, id : FieldId) -> String? {
 }
 
 ///|
-fn decode_c_string(c_string : @c.Pointer[Byte], length? : Int) -> String? {
+fn decode_c_string(c_string : @c.Pointer[Byte], length? : Int32) -> String? {
   if c_string.is_null() {
     return None
   }
-  let buffer = @buffer.new()
+  let buffer = Buffer()
   match length {
     None =>
       for i = 0; c_string[i] != 0; i = i + 1 {
@@ -110,11 +110,11 @@ fn decode_c_string(c_string : @c.Pointer[Byte], length? : Int) -> String? {
 extern "c" fn ts_language_field_id_for_name(
   language : Language,
   name : Bytes,
-) -> UInt = "moonbit_ts_language_field_id_for_name"
+) -> UInt32 = "moonbit_ts_language_field_id_for_name"
 
 ///|
 /// Get the numerical id for the given field name string.
-pub fn Language::field_id_for_name(self : Language, name : StringView) -> Int {
+pub fn Language::field_id_for_name(self : Language, name : StringView) -> Int32 {
   let name_bytes = @utf8.encode(name)
   ts_language_field_id_for_name(self, name_bytes) |> uint_to_int()
 }
@@ -163,7 +163,7 @@ pub enum SymbolType {
 }
 
 ///|
-fn SymbolType::of_int(value : UInt) -> SymbolType {
+fn SymbolType::of_int(value : UInt32) -> SymbolType {
   match value {
     0 => SymbolType::Regular
     1 => SymbolType::Anonymous
@@ -177,7 +177,7 @@ fn SymbolType::of_int(value : UInt) -> SymbolType {
 extern "c" fn ts_language_symbol_type(
   language : Language,
   symbol : Symbol,
-) -> UInt = "moonbit_ts_language_symbol_type"
+) -> UInt32 = "moonbit_ts_language_symbol_type"
 
 ///|
 /// Check whether the given node type id belongs to named nodes, anonymous nodes,
@@ -189,7 +189,7 @@ pub fn Language::symbol_type(self : Language, symbol : Symbol) -> SymbolType {
 }
 
 ///|
-extern "c" fn ts_language_version(language : Language) -> UInt = "moonbit_ts_language_version"
+extern "c" fn ts_language_version(language : Language) -> UInt32 = "moonbit_ts_language_version"
 
 ///|
 /// Get the ABI version number for this language. This version number is used
@@ -198,12 +198,12 @@ extern "c" fn ts_language_version(language : Language) -> UInt = "moonbit_ts_lan
 ///
 /// See also `Parser::set_language`.
 #deprecated("Use `Language::abi_version` instead")
-pub fn Language::version(self : Language) -> Int {
+pub fn Language::version(self : Language) -> Int32 {
   uint_to_int(ts_language_version(self))
 }
 
 ///|
-extern "c" fn ts_language_abi_version(language : Language) -> UInt = "moonbit_ts_language_abi_version"
+extern "c" fn ts_language_abi_version(language : Language) -> UInt32 = "moonbit_ts_language_abi_version"
 
 ///|
 /// Get the ABI version number for this language. This version number is used
@@ -211,7 +211,7 @@ extern "c" fn ts_language_abi_version(language : Language) -> UInt = "moonbit_ts
 /// Tree-sitter.
 ///
 /// See also `Parser::set_language`.
-pub fn Language::abi_version(self : Language) -> Int {
+pub fn Language::abi_version(self : Language) -> Int32 {
   uint_to_int(ts_language_abi_version(self))
 }
 

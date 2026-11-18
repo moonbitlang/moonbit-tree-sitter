@@ -26,7 +26,9 @@ test "zig/query" {
     #|    return a * b;
     #|}
   let tree = parser.parse_string(source)
-  let query_cursor = tree.query("(function_declaration name: (identifier) @fn_name)")
+  let query_cursor = tree.query(
+    "(function_declaration name: (identifier) @fn_name)",
+  )
   let funcs = []
   for match_ in query_cursor.matches() {
     for capture in match_.captures() {
@@ -41,9 +43,12 @@ test "zig/query" {
 ///|
 test "zig/language" {
   let language : @tree_sitter.Language = @tree_sitter_zig.language()
-  inspect(language.name(), content=(
-    #|Some("zig")
-  ))
+  debug_inspect(
+    language.name(),
+    content=(
+      #|Some("zig")
+    ),
+  )
   assert_true(language.abi_version() > 0)
   assert_true(language.symbol_count() > 0)
 }

@@ -1,0 +1,24 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "tonyfettes/tree_sitter/query"
+
+import {
+  "tonyfettes/tree_sitter",
+}
+
+// Values
+
+// Errors
+type ParseError
+
+// Types and methods
+type Query
+pub fn Query::new(@tree_sitter.Language, StringView) -> Self raise ParseError
+
+type QueryCursor
+pub fn QueryCursor::captures(Self) -> Iter2[String, @tree_sitter.Node]
+pub fn QueryCursor::exec(Self, @tree_sitter.Node) -> Unit
+pub fn QueryCursor::new(Query) -> Self
+
+// Type aliases
+
+// Traits

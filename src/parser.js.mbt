@@ -50,9 +50,9 @@ extern "js" fn ts_parser_set_language(
 ///|
 suberror LanguageError {
   VersionMismatch(
-    language_abi_version~ : Int,
-    library_version~ : Int,
-    min_compatible_version~ : Int
+    language_abi_version~ : Int32,
+    library_version~ : Int32,
+    min_compatible_version~ : Int32,
   )
 }
 
@@ -70,7 +70,7 @@ pub fn Parser::set_language(
   language : Language,
 ) -> Unit raise LanguageError {
   let succeed = ts_parser_set_language(self, language)
-  if not(succeed) {
+  if !succeed {
     raise VersionMismatch(
       language_abi_version=language.abi_version(),
       library_version=LANGUAGE_VERSION,
@@ -106,10 +106,11 @@ pub fn Parser::included_ranges(self : Parser) -> Array[Range] {
 }
 
 ///|
+#derive(Debug)
 pub suberror ParseError {
   MissingLanguage
   Cancelled
-} derive(Show)
+}
 
 ///|
 fn Parser::raise_parse_error(
@@ -217,4 +218,9 @@ extern "js" fn ts_parser_logger(parser : Parser) -> (String, Bool) -> Unit =
 /// Get the parser's current logger.
 pub fn Parser::logger(self : Parser) -> Logger {
   ts_parser_logger(self)
+}
+
+///|
+pub impl Show for ParseError with fn output(self, logger) {
+  logger.write_string(@debug.to_string(self))
 }

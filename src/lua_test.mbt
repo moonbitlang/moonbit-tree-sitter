@@ -23,7 +23,9 @@ test "lua/query" {
     #|local function foo() end
     #|local function bar() end
   let tree = parser.parse_string(source)
-  let query_cursor = tree.query("(function_declaration name: (identifier) @func_name)")
+  let query_cursor = tree.query(
+    "(function_declaration name: (identifier) @func_name)",
+  )
   let funcs = []
   for match_ in query_cursor.matches() {
     for capture in match_.captures() {
@@ -38,9 +40,12 @@ test "lua/query" {
 ///|
 test "lua/language" {
   let language : @tree_sitter.Language = @tree_sitter_lua.language()
-  inspect(language.name(), content=(
-    #|Some("lua")
-  ))
+  debug_inspect(
+    language.name(),
+    content=(
+      #|Some("lua")
+    ),
+  )
   assert_true(language.abi_version() > 0)
   assert_true(language.symbol_count() > 0)
 }

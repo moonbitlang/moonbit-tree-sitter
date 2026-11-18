@@ -1,8 +1,8 @@
 ///|
-struct Range(FixedArray[UInt])
+struct Range(FixedArray[UInt32])
 
 ///|
-pub impl Show for Range with output(self : Range, logger : &@builtin.Logger) -> Unit {
+pub impl Show for Range with fn output(self : Range, logger : &@builtin.Logger) -> Unit {
   logger.write_object(self.start_point())
   logger.write_string(" - ")
   logger.write_object(self.end_point())
@@ -12,8 +12,8 @@ pub impl Show for Range with output(self : Range, logger : &@builtin.Logger) -> 
 fn ts_range_new(
   start_point : Point,
   end_point : Point,
-  start_byte : UInt,
-  end_byte : UInt,
+  start_byte : UInt32,
+  end_byte : UInt32,
 ) -> Range {
   [
     ts_point_row(start_point),
@@ -29,8 +29,8 @@ fn ts_range_new(
 pub fn Range::new(
   start_point : Point,
   end_point : Point,
-  start_byte : Int,
-  end_byte : Int,
+  start_byte : Int32,
+  end_byte : Int32,
 ) -> Range {
   let start_byte = int_to_uint(start_byte)
   let end_byte = int_to_uint(end_byte)
@@ -48,21 +48,26 @@ pub fn Range::end_point(self : Range) -> Point {
 }
 
 ///|
-fn ts_range_start_byte(point : Range) -> UInt {
+fn ts_range_start_byte(point : Range) -> UInt32 {
   point.0[4]
 }
 
 ///|
-pub fn Range::start_byte(self : Range) -> Int {
+pub fn Range::start_byte(self : Range) -> Int32 {
   uint_to_int(ts_range_start_byte(self))
 }
 
 ///|
-fn ts_range_end_byte(point : Range) -> UInt {
+fn ts_range_end_byte(point : Range) -> UInt32 {
   point.0[5]
 }
 
 ///|
-pub fn Range::end_byte(self : Range) -> Int {
+pub fn Range::end_byte(self : Range) -> Int32 {
   uint_to_int(ts_range_end_byte(self))
+}
+
+///|
+pub impl Debug for Range with fn to_repr(self) {
+  Repr::literal(Show::to_string(self))
 }

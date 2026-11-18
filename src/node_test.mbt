@@ -60,12 +60,12 @@ test "node advanced operations" {
   // Test child_by_field_name
   // Note: JSON language may not have field names, but we can test the API
   let maybe_field = object_node.child_by_field_name("key")
-  inspect(maybe_field, content="None")
+  debug_inspect(maybe_field, content="None")
 
   // Test descendant_for_byte_range
   let name_value_node = object_node.descendant_for_byte_range(12, 18)
-  inspect(
-    name_value_node.map(fn(x) { x.text() }),
+  debug_inspect(
+    name_value_node.map(fn(x) { x.text().to_owned() }),
     content=(
       #|Some("\"name\": \"test\"")
     ),
@@ -76,8 +76,8 @@ test "node advanced operations" {
     @tree_sitter.Point::new(0, 12),
     @tree_sitter.Point::new(0, 18),
   )
-  inspect(
-    point_node.map(fn(x) { x.text() }),
+  debug_inspect(
+    point_node.map(fn(x) { x.text().to_owned() }),
     content=(
       #|Some("\"name\": \"test\"")
     ),

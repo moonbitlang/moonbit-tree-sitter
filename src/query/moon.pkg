@@ -11,7 +11,8 @@ import {
   "tonyfettes/tree_sitter_moonbit",
 } for "test"
 
+supported_targets = "+native"
+
 options(
-  "supported-targets": "+native",
   targets: { "query.mbt": [ "native" ], "query_test.mbt": [ "native" ] },
 )

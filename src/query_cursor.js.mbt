@@ -2,7 +2,7 @@
 type QueryCapture
 
 ///|
-pub extern "js" fn QueryCapture::pattern_index(self : QueryCapture) -> Int =
+pub extern "js" fn QueryCapture::pattern_index(self : QueryCapture) -> Int32 =
   #|(self) => {
   #|  return self.patternIndex;
   #|}
@@ -31,7 +31,7 @@ extern "js" fn TSQueryMatch::captures(
   #|}
 
 ///|
-extern "js" fn TSQueryMatch::pattern_index(self : TSQueryMatch) -> Int =
+extern "js" fn TSQueryMatch::pattern_index(self : TSQueryMatch) -> Int32 =
   #|(self) => {
   #|  return self.patternIndex;
   #|}
@@ -48,7 +48,7 @@ pub fn QueryMatch::captures(self : QueryMatch) -> Array[QueryCapture] {
 }
 
 ///|
-pub fn QueryMatch::pattern_index(self : QueryMatch) -> Int {
+pub fn QueryMatch::pattern_index(self : QueryMatch) -> Int32 {
   self.query_match.pattern_index()
 }
 
@@ -65,7 +65,7 @@ struct QueryCursor {
 
 ///|
 pub fn QueryCursor::new() -> QueryCursor {
-  QueryCursor::{ query: None, node: None }
+  QueryCursor::{ query: None, node: None, }
 }
 
 ///|

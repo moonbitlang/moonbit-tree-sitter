@@ -67,7 +67,7 @@ test "tree included ranges" {
 
   // Get included ranges back from the tree
   let tree_ranges = partial_tree.included_ranges()
-  inspect(tree_ranges, content="[(0, 0) - (0, 10)]")
+  debug_inspect(tree_ranges, content="[(0, 0) - (0, 10)]")
 }
 
 ///|

@@ -1,0 +1,322 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "tonyfettes/tree_sitter"
+
+import {
+  "moonbitlang/core/builtin",
+  "moonbitlang/core/debug",
+  "moonbitlang/core/json",
+  "tonyfettes/tree_sitter/grammar",
+  "tonyfettes/tree_sitter/node_types",
+  "tonyfettes/tree_sitter_language",
+}
+
+// Values
+pub const LANGUAGE_VERSION : Int32 = 15
+
+pub const MIN_COMPATIBLE_LANGUAGE_VERSION : Int32 = 13
+
+pub fn parser(Language) -> Parser raise LanguageError
+
+// Errors
+#derive(@debug.Debug)
+type LanguageError
+pub impl Show for LanguageError
+pub impl @json.ToJson for LanguageError
+
+#derive(@debug.Debug)
+pub suberror ParseError {
+  MissingLanguage
+  Cancelled
+}
+pub impl Show for ParseError
+
+#derive(@debug.Debug)
+type QueryError
+pub impl Show for QueryError
+
+// Types and methods
+type DecodeResult
+pub fn DecodeResult::new(code_point~ : Char, bytes_read~ : Int32) -> Self
+
+type FieldId
+
+type Input[DecodeFunction]
+pub fn[DecodeFunction] Input::new((Int32, Point) -> BytesView, DecodeFunction) -> Self[DecodeFunction]
+
+type InputEdit
+pub fn InputEdit::new(start_byte~ : Int32, old_end_byte~ : Int32, new_end_byte~ : Int32, start_point~ : Point, old_end_point~ : Point, new_end_point~ : Point) -> Self
+
+pub(all) enum InputEncoding {
+  UTF8
+  UTF16LE
+  UTF16BE
+  Custom
+}
+pub fn InputEncoding::custom() -> Self
+pub impl DecodeFunction for InputEncoding
+
+pub(all) struct Language(@tree_sitter_language.Language)
+pub fn Language::abi_version(Self) -> Int32
+pub fn Language::copy(Self) -> Self
+pub fn Language::delete(Self) -> Unit
+pub fn Language::field_count(Self) -> Int32
+pub fn Language::field_id_for_name(Self, StringView) -> Int32
+pub fn Language::field_name_for_id(Self, FieldId) -> String?
+pub fn Language::metadata(Self) -> LanguageMetadata
+pub fn Language::name(Self) -> String?
+pub fn Language::next_state(Self, StateId, Symbol) -> StateId
+pub fn Language::state_count(Self) -> Int32
+pub fn Language::subtypes(Self) -> Array[Symbol]
+pub fn Language::supertypes(Self) -> Array[Symbol]
+pub fn Language::symbol_count(Self) -> Int32
+pub fn Language::symbol_for_name(Self, StringView) -> Symbol?
+pub fn Language::symbol_name(Self, Symbol) -> String?
+pub fn Language::symbol_type(Self, Symbol) -> SymbolType
+#deprecated
+pub fn Language::version(Self) -> Int32
+
+type LanguageMetadata
+pub fn LanguageMetadata::major_version(Self) -> Byte
+pub fn LanguageMetadata::minor_version(Self) -> Byte
+pub fn LanguageMetadata::patch_version(Self) -> Byte
+
+pub enum LogType {
+  Parse
+  Lex
+}
+
+type Logger
+pub fn Logger::new((LogType, StringView) -> Unit) -> Self
+
+type LookaheadIterator
+pub fn LookaheadIterator::current_symbol(Self) -> Symbol
+pub fn LookaheadIterator::current_symbol_name(Self) -> String?
+pub fn LookaheadIterator::language(Self) -> Language
+pub fn LookaheadIterator::new(Language, StateId) -> Self?
+pub fn LookaheadIterator::next(Self) -> Bool
+pub fn LookaheadIterator::reset(Self, Language, StateId) -> Bool
+pub fn LookaheadIterator::reset_state(Self, StateId) -> Bool
+
+type Node
+pub fn Node::child(Self, Int32) -> Self?
+pub fn Node::child_by_field_id(Self, FieldId) -> Self?
+pub fn Node::child_by_field_name(Self, StringView) -> Self?
+pub fn Node::child_count(Self) -> Int32
+pub fn Node::child_with_descendant(Self, Self) -> Self?
+pub fn Node::children(Self) -> Iter[Self]
+pub fn Node::descendant_count(Self) -> Int32
+pub fn Node::descendant_for_byte_range(Self, Int32, Int32) -> Self?
+pub fn Node::descendant_for_point_range(Self, Point, Point) -> Self?
+pub fn Node::edit(Self, InputEdit) -> Unit
+pub fn Node::end_byte(Self) -> Int32
+pub fn Node::end_point(Self) -> Point
+pub fn Node::eq(Self, Self) -> Bool
+pub fn Node::field_name_for_child(Self, Int32) -> String?
+pub fn Node::field_name_for_named_child(Self, Int32) -> String?
+pub fn Node::first_child_for_byte(Self, Int32) -> Self?
+pub fn Node::first_named_child_for_byte(Self, Int32) -> Self?
+pub fn Node::grammar_symbol(Self) -> Symbol
+pub fn Node::grammar_type(Self) -> String
+pub fn Node::has_changes(Self) -> Bool
+pub fn Node::has_error(Self) -> Bool
+pub fn Node::is_error(Self) -> Bool
+pub fn Node::is_extra(Self) -> Bool
+pub fn Node::is_missing(Self) -> Bool
+pub fn Node::is_named(Self) -> Bool
+pub fn Node::is_null(Self) -> Bool
+pub fn Node::language(Self) -> Language
+pub fn Node::named_child(Self, Int32) -> Self?
+pub fn Node::named_child_count(Self) -> Int32
+pub fn Node::named_children(Self) -> Iter[Self]
+pub fn Node::named_descendant_for_byte_range(Self, Int32, Int32) -> Self?
+pub fn Node::named_descendant_for_point_range(Self, Point, Point) -> Self?
+pub fn Node::next_named_sibling(Self) -> Self?
+pub fn Node::next_parse_state(Self) -> StateId
+pub fn Node::next_sibling(Self) -> Self?
+pub fn Node::next_symbol_names(Self) -> Iter[String]
+pub fn Node::next_symbols(Self) -> Iter[Symbol]
+pub fn Node::parent(Self) -> Self?
+pub fn Node::parse_state(Self) -> StateId
+pub fn Node::prev_named_sibling(Self) -> Self?
+pub fn Node::prev_sibling(Self) -> Self?
+pub fn Node::query(Self, StringView) -> QueryCursor raise QueryError
+pub fn Node::range(Self) -> Range
+pub fn Node::start_byte(Self) -> Int32
+pub fn Node::start_point(Self) -> Point
+pub fn Node::string(Self) -> String
+pub fn Node::symbol(Self) -> Symbol
+pub fn Node::symbol_names(Self) -> Iter[String]
+pub fn Node::symbols(Self) -> Iter[Symbol]
+pub fn Node::text(Self) -> StringView
+pub fn Node::type_(Self) -> String
+pub fn Node::walk(Self) -> TreeCursor
+pub impl Eq for Node
+pub impl Hash for Node
+pub impl Show for Node
+pub impl @debug.Debug for Node
+pub impl @json.ToJson for Node
+
+type ParseOptions
+pub fn ParseOptions::new((ParseState) -> Bool) -> Self
+
+pub struct ParseState {
+  current_byte_offset : Int32
+  has_error : Bool
+}
+
+type Parser
+pub fn Parser::included_ranges(Self) -> Array[Range]
+pub fn Parser::language(Self) -> Language?
+pub fn Parser::logger(Self) -> Logger
+pub fn Parser::new() -> Self
+pub fn[Encoding : DecodeFunction] Parser::parse(Self, old_tree? : Tree, Input[Encoding], options? : ParseOptions) -> Tree raise ParseError
+pub fn Parser::parse_bytes(Self, old_tree? : Tree, Bytes, encoding~ : InputEncoding) -> Tree raise ParseError
+pub fn Parser::parse_string(Self, old_tree? : Tree, StringView) -> Tree raise ParseError
+pub fn Parser::reset(Self) -> Unit
+pub fn Parser::set_included_ranges(Self, Array[Range]) -> Bool
+pub fn Parser::set_language(Self, Language) -> Unit raise LanguageError
+pub fn Parser::set_logger(Self, Logger) -> Unit
+
+type Point
+pub fn Point::column(Self) -> Int32
+pub fn Point::new(Int32, Int32) -> Self
+pub fn Point::row(Self) -> Int32
+pub impl Show for Point
+pub impl @debug.Debug for Point
+
+#derive(@debug.Debug)
+pub enum Quantifier {
+  Zero
+  ZeroOrOne
+  ZeroOrMore
+  One
+  OneOrMore
+}
+pub impl Show for Quantifier
+
+type Query
+pub fn Query::capture_count(Self) -> Int32
+pub fn Query::capture_name_for_id(Self, Int32) -> String
+pub fn Query::capture_quantifier_for_id(Self, Int32, Int32) -> Quantifier
+pub fn Query::captures(Self, Node) -> Iter[QueryCapture]
+pub fn Query::disable_capture(Self, StringView) -> Unit
+pub fn Query::disable_pattern(Self, Int32) -> Unit
+pub fn Query::end_byte_for_pattern(Self, Int32) -> Int32
+pub fn Query::is_pattern_guaranteed_at_step(Self, Int32) -> Bool
+pub fn Query::is_pattern_non_local(Self, Int32) -> Bool
+pub fn Query::is_pattern_rooted(Self, Int32) -> Bool
+pub fn Query::matches(Self, Node) -> Iter[QueryMatch]
+pub fn Query::new(Language, StringView) -> Self raise QueryError
+pub fn Query::pattern_count(Self) -> Int32
+pub fn Query::predicates_for_pattern(Self, Int32) -> Array[Array[QueryPredicateStep]]
+pub fn Query::start_byte_for_pattern(Self, Int32) -> Int32
+pub fn Query::string_count(Self) -> Int32
+pub fn Query::string_value_for_id(Self, Int32) -> String?
+
+type QueryCapture
+pub fn QueryCapture::index(Self) -> Int32
+pub fn QueryCapture::name(Self) -> String
+pub fn QueryCapture::node(Self) -> Node
+pub impl Show for QueryCapture
+pub impl @debug.Debug for QueryCapture
+pub impl @json.ToJson for QueryCapture
+
+type QueryCursor
+pub fn QueryCursor::captures(Self) -> Iter[QueryCapture]
+pub fn QueryCursor::did_exceed_match_limit(Self) -> Bool
+pub fn QueryCursor::exec(Self, Query, Node, options? : QueryCursorOptions) -> Unit
+pub fn QueryCursor::match_limit(Self) -> Int32
+pub fn QueryCursor::matches(Self) -> Iter[QueryMatch]
+pub fn QueryCursor::new() -> Self
+pub fn QueryCursor::next_capture(Self) -> QueryCapture?
+pub fn QueryCursor::next_match(Self) -> QueryMatch?
+pub fn QueryCursor::remove_match(Self, Int32) -> Unit
+pub fn QueryCursor::set_byte_range(Self, Int32, Int32) -> Unit
+pub fn QueryCursor::set_match_limit(Self, Int32) -> Unit
+pub fn QueryCursor::set_max_start_depth(Self, Int32) -> Unit
+pub fn QueryCursor::set_point_range(Self, Point, Point) -> Unit
+
+type QueryCursorOptions
+pub fn QueryCursorOptions::new(progress_callback~ : (QueryCursorState) -> Unit) -> Self
+
+pub struct QueryCursorState {
+  current_byte_offset : Int32
+}
+
+type QueryMatch
+pub fn QueryMatch::captures(Self) -> Iter[QueryCapture]
+pub fn QueryMatch::id(Self) -> Int32
+pub fn QueryMatch::pattern_index(Self) -> Int32
+pub fn QueryMatch::predicates(Self) -> Array[Array[QueryPredicateStep]]
+pub impl @json.ToJson for QueryMatch
+
+pub enum QueryPredicateStep {
+  Capture(String)
+  String(String)
+}
+pub impl Show for QueryPredicateStep
+pub impl @debug.Debug for QueryPredicateStep
+pub impl @json.ToJson for QueryPredicateStep
+
+type Range
+pub fn Range::end_byte(Self) -> Int32
+pub fn Range::end_point(Self) -> Point
+pub fn Range::new(Point, Point, Int32, Int32) -> Self
+pub fn Range::start_byte(Self) -> Int32
+pub fn Range::start_point(Self) -> Point
+pub impl Show for Range
+pub impl @debug.Debug for Range
+
+type StateId
+
+type Symbol
+
+pub enum SymbolType {
+  Regular
+  Anonymous
+  Supertype
+  Auxiliary
+}
+
+type Tree
+pub fn Tree::copy(Self) -> Self
+pub fn Tree::edit(Self, InputEdit) -> Unit
+pub fn Tree::get_changed_ranges(Self, Self) -> Array[Range]
+pub fn Tree::included_ranges(Self) -> Array[Range]
+pub fn Tree::language(Self) -> Language
+pub fn Tree::query(Self, StringView) -> QueryCursor raise QueryError
+pub fn Tree::root_node(Self) -> Node
+pub fn Tree::root_node_with_offset(Self, Int32, Point) -> Node
+pub fn Tree::walk(Self) -> TreeCursor
+
+type TreeCursor
+pub fn TreeCursor::copy(Self) -> Self
+pub fn TreeCursor::current_depth(Self) -> Int32
+pub fn TreeCursor::current_descendant_index(Self) -> Int32
+pub fn TreeCursor::current_field_id(Self) -> FieldId
+pub fn TreeCursor::current_field_name(Self) -> String?
+pub fn TreeCursor::current_node(Self) -> Node
+pub fn TreeCursor::goto_descendant(Self, Int32) -> Unit
+pub fn TreeCursor::goto_first_child(Self) -> Bool
+pub fn TreeCursor::goto_first_child_for_byte(Self, Int32) -> Bool
+pub fn TreeCursor::goto_first_child_for_point(Self, Point) -> Bool
+pub fn TreeCursor::goto_last_child(Self) -> Bool
+pub fn TreeCursor::goto_next_sibling(Self) -> Bool
+pub fn TreeCursor::goto_parent(Self) -> Bool
+pub fn TreeCursor::goto_previous_sibling(Self) -> Bool
+pub fn TreeCursor::new(Node) -> Self
+pub fn TreeCursor::reset(Self, Node) -> Unit
+pub fn TreeCursor::reset_to(Self, Self) -> Unit
+
+// Type aliases
+pub using @grammar {type Grammar}
+
+pub using @node_types {type NodeTypes}
+
+pub type QueryPredicate = Array[QueryPredicateStep]
+
+// Traits
+pub(open) trait DecodeFunction {
+  fn encoding(Self) -> InputEncoding = _
+  fn decode(BytesView) -> DecodeResult?
+}

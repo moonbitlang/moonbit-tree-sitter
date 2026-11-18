@@ -10,7 +10,7 @@ extern "js" fn ts_lookahead_iterator_is_null(
   #|}
 
 ///|
-impl Nullable for LookaheadIterator with is_null(self : LookaheadIterator) -> Bool {
+impl Nullable for LookaheadIterator with fn is_null(self : LookaheadIterator) -> Bool {
   ts_lookahead_iterator_is_null(self)
 }
 

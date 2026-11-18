@@ -1,10 +1,11 @@
 ///|
+#derive(Eq)
 pub enum Quantifier {
   ZeroOrOne
   ZeroOrMore
   One
   OneOrMore
-} derive(Eq)
+}
 
 ///|
 pub fn Quantifier::from_char(char : Char) -> Quantifier raise SexpError {
@@ -17,7 +18,7 @@ pub fn Quantifier::from_char(char : Char) -> Quantifier raise SexpError {
 }
 
 ///|
-pub impl Show for Quantifier with output(self : Quantifier, logger : &Logger) -> Unit {
+pub impl Show for Quantifier with fn output(self : Quantifier, logger : &Logger) -> Unit {
   match self {
     ZeroOrMore => logger.write_char('*')
     ZeroOrOne => logger.write_char('?')
@@ -27,6 +28,7 @@ pub impl Show for Quantifier with output(self : Quantifier, logger : &Logger) ->
 }
 
 ///|
+#derive(Eq)
 pub enum Atom {
   Field(String)
   Symbol(String)
@@ -37,15 +39,15 @@ pub enum Atom {
   Comment(String)
   Predicate(String)
   Directive(String)
-} derive(Eq)
-
-///|
-impl ToJson for Atom with to_json(self : Atom) -> Json {
-  self.to_string().to_json()
 }
 
 ///|
-pub impl Show for Atom with output(self : Atom, logger : &Logger) -> Unit {
+impl ToJson for Atom with fn to_json(self : Atom) -> Json {
+  @json.to_json(Show::to_string(self))
+}
+
+///|
+pub impl Show for Atom with fn output(self : Atom, logger : &Logger) -> Unit {
   match self {
     Field(name) => {
       logger.write_string(name)
@@ -81,11 +83,12 @@ pub impl Show for Atom with output(self : Atom, logger : &Logger) -> Unit {
 }
 
 ///|
+#derive(Eq, Debug)
 pub enum Delimiter {
   Bracket
   Parenthesis
   Brace
-} derive(Eq, Show)
+}
 
 ///|
 fn Delimiter::open(self : Delimiter) -> Char {
@@ -106,36 +109,37 @@ fn Delimiter::close(self : Delimiter) -> Char {
 }
 
 ///|
+#derive(Eq)
 pub enum Sexp {
   Atom(Atom)
   List(Array[Sexp], delimiter~ : Delimiter, mut quantifier~ : Quantifier)
-} derive(Eq)
+}
 
 ///|
 pub fn Sexp::list(
   list : Array[Sexp],
-  delimiter? : Delimiter = Parenthesis,
-  quantifier? : Quantifier = One,
+  delimiter~ : Delimiter = Parenthesis,
+  quantifier~ : Quantifier = One,
 ) -> Sexp {
   Sexp::List(list, delimiter~, quantifier~)
 }
 
 ///|
-pub impl ToJson for Sexp with to_json(self : Sexp) -> Json {
+pub impl ToJson for Sexp with fn to_json(self : Sexp) -> Json {
   match self {
-    Atom(atom) => atom.to_json()
-    List(list, ..) => list.to_json()
+    Atom(atom) => @json.to_json(atom)
+    List(list, ..) => @json.to_json(list)
   }
 }
 
 ///|
-pub impl Show for Sexp with output(self : Sexp, logger : &Logger) -> Unit {
+pub impl Show for Sexp with fn output(self : Sexp, logger : &Logger) -> Unit {
   match self {
-    Atom(atom) => atom.output(logger)
+    Atom(atom) => Show::output(atom, logger)
     List(list, delimiter~, quantifier~) => {
       logger.write_char(delimiter.open())
       for i, sexp in list {
-        sexp.output(logger)
+        Show::output(sexp, logger)
         if i < list.length() - 1 {
           logger.write_char(' ')
         }
@@ -146,4 +150,24 @@ pub impl Show for Sexp with output(self : Sexp, logger : &Logger) -> Unit {
       }
     }
   }
+}
+
+///|
+pub impl Debug for Quantifier with fn to_repr(self) {
+  Repr::literal(Show::to_string(self))
+}
+
+///|
+pub impl Debug for Atom with fn to_repr(self) {
+  Repr::literal(Show::to_string(self))
+}
+
+///|
+pub impl Debug for Sexp with fn to_repr(self) {
+  Repr::literal(Show::to_string(self))
+}
+
+///|
+pub impl Show for Delimiter with fn output(self, logger) {
+  logger.write_string(@debug.to_string(self))
 }

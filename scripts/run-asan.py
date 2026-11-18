@@ -18,6 +18,8 @@ lacks LeakSanitizer). On other platforms the system compiler is used directly.
 Both `moon.pkg` (DSL format) and `moon.pkg.json` (JSON format) are supported.
 """
 
+from __future__ import annotations
+
 import argparse
 import json
 import os
@@ -637,9 +639,9 @@ def main():
     repo_root = args.repo_root.resolve()
     if not repo_root.is_dir():
         sys.exit(f"--repo-root is not a directory: {repo_root}")
-    if not (repo_root / "moon.mod.json").is_file():
+    if not (repo_root / "moon.mod").is_file():
         print(
-            f"Warning: no moon.mod.json found in {repo_root}. "
+            f"Warning: no moon.mod found in {repo_root}. "
             "Is --repo-root pointing at the right directory?",
             file=sys.stderr,
         )

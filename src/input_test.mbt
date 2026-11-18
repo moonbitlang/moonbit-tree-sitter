@@ -16,7 +16,7 @@ test "input creation and usage" {
       if end > source.length() {
         end = source.length()
       }
-      let view = source.view(start_offset=start, end_offset=end)
+      let view = source.clamped_view(start~, end~)
       let bytes = @utf8.encode(view)
       return bytes
     },

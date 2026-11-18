@@ -21,7 +21,7 @@ if MOON_HOME is None:
     MOON_HOME = Path.home() / ".moon"
 else:
     MOON_HOME = Path(MOON_HOME)
-VERSION = "0.1.26"
+VERSION = "0.1.27"
 
 
 class Metadata:
@@ -52,7 +52,6 @@ class Grammar:
     scope: str
     path: Path
     stubs: list[str]
-    files: list[str]
     external_files: list[Path]
     file_types: list[str]
 
@@ -68,7 +67,6 @@ class Grammar:
         self.path = path
         self.metadata = metadata
         self.stubs = []
-        self.files = []
         self.external_files = external_files
         self.file_types = file_types
 
@@ -90,21 +88,22 @@ class Grammar:
         content = "# MoonBit\n_build/\n.mooncakes/\ntarget\n"
         destination.write_text(content)
 
-    def generate_moon_mod_json_to(self, destination: Path, version: str, wasm: str):
-        moon_mod_json = {
+    def generate_moon_mod_to(self, destination: Path, version: str):
+        metadata = {
             "name": f"tonyfettes/tree_sitter_{self.name}",
             "version": version,
-            "deps": {
-                "tonyfettes/tree_sitter_language": "0.1.3",
-            },
             "repository": self.metadata.repository,
             "license": self.metadata.license,
             "description": self.metadata.description,
             "keywords": ["tree-sitter", self.name],
-            "include": self.files + ["binding.mbt", "moon.pkg", wasm],
-            "preferred-target": "native",
+            "preferred_target": "native",
+            "supported_targets": "native",
         }
-        destination.write_text(json.dumps(moon_mod_json, indent=2) + "\n")
+        content = "\n\n".join(
+            f"{key} = {json.dumps(value)}" for key, value in metadata.items()
+        )
+        content += '\n\nimport {\n  "tonyfettes/tree_sitter_language@0.1.4",\n}\n'
+        destination.write_text(content)
 
     def generate_moon_pkg_to(self, destination: Path):
         native_stub_list = ", ".join(f'"{stub}"' for stub in self.stubs)
@@ -112,9 +111,10 @@ class Grammar:
   "tonyfettes/tree_sitter_language",
 }}
 
+supported_targets = "+native"
+
 options(
   native_stub: [ {native_stub_list} ],
-  "supported-targets": "+native",
   targets: {{ "binding.mbt": [ "native" ] }},
 )
 """
@@ -191,24 +191,19 @@ pub extern "c" fn language() -> @tree_sitter_language.Language = "{function_name
             self.perform_c_include_to(
                 destination, file.relative_to(destination), relocations
             )
-        # Scan destination to collect stubs and files after all copying is done
+        # Scan destination to collect stubs after all copying is done.
         self.stubs = []
-        self.files = []
         for file in destination.iterdir():
             if file.suffix == ".c":
                 self.stubs.append(file.name)
-            self.files.append(file.name)
         self.stubs.sort()
-        self.files.sort()
         wasm_path = self.tree_sitter_build_wasm()
         shutil.copyfile(wasm_path, destination / wasm_path.name)
         self.generate_binding_native_mbt_to(
             destination / "parser.c", destination / "binding.mbt"
         )
         self.generate_gitignore_to(destination / ".gitignore")
-        self.generate_moon_mod_json_to(
-            destination / "moon.mod.json", VERSION, wasm=wasm_path.name
-        )
+        self.generate_moon_mod_to(destination / "moon.mod", VERSION)
         self.generate_moon_pkg_to(destination / "moon.pkg")
 
 
@@ -361,7 +356,7 @@ def publish_languages(bindings: Path):
     for lang_dir in sorted(bindings.iterdir()):
         if not lang_dir.is_dir():
             continue
-        if not (lang_dir / "moon.mod.json").exists():
+        if not (lang_dir / "moon.mod").exists():
             continue
         logger.info(f"Publishing {lang_dir.name}")
         try:

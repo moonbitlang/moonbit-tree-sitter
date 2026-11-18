@@ -8,7 +8,7 @@ extern "c" fn ts_lookahead_iterator_is_null(
 ) -> Bool = "moonbit_c_is_null"
 
 ///|
-impl Nullable for LookaheadIterator with is_null(self : LookaheadIterator) -> Bool {
+impl Nullable for LookaheadIterator with fn is_null(self : LookaheadIterator) -> Bool {
   ts_lookahead_iterator_is_null(self)
 }
 
@@ -36,7 +36,7 @@ pub fn LookaheadIterator::new(
   language : Language,
   state : StateId,
 ) -> LookaheadIterator? {
-  ts_lookahead_iterator_new(language, state).to_option()
+  ts_lookahead_iterator_new(language, state) |> Nullable::to_option
 }
 
 ///|

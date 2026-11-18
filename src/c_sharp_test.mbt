@@ -30,7 +30,9 @@ test "c_sharp/query" {
     #|    int Baz() { return 0; }
     #|}
   let tree = parser.parse_string(source)
-  let query_cursor = tree.query("(method_declaration name: (identifier) @method_name)")
+  let query_cursor = tree.query(
+    "(method_declaration name: (identifier) @method_name)",
+  )
   let methods = []
   for match_ in query_cursor.matches() {
     for capture in match_.captures() {
@@ -45,9 +47,12 @@ test "c_sharp/query" {
 ///|
 test "c_sharp/language" {
   let language : @tree_sitter.Language = @tree_sitter_c_sharp.language()
-  inspect(language.name(), content=(
-    #|Some("c_sharp")
-  ))
+  debug_inspect(
+    language.name(),
+    content=(
+      #|Some("c_sharp")
+    ),
+  )
   assert_true(language.abi_version() > 0)
   assert_true(language.symbol_count() > 0)
 }

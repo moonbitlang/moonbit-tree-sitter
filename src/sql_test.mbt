@@ -20,7 +20,9 @@ test "sql/query" {
     #|SELECT name FROM users;
     #|SELECT id FROM orders;
   let tree = parser.parse_string(source)
-  let query_cursor = tree.query("(relation (object_reference name: (identifier) @table_name))")
+  let query_cursor = tree.query(
+    "(relation (object_reference name: (identifier) @table_name))",
+  )
   let tables = []
   for match_ in query_cursor.matches() {
     for capture in match_.captures() {
@@ -35,9 +37,12 @@ test "sql/query" {
 ///|
 test "sql/language" {
   let language : @tree_sitter.Language = @tree_sitter_sql.language()
-  inspect(language.name(), content=(
-    #|Some("sql")
-  ))
+  debug_inspect(
+    language.name(),
+    content=(
+      #|Some("sql")
+    ),
+  )
   assert_true(language.abi_version() > 0)
   assert_true(language.symbol_count() > 0)
 }

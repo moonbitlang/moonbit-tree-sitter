@@ -24,7 +24,9 @@ test "bash/query" {
     #|name="world"
     #|count=42
   let tree = parser.parse_string(source)
-  let query_cursor = tree.query("(variable_assignment name: (variable_name) @name) @assignment")
+  let query_cursor = tree.query(
+    "(variable_assignment name: (variable_name) @name) @assignment",
+  )
   let names = []
   for match_ in query_cursor.matches() {
     for capture in match_.captures() {
@@ -39,9 +41,12 @@ test "bash/query" {
 ///|
 test "bash/language" {
   let language : @tree_sitter.Language = @tree_sitter_bash.language()
-  inspect(language.name(), content=(
-    #|Some("bash")
-  ))
+  debug_inspect(
+    language.name(),
+    content=(
+      #|Some("bash")
+    ),
+  )
   assert_true(language.abi_version() > 0)
   assert_true(language.symbol_count() > 0)
 }

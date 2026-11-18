@@ -1,4 +1,5 @@
 ///|
+#derive(Eq)
 enum Node {
   True
   False
@@ -8,55 +9,55 @@ enum Node {
   Type(String)
   Child(Expr)
   Descendant(Expr)
-} derive(Eq)
+}
 
 ///|
-impl ToJson for Node with to_json(self : Node) -> Json {
+impl ToJson for Node with fn to_json(self : Node) -> Json {
   match self {
     True => Json::boolean(true)
     False => Json::boolean(false)
     And(n1, n2) => { "and": [n1, n2] }
     Or(n1, n2) => { "or": [n1, n2] }
     Not(n1) => { "not": n1 }
-    Type(t) => t.to_json()
-    Child(e) => { "child": e.to_json() }
-    Descendant(e) => { "descendant": e.to_json() }
+    Type(t) => @json.to_json(t)
+    Child(e) => { "child": @json.to_json(e) }
+    Descendant(e) => { "descendant": @json.to_json(e) }
   }
 }
 
 ///|
-impl Show for Node with output(self : Node, logger : &Logger) -> Unit {
+impl Show for Node with fn output(self : Node, logger : &Logger) -> Unit {
   match self {
     True => logger.write_string("true")
     False => logger.write_string("false")
     And(n1, n2) => {
       logger.write_char('(')
-      n1.output(logger)
+      Show::output(n1, logger)
       logger.write_string(" && ")
-      n2.output(logger)
+      Show::output(n2, logger)
       logger.write_char(')')
     }
     Or(n1, n2) => {
       logger.write_char('(')
-      n1.output(logger)
+      Show::output(n1, logger)
       logger.write_string(" || ")
-      n2.output(logger)
+      Show::output(n2, logger)
       logger.write_char(')')
     }
     Not(n1) => {
       logger.write_string("!(")
-      n1.output(logger)
+      Show::output(n1, logger)
       logger.write_char(')')
     }
     Type(t) => logger.write_string(t.escape())
     Child(e) => {
       logger.write_string(".(")
-      e.output(logger)
+      Show::output(e, logger)
       logger.write_char(')')
     }
     Descendant(e) => {
       logger.write_string("..(")
-      e.output(logger)
+      Show::output(e, logger)
       logger.write_char(')')
     }
   }
@@ -251,7 +252,7 @@ pub fn Node::matches(
         let b2 = matches(n2, node, group)
         b1 || b2
       }
-      Not(n1) => not(matches(n1, node, group))
+      Not(n1) => !matches(n1, node, group)
       Type(t) => if node.type_() == t { true } else { false }
       Child(e) =>
         if e.matches(node.children()) is Some(matched) {
@@ -266,7 +267,7 @@ pub fn Node::matches(
     result
   }
 
-  let group = Map::new()
+  let group = Map([])
   if matches(self, node, group) {
     Some(group)
   } else {
@@ -275,6 +276,7 @@ pub fn Node::matches(
 }
 
 ///|
+#derive(Eq, ToJson)
 enum Expr {
   Empty
   Never
@@ -283,42 +285,42 @@ enum Expr {
   Alt(Expr, Expr)
   And(Expr, Expr)
   Repeat(Expr)
-  Capture(Expr, String, id~ : Int?)
-} derive(Eq, ToJson)
+  Capture(Expr, String, id~ : Int32?)
+}
 
 ///|
-impl Show for Expr with output(self : Expr, logger : &Logger) -> Unit {
+impl Show for Expr with fn output(self : Expr, logger : &Logger) -> Unit {
   match self {
     Empty => logger.write_char('ε')
     Never => logger.write_char('⊥')
     Node(True) => logger.write_char('_')
-    Node(n) => n.output(logger)
+    Node(n) => Show::output(n, logger)
     Seq(e1, e2) => {
-      e1.output(logger)
+      Show::output(e1, logger)
       logger.write_char(' ')
-      e2.output(logger)
+      Show::output(e2, logger)
     }
     Alt(e1, e2) => {
       logger.write_char('(')
-      e1.output(logger)
+      Show::output(e1, logger)
       logger.write_char('|')
-      e2.output(logger)
+      Show::output(e2, logger)
       logger.write_char(')')
     }
     And(e1, e2) => {
       logger.write_char('(')
-      e1.output(logger)
+      Show::output(e1, logger)
       logger.write_char('&')
-      e2.output(logger)
+      Show::output(e2, logger)
       logger.write_char(')')
     }
     Repeat(Node(True) as n) | Repeat(Node(Type(_)) as n) => {
-      n.output(logger)
+      Show::output(n, logger)
       logger.write_char('*')
     }
     Repeat(e) => {
       logger.write_char('(')
-      e.output(logger)
+      Show::output(e, logger)
       logger.write_string(")*")
     }
     Capture(e, name, id~) => {
@@ -328,7 +330,7 @@ impl Show for Expr with output(self : Expr, logger : &Logger) -> Unit {
         logger.write_string("@\{id}")
       }
       logger.write_char(':')
-      e.output(logger)
+      Show::output(e, logger)
       logger.write_char(')')
     }
   }
@@ -400,7 +402,7 @@ pub fn Expr::node(node : Node) -> Expr {
 }
 
 ///|
-pub fn Expr::capture(self : Expr, name : String, id? : Int) -> Expr {
+pub fn Expr::capture(self : Expr, name : String, id? : Int32) -> Expr {
   match self {
     Never => Never
     self => Capture(self, name, id~)
@@ -410,20 +412,20 @@ pub fn Expr::capture(self : Expr, name : String, id? : Int) -> Expr {
 ///|
 priv struct State {
   nodes : Array[@tree_sitter.Node]
-  start : Array[Int] // id -> start position
-  end : Array[Int] // id -> end position
-  table : Map[String, Array[Int]] // name -> ids
+  start : Array[Int32] // id -> start position
+  end : Array[Int32] // id -> end position
+  table : Map[String, Array[Int32]] // name -> ids
   group : Array[Map[String, Array[Match]]] // captures for each node
-  ids : Array[Array[Int]] // ids for each node
+  ids : Array[Array[Int32]] // ids for each node
 }
 
 ///|
 fn State::new() -> State {
-  { nodes: [], start: [], end: [], table: Map::new(), group: [], ids: [] }
+  { nodes: [], start: [], end: [], table: Map([]), group: [], ids: [], }
 }
 
 ///|
-fn State::start(self : Self, name : String) -> Int {
+fn State::start(self : Self, name : String) -> Int32 {
   let id = self.start.length()
   let index = self.index()
   self.start.push(index)
@@ -437,13 +439,13 @@ fn State::start(self : Self, name : String) -> Int {
 }
 
 ///|
-fn State::end(self : Self, id : Int) -> Unit {
+fn State::end(self : Self, id : Int32) -> Unit {
   guard self.end[id] == -1
   self.end[id] = self.nodes.length()
 }
 
 ///|
-fn State::index(self : Self) -> Int {
+fn State::index(self : Self) -> Int32 {
   self.nodes.length()
 }
 
@@ -521,10 +523,11 @@ fn State::finish(self : State, expr : Expr) -> Bool {
 }
 
 ///|
+#derive(Debug, ToJson)
 struct Match {
   value : ArrayView[@tree_sitter.Node]
   group : Map[String, Array[Match]]
-} derive(Show, ToJson)
+}
 
 ///|
 fn State::matches(
@@ -549,10 +552,10 @@ fn State::matches(
 pub fn Expr::matches(self : Expr, nodes : Iter[@tree_sitter.Node]) -> Match? {
   let state = State::new()
   let self = state.matches(self, nodes)
-  if not(state.finish(self)) {
+  if !state.finish(self) {
     return None
   }
-  let matched = Map::new()
+  let matched = Map([])
   for name, ids in state.table {
     let captures = []
     for id in ids {
@@ -561,13 +564,13 @@ pub fn Expr::matches(self : Expr, nodes : Iter[@tree_sitter.Node]) -> Match? {
       if end == -1 {
         continue
       }
-      let group : Map[String, Array[Match]] = Map::new()
+      let group : Map[String, Array[Match]] = Map([])
       for i in start..<end {
         group.merge_matches(state.group[i])
       }
-      captures.push({ value: state.nodes[start:end], group })
+      captures.push({ value: state.nodes[start:end], group, })
     }
-    if not(captures.is_empty()) {
+    if !captures.is_empty() {
       matched[name] = captures
     }
   }
@@ -582,5 +585,20 @@ pub fn Expr::matches(self : Expr, nodes : Iter[@tree_sitter.Node]) -> Match? {
       matched.merge_matches(g)
     }
   }
-  Some({ value: state.nodes, group: matched })
+  Some({ value: state.nodes, group: matched, })
+}
+
+///|
+pub impl Debug for Node with fn to_repr(self) {
+  Repr::literal(Show::to_string(self))
+}
+
+///|
+pub impl Debug for Expr with fn to_repr(self) {
+  Repr::literal(Show::to_string(self))
+}
+
+///|
+pub impl Show for Match with fn output(self, logger) {
+  logger.write_string(@debug.to_string(self))
 }

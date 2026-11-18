@@ -1,4 +1,10 @@
 ///|
+priv enum State {
+  Search(StringBuilder)
+  Narrow(String, StringBuilder)
+}
+
+///|
 struct Query {
   search : @tree_sitter.Query
   narrow : Map[String, @tree_sitter.Query]
@@ -15,20 +21,16 @@ pub fn Query::new(
   language : @tree_sitter.Language,
   query : StringView,
 ) -> Query raise ParseError {
-  enum State {
-    Search(StringBuilder)
-    Narrow(String, StringBuilder)
-  }
   let sexp_list = @sexp.parse(query) catch {
     error => raise ParseError::SyntaxError(error)
   }
-  let search = StringBuilder::new()
-  let narrow : Map[String, StringBuilder] = Map::new()
-  let mut state = Search(StringBuilder::new())
+  let search = StringBuilder()
+  let narrow : Map[String, StringBuilder] = Map([])
+  let mut state = Search(StringBuilder())
   fn save() -> StringBuilder {
     match state {
       Search(buffer) => {
-        if not(buffer.to_string().is_empty()) {
+        if !buffer.to_string().is_empty() {
           search.write_string(buffer.to_string())
         }
         buffer.reset()
@@ -43,16 +45,18 @@ pub fn Query::new(
           }
           None => {
             narrow.set(capture, buffer)
-            StringBuilder::new()
+            StringBuilder()
           }
         }
     }
   }
 
   fn skip_comment(sexp_list : ArrayView[@sexp.Sexp]) -> ArrayView[@sexp.Sexp] {
-    loop sexp_list {
-      [Atom(Comment(_)), .. sexp_list] => continue sexp_list
-      [..] as sexp_list => return sexp_list
+    for loop_state = sexp_list {
+      break match loop_state {
+        [Atom(Comment(_)), .. sexp_list] => continue sexp_list
+        [..] as sexp_list => return sexp_list
+      }
     }
   }
 
@@ -62,20 +66,20 @@ pub fn Query::new(
   ) -> ArrayView[@sexp.Sexp] {
     match skip_comment(sexp_list) {
       [Atom(Field(_)) as field, .. sexp_list] => {
-        field.output(buffer)
+        Show::output(field, buffer)
         match parse(sexp_list, buffer) {
           [Atom(Capture(_)) as capture, .. sexp_list] => {
-            capture.output(buffer)
+            Show::output(capture, buffer)
             return sexp_list
           }
           [.. sexp_list] => return sexp_list
         }
       }
       [sexp, .. sexp_list] => {
-        sexp.output(buffer)
+        Show::output(sexp, buffer)
         match skip_comment(sexp_list) {
           [Atom(Capture(_)) as capture, .. sexp_list] => {
-            capture.output(buffer)
+            Show::output(capture, buffer)
             return sexp_list
           }
           [.. sexp_list] => return sexp_list
@@ -85,26 +89,28 @@ pub fn Query::new(
     }
   }
 
-  loop sexp_list[:] {
-    [Atom(Comment(_)), .. sexp_list] => continue sexp_list
-    [Atom(Narrow(capture)), .. sexp_list] => {
-      let buffer = save()
-      state = Narrow(capture, buffer)
-      continue parse(sexp_list, buffer)
+  for loop_state = sexp_list[:] {
+    break match loop_state {
+      [Atom(Comment(_)), .. sexp_list] => continue sexp_list
+      [Atom(Narrow(capture)), .. sexp_list] => {
+        let buffer = save()
+        state = Narrow(capture, buffer)
+        continue parse(sexp_list, buffer)
+      }
+      [_, ..] as sexp_list => {
+        let buffer = save()
+        state = Search(buffer)
+        continue parse(sexp_list, buffer)
+      }
+      [] => break
     }
-    [_, ..] as sexp_list => {
-      let buffer = save()
-      state = Search(buffer)
-      continue parse(sexp_list, buffer)
-    }
-    [] => break
   }
   ignore(save())
   let search = @tree_sitter.Query::new(language, search.to_string()) catch {
     error => raise ParseError::QueryError(error)
   }
   let narrow = {
-    let map = Map::new()
+    let map = Map([])
     for capture, buffer in narrow {
       map[capture] = @tree_sitter.Query::new(language, buffer.to_string()) catch {
         error => raise ParseError::QueryError(error)
@@ -112,7 +118,7 @@ pub fn Query::new(
     }
     map
   }
-  { search, narrow }
+  { search, narrow, }
 }
 
 ///|
@@ -125,13 +131,13 @@ struct QueryCursor {
 ///|
 pub fn QueryCursor::new(query : Query) -> QueryCursor {
   let cursor = @tree_sitter.QueryCursor::new()
-  let captures : Map[String, Array[@tree_sitter.Node]] = Map::new()
-  { query, cursor, captures }
+  let captures : Map[String, Array[@tree_sitter.Node]] = Map([])
+  { query, cursor, captures, }
 }
 
 ///|
 pub fn QueryCursor::exec(self : QueryCursor, node : @tree_sitter.Node) -> Unit {
-  let queue = @queue.new()
+  let queue = @queue.Queue([])
   self.captures.clear()
   self.cursor.exec(self.query.search, node)
   for capture in self.cursor.captures() {

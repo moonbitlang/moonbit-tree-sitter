@@ -24,7 +24,9 @@ test "kotlin/query" {
     #|fun greet() {}
     #|fun calculate() {}
   let tree = parser.parse_string(source)
-  let query_cursor = tree.query("(function_declaration (simple_identifier) @func_name)")
+  let query_cursor = tree.query(
+    "(function_declaration (simple_identifier) @func_name)",
+  )
   let funcs = []
   for match_ in query_cursor.matches() {
     for capture in match_.captures() {
@@ -39,9 +41,12 @@ test "kotlin/query" {
 ///|
 test "kotlin/language" {
   let language : @tree_sitter.Language = @tree_sitter_kotlin.language()
-  inspect(language.name(), content=(
-    #|Some("kotlin")
-  ))
+  debug_inspect(
+    language.name(),
+    content=(
+      #|Some("kotlin")
+    ),
+  )
   assert_true(language.abi_version() > 0)
   assert_true(language.symbol_count() > 0)
 }

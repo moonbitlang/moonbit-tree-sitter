@@ -65,11 +65,11 @@ pub fn Node::grammar_symbol(self : Node) -> Symbol {
 
 ///|
 #borrow(node, tree)
-extern "c" fn ts_node_start_byte(node : TSNode, tree : TSTree) -> Int = "moonbit_ts_node_start_byte"
+extern "c" fn ts_node_start_byte(node : TSNode, tree : TSTree) -> Int32 = "moonbit_ts_node_start_byte"
 
 ///|
 /// Get the node's start byte.
-pub fn Node::start_byte(self : Node) -> Int {
+pub fn Node::start_byte(self : Node) -> Int32 {
   return ts_node_start_byte(self.node, self.tree)
 }
 
@@ -85,11 +85,11 @@ pub fn Node::start_point(self : Node) -> Point {
 
 ///|
 #borrow(node, tree)
-extern "c" fn ts_node_end_byte(node : TSNode, tree : TSTree) -> Int = "moonbit_ts_node_end_byte"
+extern "c" fn ts_node_end_byte(node : TSNode, tree : TSTree) -> Int32 = "moonbit_ts_node_end_byte"
 
 ///|
 /// Get the node's end byte.
-pub fn Node::end_byte(self : Node) -> Int {
+pub fn Node::end_byte(self : Node) -> Int32 {
   return ts_node_end_byte(self.node, self.tree)
 }
 
@@ -124,7 +124,7 @@ pub fn Node::string(self : Node) -> String {
 }
 
 ///|
-pub impl Show for Node with output(self : Node, logger : &@builtin.Logger) -> Unit {
+pub impl Show for Node with fn output(self : Node, logger : &@builtin.Logger) -> Unit {
   try @sexp.parse(self.string()) |> @sexp.print_to(logger) catch {
     _ => logger.write_string(self.string().to_string())
   }
@@ -238,7 +238,7 @@ pub fn Node::parent(self : Node) -> Node? {
   if ts_node_is_null(parent, self.tree) {
     None
   } else {
-    Some({ ..self, node: parent })
+    Some({ ..self, node: parent, })
   }
 }
 
@@ -265,7 +265,7 @@ pub fn Node::child_with_descendant(self : Node, descendant : Node) -> Node? {
   if ts_node_is_null(child, self.tree) {
     None
   } else {
-    Some({ ..self, node: child })
+    Some({ ..self, node: child, })
   }
 }
 
@@ -274,31 +274,31 @@ pub fn Node::child_with_descendant(self : Node, descendant : Node) -> Node? {
 extern "c" fn ts_node_child(
   node : TSNode,
   tree : TSTree,
-  index : UInt,
+  index : UInt32,
 ) -> TSNode = "moonbit_ts_node_child"
 
 ///|
-fn int_to_uint(value : Int) -> UInt {
+fn int_to_uint(value : Int32) -> UInt32 {
   guard value >= 0
   value.reinterpret_as_uint()
 }
 
 ///|
-fn uint_to_int(value : UInt) -> Int {
-  guard value <= @int.max_value.reinterpret_as_uint()
+fn uint_to_int(value : UInt32) -> Int32 {
+  guard value <= @int.MAX_VALUE.reinterpret_as_uint()
   value.reinterpret_as_int()
 }
 
 ///|
 /// Get the node's child at the given index, where zero represents the first
 /// child.
-pub fn Node::child(self : Node, index : Int) -> Node? {
+pub fn Node::child(self : Node, index : Int32) -> Node? {
   let index = int_to_uint(index)
   let child = ts_node_child(self.node, self.tree, index)
   if ts_node_is_null(child, self.tree) {
     None
   } else {
-    Some({ ..self, node: child })
+    Some({ ..self, node: child, })
   }
 }
 
@@ -313,7 +313,7 @@ pub fn Node::children(self : Node) -> Iter[Node] {
     } else {
       let child = ts_node_child(self.node, self.tree, i)
       i += 1
-      Some({ ..self, node: child })
+      Some({ ..self, node: child, })
     }
   })
 }
@@ -323,13 +323,13 @@ pub fn Node::children(self : Node) -> Iter[Node] {
 extern "c" fn ts_node_field_name_for_child(
   node : TSNode,
   tree : TSTree,
-  child_index : UInt,
+  child_index : UInt32,
 ) -> @c.Pointer[Byte] = "moonbit_ts_node_field_name_for_child"
 
 ///|
 /// Get the field name for node's child at the given index, where zero represents
 /// the first child. Returns `None`, if no field is found.
-pub fn Node::field_name_for_child(self : Node, child_index : Int) -> String? {
+pub fn Node::field_name_for_child(self : Node, child_index : Int32) -> String? {
   let child_index = int_to_uint(child_index)
   let field_name = ts_node_field_name_for_child(
     self.node,
@@ -344,7 +344,7 @@ pub fn Node::field_name_for_child(self : Node, child_index : Int) -> String? {
 extern "c" fn ts_node_field_name_for_named_child(
   node : TSNode,
   tree : TSTree,
-  child_index : UInt,
+  child_index : UInt32,
 ) -> @c.Pointer[Byte] = "moonbit_ts_node_field_name_for_named_child"
 
 ///|
@@ -352,7 +352,7 @@ extern "c" fn ts_node_field_name_for_named_child(
 /// represents the first named child. Returns `None`, if no field is found.
 pub fn Node::field_name_for_named_child(
   self : Node,
-  child_index : Int,
+  child_index : Int32,
 ) -> String? {
   let child_index = int_to_uint(child_index)
   let field_name = ts_node_field_name_for_named_child(
@@ -365,11 +365,11 @@ pub fn Node::field_name_for_named_child(
 
 ///|
 #borrow(node, tree)
-extern "c" fn ts_node_child_count(node : TSNode, tree : TSTree) -> UInt = "moonbit_ts_node_child_count"
+extern "c" fn ts_node_child_count(node : TSNode, tree : TSTree) -> UInt32 = "moonbit_ts_node_child_count"
 
 ///|
 /// Get the node's number of children.
-pub fn Node::child_count(self : Node) -> Int {
+pub fn Node::child_count(self : Node) -> Int32 {
   uint_to_int(ts_node_child_count(self.node, self.tree))
 }
 
@@ -378,32 +378,32 @@ pub fn Node::child_count(self : Node) -> Int {
 extern "c" fn ts_node_named_child(
   node : TSNode,
   tree : TSTree,
-  child_index : UInt,
+  child_index : UInt32,
 ) -> TSNode = "moonbit_ts_node_named_child"
 
 ///|
 /// Get the node's *named* child at the given index.
 ///
 /// See also `Node::is_named`.
-pub fn Node::named_child(self : Node, child_index : Int) -> Node? {
+pub fn Node::named_child(self : Node, child_index : Int32) -> Node? {
   let child_index = int_to_uint(child_index)
   let child = ts_node_named_child(self.node, self.tree, child_index)
   if ts_node_is_null(child, self.tree) {
     None
   } else {
-    Some({ ..self, node: child })
+    Some({ ..self, node: child, })
   }
 }
 
 ///|
 #borrow(node, tree)
-extern "c" fn ts_node_named_child_count(node : TSNode, tree : TSTree) -> UInt = "moonbit_ts_node_named_child_count"
+extern "c" fn ts_node_named_child_count(node : TSNode, tree : TSTree) -> UInt32 = "moonbit_ts_node_named_child_count"
 
 ///|
 /// Get the node's number of *named* children.
 ///
 /// See also `Node::is_named`.
-pub fn Node::named_child_count(self : Node) -> Int {
+pub fn Node::named_child_count(self : Node) -> Int32 {
   uint_to_int(ts_node_named_child_count(self.node, self.tree))
 }
 
@@ -418,7 +418,7 @@ pub fn Node::named_children(self : Node) -> Iter[Node] {
     } else {
       let child = ts_node_named_child(self.node, self.tree, i)
       i += 1
-      Some({ ..self, node: child })
+      Some({ ..self, node: child, })
     }
   })
 }
@@ -440,7 +440,7 @@ pub fn Node::child_by_field_name(self : Node, name : StringView) -> Node? {
   if ts_node_is_null(child, self.tree) {
     None
   } else {
-    Some({ ..self, node: child })
+    Some({ ..self, node: child, })
   }
 }
 
@@ -462,7 +462,7 @@ pub fn Node::child_by_field_id(self : Node, id : FieldId) -> Node? {
   if ts_node_is_null(child, self.tree) {
     None
   } else {
-    Some({ ..self, node: child })
+    Some({ ..self, node: child, })
   }
 }
 
@@ -477,7 +477,7 @@ pub fn Node::next_sibling(self : Node) -> Node? {
   if ts_node_is_null(next_sibling, self.tree) {
     None
   } else {
-    Some({ ..self, node: next_sibling })
+    Some({ ..self, node: next_sibling, })
   }
 }
 
@@ -492,7 +492,7 @@ pub fn Node::prev_sibling(self : Node) -> Node? {
   if ts_node_is_null(prev_sibling, self.tree) {
     None
   } else {
-    Some({ ..self, node: prev_sibling })
+    Some({ ..self, node: prev_sibling, })
   }
 }
 
@@ -510,7 +510,7 @@ pub fn Node::next_named_sibling(self : Node) -> Node? {
   if ts_node_is_null(next_named_sibling, self.tree) {
     None
   } else {
-    Some({ ..self, node: next_named_sibling })
+    Some({ ..self, node: next_named_sibling, })
   }
 }
 
@@ -528,7 +528,7 @@ pub fn Node::prev_named_sibling(self : Node) -> Node? {
   if ts_node_is_null(prev_named_sibling, self.tree) {
     None
   } else {
-    Some({ ..self, node: prev_named_sibling })
+    Some({ ..self, node: prev_named_sibling, })
   }
 }
 
@@ -537,18 +537,18 @@ pub fn Node::prev_named_sibling(self : Node) -> Node? {
 extern "c" fn ts_node_first_child_for_byte(
   node : TSNode,
   tree : TSTree,
-  byte : UInt,
+  byte : UInt32,
 ) -> TSNode = "moonbit_ts_node_first_child_for_byte"
 
 ///|
 /// Get the node's first child that contains or starts after the given byte offset.
-pub fn Node::first_child_for_byte(self : Node, byte : Int) -> Node? {
+pub fn Node::first_child_for_byte(self : Node, byte : Int32) -> Node? {
   let byte = int_to_uint(byte)
   let child = ts_node_first_child_for_byte(self.node, self.tree, byte)
   if ts_node_is_null(child, self.tree) {
     None
   } else {
-    Some({ ..self, node: child })
+    Some({ ..self, node: child, })
   }
 }
 
@@ -557,28 +557,28 @@ pub fn Node::first_child_for_byte(self : Node, byte : Int) -> Node? {
 extern "c" fn ts_node_first_named_child_for_byte(
   node : TSNode,
   tree : TSTree,
-  byte : UInt,
+  byte : UInt32,
 ) -> TSNode = "moonbit_ts_node_first_named_child_for_byte"
 
 ///|
 /// Get the node's first named child that contains or starts after the given byte offset.
-pub fn Node::first_named_child_for_byte(self : Node, byte : Int) -> Node? {
+pub fn Node::first_named_child_for_byte(self : Node, byte : Int32) -> Node? {
   let byte = int_to_uint(byte)
   let child = ts_node_first_named_child_for_byte(self.node, self.tree, byte)
   if ts_node_is_null(child, self.tree) {
     None
   } else {
-    Some({ ..self, node: child })
+    Some({ ..self, node: child, })
   }
 }
 
 ///|
 #borrow(node, tree)
-extern "c" fn ts_node_descendant_count(node : TSNode, tree : TSTree) -> Int = "moonbit_ts_node_descendant_count"
+extern "c" fn ts_node_descendant_count(node : TSNode, tree : TSTree) -> Int32 = "moonbit_ts_node_descendant_count"
 
 ///|
 /// Get the node's number of descendants, including one for the node itself.
-pub fn Node::descendant_count(self : Node) -> Int {
+pub fn Node::descendant_count(self : Node) -> Int32 {
   return ts_node_descendant_count(self.node, self.tree)
 }
 
@@ -587,16 +587,16 @@ pub fn Node::descendant_count(self : Node) -> Int {
 extern "c" fn ts_node_descendant_for_byte_range(
   node : TSNode,
   tree : TSTree,
-  start_byte : UInt,
-  end_byte : UInt,
+  start_byte : UInt32,
+  end_byte : UInt32,
 ) -> TSNode = "moonbit_ts_node_descendant_for_byte_range"
 
 ///|
 /// Get the smallest node within this node that spans the given range of bytes.
 pub fn Node::descendant_for_byte_range(
   self : Node,
-  start_byte : Int,
-  end_byte : Int,
+  start_byte : Int32,
+  end_byte : Int32,
 ) -> Node? {
   let start_byte = int_to_uint(start_byte)
   let end_byte = int_to_uint(end_byte)
@@ -609,7 +609,7 @@ pub fn Node::descendant_for_byte_range(
   if ts_node_is_null(descendant, self.tree) {
     None
   } else {
-    Some({ ..self, node: descendant })
+    Some({ ..self, node: descendant, })
   }
 }
 
@@ -639,7 +639,7 @@ pub fn Node::descendant_for_point_range(
   if ts_node_is_null(descendant, self.tree) {
     None
   } else {
-    Some({ ..self, node: descendant })
+    Some({ ..self, node: descendant, })
   }
 }
 
@@ -648,8 +648,8 @@ pub fn Node::descendant_for_point_range(
 extern "c" fn ts_node_named_descendant_for_byte_range(
   node : TSNode,
   tree : TSTree,
-  start_byte : UInt,
-  end_byte : UInt,
+  start_byte : UInt32,
+  end_byte : UInt32,
 ) -> TSNode = "moonbit_ts_node_named_descendant_for_byte_range"
 
 ///|
@@ -657,8 +657,8 @@ extern "c" fn ts_node_named_descendant_for_byte_range(
 /// bytes.
 pub fn Node::named_descendant_for_byte_range(
   self : Node,
-  start_byte : Int,
-  end_byte : Int,
+  start_byte : Int32,
+  end_byte : Int32,
 ) -> Node? {
   let start_byte = int_to_uint(start_byte)
   let end_byte = int_to_uint(end_byte)
@@ -671,7 +671,7 @@ pub fn Node::named_descendant_for_byte_range(
   if ts_node_is_null(descendant, self.tree) {
     None
   } else {
-    Some({ ..self, node: descendant })
+    Some({ ..self, node: descendant, })
   }
 }
 
@@ -701,7 +701,7 @@ pub fn Node::named_descendant_for_point_range(
   if ts_node_is_null(descendant, self.tree) {
     None
   } else {
-    Some({ ..self, node: descendant })
+    Some({ ..self, node: descendant, })
   }
 }
 
@@ -737,18 +737,18 @@ pub fn Node::eq(self : Node, other : Node) -> Bool {
 }
 
 ///|
-pub impl Eq for Node with equal(self, other) -> Bool {
+pub impl Eq for Node with fn equal(self, other) -> Bool {
   ts_node_eq(self.node, self.tree, other.node, other.tree)
 }
 
 ///|
-pub impl ToJson for Node with to_json(self : Node) -> Json {
+pub impl ToJson for Node with fn to_json(self : Node) -> Json {
   {
-    "node": self.string().to_json(),
-    "text": self.text().to_json(),
+    "node": @json.to_json(self.string()),
+    "text": @json.to_json(self.text()),
     "range": {
-      "start": self.start_point().to_json(),
-      "end": self.end_point().to_json(),
+      "start": @json.to_json(self.start_point()),
+      "end": @json.to_json(self.end_point()),
     },
   }
 }
@@ -758,7 +758,7 @@ pub impl ToJson for Node with to_json(self : Node) -> Json {
 extern "c" fn Node::id_as_uint64(self : TSNode, tree : TSTree) -> UInt64 = "moonbit_ts_node_id_as_uint64"
 
 ///|
-pub impl Hash for Node with hash_combine(self, hasher) {
+pub impl Hash for Node with fn hash_combine(self, hasher) {
   let id = Node::id_as_uint64(self.node, self.tree)
   hasher.combine(id)
 }
@@ -783,7 +783,7 @@ pub fn Node::query(
 pub fn Node::text(self : Node) -> StringView {
   let start = self.start_byte()
   let end = self.end_byte()
-  let text = self.text.view(start_offset=start, end_offset=end)
+  let text = self.text.clamped_view(start~, end~)
   return text
 }
 
@@ -826,4 +826,9 @@ pub fn Node::next_symbols(self : Node) -> Iter[Symbol] {
 pub fn Node::next_symbol_names(self : Node) -> Iter[String] {
   let language = self.language()
   self.next_symbols().filter_map(fn(symbol) { language.symbol_name(symbol) })
+}
+
+///|
+pub impl Debug for Node with fn to_repr(self) {
+  Repr::literal(Show::to_string(self))
 }

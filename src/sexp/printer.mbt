@@ -2,67 +2,73 @@
 pub fn print_to(
   list : ArrayView[Sexp],
   logger : &Logger,
-  indent? : Int = 0,
+  indent~ : Int32 = 0,
 ) -> Unit {
-  loop list {
-    [] => ()
-    [Atom(Comment(_)) as sexp] => {
-      sexp.print_to(logger, indent~)
-      logger.write_char('\n')
-      for _ in 0..<(indent - 1) {
-        logger.write_char(' ')
+  for loop_state = list {
+    break match loop_state {
+      [] => ()
+      [Atom(Comment(_)) as sexp] => {
+        sexp.print_to(logger, indent~)
+        logger.write_char('\n')
+        for _ in 0..<(indent - 1) {
+          logger.write_char(' ')
+        }
       }
-    }
-    [sexp] => sexp.print_to(logger, indent~)
-    [Atom(Field(name)) as field, value, Atom(Capture(_)) as capture, .. list] => {
-      field.print_to(logger)
-      logger.write_char(' ')
-      value.print_to(logger, indent=indent + name.length() + 2)
-      logger.write_char(' ')
-      capture.print_to(logger)
-      continue list
-    }
-    [Atom(Field(name)) as field, value] => {
-      field.print_to(logger)
-      logger.write_char(' ')
-      value.print_to(logger, indent=indent + name.length() + 2)
-    }
-    [Atom(Field(name)) as field, value, .. list] => {
-      field.print_to(logger)
-      logger.write_char(' ')
-      value.print_to(logger, indent=indent + name.length() + 2)
-      logger.write_char('\n')
-      for _ in 0..<indent {
+      [sexp] => sexp.print_to(logger, indent~)
+      [Atom(Field(name)) as field, value, Atom(Capture(_)) as capture, .. list] => {
+        field.print_to(logger)
         logger.write_char(' ')
-      }
-      continue list
-    }
-    [sexp, Atom(Capture(_)) as capture, .. list] => {
-      sexp.print_to(logger, indent~)
-      logger.write_char(' ')
-      capture.print_to(logger)
-      continue list
-    }
-    [sexp, .. list] => {
-      sexp.print_to(logger, indent~)
-      logger.write_char('\n')
-      for _ in 0..<indent {
+        value.print_to(logger, indent=indent + name.length() + 2)
         logger.write_char(' ')
+        capture.print_to(logger)
+        continue list
       }
-      continue list
+      [Atom(Field(name)) as field, value] => {
+        field.print_to(logger)
+        logger.write_char(' ')
+        value.print_to(logger, indent=indent + name.length() + 2)
+      }
+      [Atom(Field(name)) as field, value, .. list] => {
+        field.print_to(logger)
+        logger.write_char(' ')
+        value.print_to(logger, indent=indent + name.length() + 2)
+        logger.write_char('\n')
+        for _ in 0..<indent {
+          logger.write_char(' ')
+        }
+        continue list
+      }
+      [sexp, Atom(Capture(_)) as capture, .. list] => {
+        sexp.print_to(logger, indent~)
+        logger.write_char(' ')
+        capture.print_to(logger)
+        continue list
+      }
+      [sexp, .. list] => {
+        sexp.print_to(logger, indent~)
+        logger.write_char('\n')
+        for _ in 0..<indent {
+          logger.write_char(' ')
+        }
+        continue list
+      }
     }
   }
 }
 
 ///|
 pub fn print(list : Array[Sexp]) -> String {
-  let buffer = StringBuilder::new()
+  let buffer = StringBuilder()
   print_to(list, buffer)
   return buffer.to_string()
 }
 
 ///|
-pub fn Sexp::print_to(self : Sexp, logger : &Logger, indent? : Int = 0) -> Unit {
+pub fn Sexp::print_to(
+  self : Sexp,
+  logger : &Logger,
+  indent~ : Int32 = 0,
+) -> Unit {
   match self {
     Atom(atom) => logger.write_object(atom)
     List(list, delimiter~, quantifier~) => {
@@ -82,7 +88,7 @@ test "print" {
     Atom(Field("c")),
     Sexp::list([Atom(Symbol("d")), Atom(String("e"))]),
   ])
-  let buffer = StringBuilder::new()
+  let buffer = StringBuilder()
   sexp.print_to(buffer)
   inspect(
     buffer,

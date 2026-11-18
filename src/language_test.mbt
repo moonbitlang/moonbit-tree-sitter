@@ -1,7 +1,7 @@
 ///|
 test "language" {
   let language : @tree_sitter.Language = @tree_sitter_moonbit.language()
-  inspect(
+  debug_inspect(
     language.name(),
     content=(
       #|Some("moonbit")

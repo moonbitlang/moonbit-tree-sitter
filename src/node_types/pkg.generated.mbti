@@ -1,0 +1,47 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "tonyfettes/tree_sitter/node_types"
+
+import {
+  "moonbitlang/core/debug",
+  "moonbitlang/core/json",
+}
+
+// Values
+
+// Errors
+
+// Types and methods
+#derive(@debug.Debug, @json.ToJson)
+pub struct ChildType {
+  multiple : Bool
+  required : Bool
+  types : Array[NodeType]
+}
+pub impl Show for ChildType
+
+#derive(@debug.Debug)
+pub struct NodeType {
+  type_ : String
+  named : Bool
+  payload : NodeTypePayload
+}
+pub impl Show for NodeType
+pub impl @json.FromJson for NodeType
+pub impl @json.ToJson for NodeType
+
+#derive(@debug.Debug)
+pub enum NodeTypePayload {
+  Empty
+  Supertype(subtypes~ : Array[NodeType])
+  Normal(fields~ : Map[String, ChildType], children~ : ChildType)
+}
+pub impl Show for NodeTypePayload
+
+#derive(@debug.Debug, @json.FromJson, @json.ToJson)
+pub struct NodeTypes(Array[NodeType])
+pub fn NodeTypes::from_json(@json.Json) -> Self raise @json.JsonDecodeError
+pub impl Show for NodeTypes
+
+// Type aliases
+
+// Traits

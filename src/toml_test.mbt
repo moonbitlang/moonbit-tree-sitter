@@ -38,9 +38,12 @@ test "toml/query" {
 ///|
 test "toml/language" {
   let language : @tree_sitter.Language = @tree_sitter_toml.language()
-  inspect(language.name(), content=(
-    #|Some("toml")
-  ))
+  debug_inspect(
+    language.name(),
+    content=(
+      #|Some("toml")
+    ),
+  )
   assert_true(language.abi_version() > 0)
   assert_true(language.symbol_count() > 0)
 }
