@@ -92,9 +92,8 @@ def configure(project: Project):
     project.copy(Path("lib") / "src" / "lib.c")
 
 
-def main():
+def prepare(target: Path):
     source = Path("src") / "tree-sitter"
-    target = Path("src")
     target.mkdir(parents=True, exist_ok=True)
     include = [source / "lib" / "include", source / "lib" / "src"]
     project = Project(source, target, include=include, prefix="tree-sitter")
@@ -102,4 +101,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    prepare(Path("src"))

@@ -130,5 +130,15 @@ then the language bindings and main binding:
 python3 scripts/publish.py language languages main
 ```
 
-The main package's publishing step removes grammar dependencies and test imports.
-Consumers only depend on the shared language type and `tonyfettes/c`.
+Initialize the tree-sitter submodule before publishing. The script stages the
+main module in a temporary directory outside the checkout and generates the C
+sources there. It removes test grammar dependencies, test imports, and the
+development pre-build hook from the staged manifests. Consumers only depend on
+the shared language type and `tonyfettes/c`.
+
+With the shared language type already available on Mooncakes, validate the
+staged main package without releasing it:
+
+```bash
+python3 scripts/publish.py --dry-run main
+```
